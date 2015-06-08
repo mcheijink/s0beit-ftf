@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "m0d-s0beit-v-mchedit", "m0d-s0beit-v\m0d-s0beit-v.vcxproj", "{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+		w7|Win32 = w7|Win32
+		w7|x64 = w7|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}.Debug|Win32.ActiveCfg = Debug|x64
+		{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}.Debug|Win32.Build.0 = Debug|x64
+		{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}.Debug|x64.ActiveCfg = Debug|x64
+		{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}.Debug|x64.Build.0 = Debug|x64
+		{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}.Release|Win32.ActiveCfg = Release|x64
+		{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}.Release|Win32.Build.0 = Release|x64
+		{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}.Release|x64.ActiveCfg = Release|x64
+		{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}.Release|x64.Build.0 = Release|x64
+		{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}.w7|Win32.ActiveCfg = Debug|x64
+		{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}.w7|Win32.Build.0 = Debug|x64
+		{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}.w7|x64.ActiveCfg = w7|x64
+		{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}.w7|x64.Build.0 = w7|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
