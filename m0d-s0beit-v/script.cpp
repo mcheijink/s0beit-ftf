@@ -137,10 +137,10 @@ void BoostBaseCarStats(Vehicle vehicle)
 	BOOL IsRCtrlUp = !(GetAsyncKeyState(VK_RCONTROL) & 0x8000);
 	//ENTITY::SET_ENTITY_INVINCIBLE(vehicle, IsRCtrlUp); //That should do the trick.
 	ENTITY::SET_ENTITY_PROOFS(vehicle, IsRCtrlUp, IsRCtrlUp, IsRCtrlUp, IsRCtrlUp, IsRCtrlUp, IsRCtrlUp, IsRCtrlUp, IsRCtrlUp);
-	VEHICLE::SET_VEHICLE_STRONG(vehicle, TRUE); //2stronk
-	VEHICLE::SET_VEHICLE_HAS_STRONG_AXLES(vehicle, TRUE); //6stronk9meme
+	//VEHICLE::SET_VEHICLE_STRONG(vehicle, TRUE); //2stronk
+	//VEHICLE::SET_VEHICLE_HAS_STRONG_AXLES(vehicle, TRUE); //6stronk9meme
 	VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE); //What seems to be the officer, problem? *le9gagmemeface*
-	//VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(vehicle, FALSE); //Bulletproof Tires.
+	VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(vehicle, FALSE); //Bulletproof Tires.
 	//VEHICLE::SET_VEHICLE_CAN_BE_VISIBLY_DAMAGED(vehicle, FALSE); //I don't think this really works, but fuck it. Call it anyway.
 	//VEHICLE::SET_VEHICLE_CAN_BREAK(vehicle, FALSE); //Hopefully this fixes the car blowing up after getting hit by a train...
 	//VEHICLE::SET_VEHICLE_ENGINE_CAN_DEGRADE(vehicle, FALSE);
@@ -149,7 +149,7 @@ void BoostBaseCarStats(Vehicle vehicle)
 	VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_TRANSMISSION, MOD_INDEX_THREE, FALSE); //Not when I shift in to MAXIMUM OVERMEME!
 	VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_SUSPENSION, MOD_INDEX_FOUR, FALSE); //How low can you go?
 	VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_ARMOR, MOD_INDEX_FIVE, FALSE); //100% armor.
-	VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(vehicle, "GUT_HAKT"); // Custom plate
+	//VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(vehicle, "GUT_HAKT"); // Custom plate
 	VEHICLE::TOGGLE_VEHICLE_MOD(vehicle, MOD_TURBO, TRUE); //Forced induction huehuehue
 	VEHICLE::_SET_VEHICLE_HEALTH(vehicle, 1000.0f); //This is what the game does
 }
@@ -464,651 +464,666 @@ eThreadState new_Run(GtaThread* This) {
 	//if (isKeyPressedOnce(F12, VK_F12)){ bQuit = true;}
 	//if (bQuit) { return gGtaThreadOriginal.Run(This); }
 
-	if (ENTITY::DOES_ENTITY_EXIST(playerPed) == TRUE)
+	//godmode function
+	static bool bHackActive, bF7Pressed = false;
+	if (isKeyPressedOnce(bF7Pressed, VK_F7))
 	{
-		Hash currentWeapon;
-		Vehicle playerVeh = NULL;
+		bHackActive = !bHackActive;
+	}
+	if (!bHackActive)
+	{
+		draw_menu_line("Hack inactive", 150.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false, false);
+	}
+	else {
+		draw_menu_line("Hack active", 150.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false, false);
 
-		if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, FALSE))
-			playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
-
-		//Test that drawing works.
-		draw_menu_line("s0biet by gir489 - mch8-6-2015 ", 15.0f, 50.0f, 0.0f, 550.0f, 5.0f, false, false, false);
-
-		
-		//godmode function
-		static bool bGodmodeActive, bF8Pressed = false;
-		if (isKeyPressedOnce(bF8Pressed, VK_F8))
+		if (ENTITY::DOES_ENTITY_EXIST(playerPed) == TRUE)
 		{
-			bGodmodeActive = !bGodmodeActive;
-		}
-		if (bGodmodeActive)
-		{
-			draw_menu_line("Godmode Active", 150.0f, 4.0f, 0.0f, 0.0f, 0.0f, false, false, false, false);
-			//Godmode
-			if (!PLAYER::GET_PLAYER_INVINCIBLE(player))
-			{
-				DEBUGOUT("Setting godmode");
-				PLAYER::SET_PLAYER_INVINCIBLE(player, true);
-				ENTITY::SET_ENTITY_PROOFS(playerPed, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-				//	PED::SET_PED_CAN_RAGDOLL(playerPed, FALSE);
-				//	PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, FALSE);
-			}
+			Hash currentWeapon;
+			Vehicle playerVeh = NULL;
 
-			//Max armor.
-			PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
-		}
-		else {
-			if (PLAYER::GET_PLAYER_INVINCIBLE(player))
-			{
-				DEBUGOUT("Deactivating godmode");
-				PLAYER::SET_PLAYER_INVINCIBLE(player, false);
-				ENTITY::SET_ENTITY_PROOFS(playerPed, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
-				//	PED::SET_PED_CAN_RAGDOLL(playerPed, FALSE);
-				//	PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, FALSE);
-			}
-		}
+			if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, FALSE))
+				playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
+
+			//Test that drawing works.
+			draw_menu_line("s0biet by gir489 - mch8-6-2015 ", 15.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false);
 
 
-		static bool bMenuActive, bF3Pressed = false;
-		static int iFreeze = -1;
-		if (isKeyPressedOnce(bF3Pressed, VK_F3))
-		{
-			iFreeze = -1;
-			bMenuActive = !bMenuActive;
-		}
-		bool bReset = false;
-		if (bMenuActive)
-		{
-			static int iSelectedPlayer = 0;
-			static bool bPgUpPressed, bPgDwnPressed = false;
-			if (isKeyPressedOnce(bPgUpPressed, VK_PRIOR))
+			//godmode function
+			static bool bGodmodeActive, bF8Pressed = false;
+			if (isKeyPressedOnce(bF8Pressed, VK_F8))
 			{
-				iSelectedPlayer--;
-				CheckPlayer(iSelectedPlayer, false);
+				bGodmodeActive = !bGodmodeActive;
 			}
-			if (isKeyPressedOnce(bPgDwnPressed, VK_NEXT))
+			if (bGodmodeActive)
 			{
-				iSelectedPlayer++;
-				CheckPlayer(iSelectedPlayer, true);
-			}
-			CheckPlayer(iSelectedPlayer, !bPgUpPressed);
-			int iLineNum = 0;
-			Ped selectedPed = NULL;
-			for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
-			{
-				bool bSelectedPed = (playerIterator == iSelectedPlayer);
-				if (bSelectedPed)
-					selectedPed = PLAYER::GET_PLAYER_PED(playerIterator);
-				Ped pedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
-				if (ENTITY::DOES_ENTITY_EXIST(pedIterator))
+				draw_menu_line("Godmode active", 150.0f, 4.0f, 13.0f, 0.0f, 5.0f, false, false, false, false);
+				//Godmode
+				if (!PLAYER::GET_PLAYER_INVINCIBLE(player))
 				{
-					char chStringToDraw[50];
-					strcpy_s(chStringToDraw, PLAYER::GET_PLAYER_NAME(playerIterator));
-					if (bSelectedPed)
-						sprintf_s(chStringToDraw, "%s F:%i", chStringToDraw, iFreeze == selectedPed);
-					draw_menu_line(chStringToDraw, 150.0f, 4.0f, 25.0f + iLineNum * 13.0f, 350.0f, 0.0f, false, false, bSelectedPed, false);
-					iLineNum++;
+					DEBUGOUT("Setting godmode");
+					PLAYER::SET_PLAYER_INVINCIBLE(player, true);
+					ENTITY::SET_ENTITY_PROOFS(playerPed, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+					PED::SET_PED_CAN_RAGDOLL(playerPed, FALSE);
+					PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, FALSE);
+				}
+
+				//Max armor.
+				PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
+			}
+			else {
+				if (PLAYER::GET_PLAYER_INVINCIBLE(player))
+				{
+					draw_menu_line("Godmode inactive", 150.0f, 4.0f, 13.0f, 0.0f, 5.0f, false, false, false, false);
+					DEBUGOUT("Deactivating godmode");
+					PLAYER::SET_PLAYER_INVINCIBLE(player, false);
+					ENTITY::SET_ENTITY_PROOFS(playerPed, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
+					PED::SET_PED_CAN_RAGDOLL(playerPed, TRUE);
+					PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, TRUE);
 				}
 			}
 
-			static bool bDividePressed = false;
-			if (isKeyPressedOnce(bDividePressed, VK_DIVIDE))
-			{
-				GiveAllWeaponsToPed(selectedPed, WEAPONTINT_LSPD, selectedPed == playerPed);
-			}
 
-			static bool bDecimalPressed = false;
-			if (isKeyPressedOnce(bDecimalPressed, VK_DECIMAL) && selectedPed != playerPed)
+			static bool bMenuActive, bF3Pressed = false;
+			static int iFreeze = -1;
+			if (isKeyPressedOnce(bF3Pressed, VK_F3))
 			{
-				if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
+				iFreeze = -1;
+				bMenuActive = !bMenuActive;
+			}
+			bool bReset = false;
+			if (bMenuActive)
+			{
+				static int iSelectedPlayer = 0;
+				static bool bPgUpPressed, bPgDwnPressed = false;
+				if (isKeyPressedOnce(bPgUpPressed, VK_PRIOR))
 				{
-					Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
-					for (int i = SEAT_BACKPASSENGER; i >= SEAT_DRIVER; i--)
+					iSelectedPlayer--;
+					CheckPlayer(iSelectedPlayer, false);
+				}
+				if (isKeyPressedOnce(bPgDwnPressed, VK_NEXT))
+				{
+					iSelectedPlayer++;
+					CheckPlayer(iSelectedPlayer, true);
+				}
+				CheckPlayer(iSelectedPlayer, !bPgUpPressed);
+				int iLineNum = 0;
+				Ped selectedPed = NULL;
+				for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
+				{
+					bool bSelectedPed = (playerIterator == iSelectedPlayer);
+					if (bSelectedPed)
+						selectedPed = PLAYER::GET_PLAYER_PED(playerIterator);
+					Ped pedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
+					if (ENTITY::DOES_ENTITY_EXIST(pedIterator))
 					{
-						PED::SET_PED_INTO_VEHICLE(playerPed, selectedVehicle, i);
+						char chStringToDraw[50];
+						strcpy_s(chStringToDraw, PLAYER::GET_PLAYER_NAME(playerIterator));
+						if (bSelectedPed)
+							sprintf_s(chStringToDraw, "%s F:%i", chStringToDraw, iFreeze == selectedPed);
+						draw_menu_line(chStringToDraw, 150.0f, 4.0f, 25.0f + iLineNum * 13.0f, 350.0f, 0.0f, false, false, bSelectedPed, false);
+						iLineNum++;
 					}
 				}
-				Entity attachedEnt = ENTITY::GET_ENTITY_ATTACHED_TO(selectedPed);
+
+				static bool bDividePressed = false;
+				if (isKeyPressedOnce(bDividePressed, VK_DIVIDE))
+				{
+					GiveAllWeaponsToPed(selectedPed, WEAPONTINT_LSPD, selectedPed == playerPed);
+				}
+
+				static bool bDecimalPressed = false;
+				if (isKeyPressedOnce(bDecimalPressed, VK_DECIMAL) && selectedPed != playerPed)
+				{
+					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
+					{
+						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
+						for (int i = SEAT_BACKPASSENGER; i >= SEAT_DRIVER; i--)
+						{
+							PED::SET_PED_INTO_VEHICLE(playerPed, selectedVehicle, i);
+						}
+					}
+					Entity attachedEnt = ENTITY::GET_ENTITY_ATTACHED_TO(selectedPed);
+					if (ENTITY::DOES_ENTITY_EXIST(attachedEnt))
+					{
+						if (ENTITY::IS_ENTITY_A_VEHICLE(attachedEnt) == FALSE)
+							ENTITY::DELETE_ENTITY(&attachedEnt);
+					}
+				}
+
+				//Teleport to selected player on the menu.
+				static bool bNumpad0Pressed = false;
+				if (isKeyPressedOnce(bNumpad0Pressed, VK_NUMPAD0) && selectedPed != playerPed)
+				{
+					Entity e = playerPed;
+					if (playerVeh != NULL)
+						e = playerVeh;
+
+					Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
+					ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, playerPosition.x, playerPosition.y, playerPosition.z + 1, FALSE, FALSE, TRUE);
+				}
+
+				//https://www.youtube.com/watch?v=ON-7v4qnHP8
+				if (GetAsyncKeyState(VK_SUBTRACT) & 0x8000)
+				{
+					try
+					{
+						static bool bLoadsAMoney = false;
+						bLoadsAMoney = !bLoadsAMoney;
+						if (bLoadsAMoney)
+						{
+							STREAMING::REQUEST_MODEL(0x113FD533); //Manchester United: Nil Loadsamoney United: LOADS
+							if (STREAMING::HAS_MODEL_LOADED(0x113FD533)) //Good evening and welcome to: Loads of Money.
+							{
+								Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE); //Dereck B? On your bike!
+								static Hash PICKUP_MONEY_CASE = GAMEPLAY::GET_HASH_KEY("PICKUP_MONEY_CASE"); //Right. Let's do up the house.
+								int MONEY_DROP_AMOUNT = rand() % 39000 + 25000; // lets make it more random so r* wont recognize a pattern mch
+								OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, playerPosition.x + 3.0f, playerPosition.y, playerPosition.z + 0.5f, 0, MONEY_DROP_AMOUNT, 0x113FD533, FALSE, TRUE); //WHOP YOUR WAD ON THE COUNTA
+								STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(0x113FD533); //SHUT YOUR MOUTH!
+							}
+						}
+					}
+					catch (...){ Log::Error("Got too much money."); }
+				}
+
+				static bool bNumpad2Pressed = false;
+				if (isKeyPressedOnce(bNumpad2Pressed, VK_NUMPAD2))
+				{
+					Vehicle clonedVeh = ClonePedCar(selectedPed, playerPed);
+					BoostBaseCarStats(clonedVeh); //Gotta go fast
+				}
+
+				if (IsPlayerFriend(iSelectedPlayer) == FALSE)
+				{
+					if (GetAsyncKeyState(VK_NUMPAD1) & 0x8000)
+					{
+						if (GetAsyncKeyState(VK_RCONTROL) & 0x8000)
+						{
+							Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
+							if (selectedPed != playerPed)
+							{
+								AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
+								FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f);
+							}
+							else
+							{
+								FIRE::ADD_EXPLOSION(playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f);
+							}
+						}
+						else
+						{
+							static int iCounter = 0;
+							for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
+							{
+								try
+								{
+									Ped playerPedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
+									if (ENTITY::DOES_ENTITY_EXIST(playerPedIterator) && playerPedIterator != playerPed) //If the iteration exists, and they're alive, and they're not me.
+									{
+										if (IsPlayerFriend(playerIterator) == FALSE && selectedPed != playerPedIterator)
+										{
+											if (iCounter == 5)
+											{
+												try
+												{
+													AI::CLEAR_PED_TASKS_IMMEDIATELY(playerPedIterator); //If they're in a jet, or something. Toss them out.
+													Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPedIterator, FALSE);
+													static bool bExplode = false;
+													bExplode = !bExplode;
+													if (bExplode)
+														FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f); //We can blame anyone for the explosion. Whoever is selected in the menu will be blamed.
+													else
+														FIRE::START_SCRIPT_FIRE(playerPosition.x, playerPosition.y, playerPosition.z, 5, TRUE); //For LEXD Godmode kids who don't set entity proofs properly.
+												}
+												catch (...) { break; Log::Error("Crashed"); iCounter = -10; } //IDK why, but if you call these functions too many times per tick, it causes a crash. We can just toss the exception. Hopefully this fixes the crash...
+											}
+										}
+									}
+								}
+								catch (...) { break; Log::Error("Crashed"); iCounter = -10; } //IDK why, but if you call these functions too many times per tick, it causes a crash. We can just toss the exception. Hopefully this fixes the crash...
+							}
+							iCounter++;
+							if (iCounter > 5)
+								iCounter = 0;
+						}
+					}
+
+					static bool bNumpad3Pressed = false;
+					if (isKeyPressedOnce(bNumpad3Pressed, VK_NUMPAD3))
+					{
+						if (iFreeze == selectedPed)
+							iFreeze = -1;
+						else
+							iFreeze = selectedPed;
+					}
+					if (iFreeze != -1 && (selectedPed != playerPed))
+					{
+						if (iFreeze == selectedPed)
+						{
+							WEAPON::REMOVE_ALL_PED_WEAPONS(selectedPed, TRUE);
+							AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
+						}
+					}
+				}
+			}
+			else
+			{
+				//Test IsPlayerFriend and give a sample player iteration
+				if (GetAsyncKeyState(VK_NUMPAD1) & 0x8000)
+				{
+					static int iCounter = 0;
+					for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
+					{
+						Ped playerPedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
+						if (ENTITY::DOES_ENTITY_EXIST(playerPedIterator) && playerPedIterator != playerPed) //If the iteration exists, and they're alive, and they're not me.
+						{
+							if (IsPlayerFriend(playerIterator) == FALSE)
+							{
+								if (iCounter == 5)
+								{
+									try
+									{
+										AI::CLEAR_PED_TASKS_IMMEDIATELY(playerPedIterator);
+										WEAPON::REMOVE_ALL_PED_WEAPONS(playerPedIterator, TRUE); //Why does this work? C'mon, Rockstar...
+										Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPedIterator, FALSE);
+										static bool bExplode = false;
+										bExplode = !bExplode;
+										if (bExplode)
+											FIRE::ADD_OWNED_EXPLOSION(playerPedIterator, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f);
+										else
+											FIRE::START_SCRIPT_FIRE(playerPosition.x, playerPosition.y, playerPosition.z, 5, TRUE); //For LEXD Godmode kids who don't set entity proofs properly.
+									}
+									catch (...) { break; Log::Error("Crashed"); iCounter = -10; } //IDK why, but if you call these functions too many times per tick, it causes a crash. We can just toss the exception. Hopefully this fixes the crash...
+								}
+							}
+						}
+					}
+					iCounter++;
+					if (iCounter > 5)
+						iCounter = 0;
+				}
+
+				//Spawn a test car.
+				static bool bNumpad2Pressed, bWaitingForModelCar = false;
+				if ((isKeyPressedOnce(bNumpad2Pressed, VK_NUMPAD2) || bWaitingForModelCar == true) && playerVeh == NULL)
+				{
+					Hash vehicleModelHash = VEHICLE_KURUMA2;
+					if (GetAsyncKeyState(VK_RCONTROL) & 0x8000)
+						vehicleModelHash = VEHICLE_BTYPE;
+					if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+						vehicleModelHash = VEHICLE_ZENTORNO;
+					if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+						vehicleModelHash = VEHICLE_INSURGENT;
+					STREAMING::REQUEST_MODEL(vehicleModelHash);
+					if (STREAMING::HAS_MODEL_LOADED(vehicleModelHash) == TRUE)
+					{
+						Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPed, FALSE);
+						playerVeh = VEHICLE::CREATE_VEHICLE(vehicleModelHash, playerPosition.x, playerPosition.y, playerPosition.z, ENTITY::GET_ENTITY_HEADING(playerPed), TRUE, TRUE);
+						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(playerVeh);
+						PED::SET_PED_INTO_VEHICLE(playerPed, playerVeh, SEAT_DRIVER);
+						BoostBaseCarStats(playerVeh);
+						if (vehicleModelHash == VEHICLE_KURUMA2) //Test that I can make a perfect 1:1 clone of my Kuruma with only calling natives.
+						{
+							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SPOILER, MOD_INDEX_ONE, FALSE);
+							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTBUMPER, MOD_INDEX_TWO, FALSE);
+							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SIDESKIRT, MOD_INDEX_FIVE, FALSE);
+							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_EXHAUST, MOD_INDEX_ONE, FALSE);
+							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_SADTROMBONE, FALSE);
+							VEHICLE::SET_VEHICLE_WHEEL_TYPE(playerVeh, WHEEL_TYPE_HIGHEND);
+							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTWHEELS, WHEEL_HIGHEND_SUPAGEE, TRUE); //TRUE because we want the Custom Tires.
+							VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_XENONLIGHTS, TRUE);
+							VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(playerVeh, PLATE_YELLOWONBLACK);
+							VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_BLACK);
+							VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_BLACK);
+							//VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_TIRESMOKE, TRUE);
+							//VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVeh, TIRESMOKE_COLOR_BLACK);
+							VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_METALLIC_ULTRA_BLUE);
+							//for (int i = 0; i < NEON_BACK; i++) //This will turn on all the neon emitters except the back one. That shit's annoying when I'm trying to drive.
+							//{
+							//	VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, i, TRUE);
+							//}
+							//VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(playerVeh, NEON_COLOR_ELECTRICBLUE);
+						}
+						else if (vehicleModelHash == VEHICLE_ZENTORNO)
+						{
+							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_CHASSIS, MOD_INDEX_TWO, FALSE);
+							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SPOILER, MOD_INDEX_SEVEN, FALSE);
+							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTBUMPER, MOD_INDEX_TWO, FALSE);
+							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SIDESKIRT, MOD_INDEX_TWO, FALSE);
+							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_EXHAUST, MOD_INDEX_FOUR, FALSE);
+							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_SADTROMBONE, FALSE);
+							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HOOD, MOD_INDEX_TWO, FALSE);
+							VEHICLE::SET_VEHICLE_WHEEL_TYPE(playerVeh, WHEEL_TYPE_HIGHEND);
+							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTWHEELS, WHEEL_HIGHEND_SUPAGEE, TRUE);
+							VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_XENONLIGHTS, TRUE);
+							VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_BLACK);
+							VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(playerVeh, PLATE_YELLOWONBLUE);
+							VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_METALLIC_ULTRA_BLUE, COLOR_MATTE_WHITE);
+							VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_TIRESMOKE, TRUE);
+							VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVeh, TIRESMOKE_COLOR_BLACK);
+							VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_METALLIC_ULTRA_BLUE);
+							for (int i = 0; i < NEON_BACK; i++) //This will turn on all the neon emitters except the back one. That shit's annoying when I'm trying to drive.
+							{
+								VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, i, TRUE);
+							}
+							VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(playerVeh, NEON_COLOR_ELECTRICBLUE);
+						}
+						else if (vehicleModelHash == VEHICLE_INSURGENT)
+						{
+							VEHICLE::SET_VEHICLE_WHEEL_TYPE(playerVeh, WHEEL_TYPE_SPORT);
+							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTWHEELS, WHEEL_SPORT_DEEPFIVE, TRUE);
+							VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_FOREST_GREEN);
+							VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_TIRESMOKE, TRUE);
+							VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVeh, TIRESMOKE_COLOR_BLACK);
+							VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_MATTE_FOREST_GREEN);
+							VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_GREEN);
+							VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(playerVeh, "GETFUCKD");
+							VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(playerVeh, PLATE_YELLOWONBLACK);
+							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_TRUCK, FALSE);
+						}
+						STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(vehicleModelHash);
+						bWaitingForModelCar = false;
+					}
+					else
+					{
+						bWaitingForModelCar = true;
+					}
+				}
+
+				//Spawn a test aircraft.
+				static bool bNumpad3Pressed, bWaitingForModelAircraft = false;
+				if (isKeyPressedOnce(bNumpad3Pressed, VK_NUMPAD3))
+				{
+					if (bWaitingForModelAircraft || playerVeh == NULL)
+					{
+						Hash vehicleModelHash = (GetAsyncKeyState(VK_RCONTROL) & 0x8000) ? VEHICLE_BUZZARD : VEHICLE_VESTRA; //This was Vincentor's idea. See: https://www.youtube.com/watch?v=jAsgKuXaGb4
+						STREAMING::REQUEST_MODEL(vehicleModelHash);
+						if (STREAMING::HAS_MODEL_LOADED(vehicleModelHash) == TRUE)
+						{
+							Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPed, FALSE);
+							playerVeh = VEHICLE::CREATE_VEHICLE(vehicleModelHash, playerPosition.x, playerPosition.y, playerPosition.z + 800, ENTITY::GET_ENTITY_HEADING(playerPed), TRUE, TRUE);
+							PED::SET_PED_INTO_VEHICLE(playerPed, playerVeh, SEAT_DRIVER);
+							if (vehicleModelHash == VEHICLE_VESTRA)
+								VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_BLACK);
+							else
+							{
+								VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_BLACK);
+								VEHICLE::SET_HELI_BLADES_FULL_SPEED(playerVeh);
+							}
+							STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(vehicleModelHash);
+							bWaitingForModelAircraft = false;
+						}
+						else
+						{
+							bWaitingForModelAircraft = true;
+						}
+					}
+					if (playerVeh != NULL && (VEHICLE::IS_THIS_MODEL_A_PLANE(ENTITY::GET_ENTITY_MODEL(playerVeh)) == TRUE || VEHICLE::IS_THIS_MODEL_A_HELI(ENTITY::GET_ENTITY_MODEL(playerVeh)) ||
+						ENTITY::GET_ENTITY_MODEL(playerVeh) == VEHICLE_BLIMP || ENTITY::GET_ENTITY_MODEL(playerVeh) == VEHICLE_BLIMP2) == TRUE)
+					{
+						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(playerVeh);
+						Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerVeh, FALSE);
+						if (playerPosition.z < 350.0f)
+							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(playerVeh, playerPosition.x, playerPosition.y, playerPosition.z + 800, FALSE, FALSE, TRUE);
+						VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVeh, 0.0f);
+						ENTITY::SET_ENTITY_PROOFS(playerVeh, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+						VEHICLE::SET_VEHICLE_STRONG(playerVeh, TRUE);
+						VEHICLE::SET_VEHICLE_IS_STOLEN(playerVeh, FALSE);
+						VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVeh, FALSE);
+						VEHICLE::SET_VEHICLE_FORWARD_SPEED(playerVeh, 500);
+						VEHICLE::SET_VEHICLE_CAN_BE_VISIBLY_DAMAGED(playerVeh, FALSE);
+					}
+				}
+
+				//TP to mission objective.
+				static bool bNumpad7Pressed = false;
+				if (isKeyPressedOnce(bNumpad7Pressed, VK_NUMPAD7))
+				{
+					for (int i = 0; i <= 1000; i++)
+					{
+						Blip* blip = g_blipList->m_Blips[i].m_pBlip;
+						if (blip)
+						{
+							//if ( blip->dwColor != 0x3 && !(blip->bIcon == 150 && blip->dwColor == 1) ) //Cut out most of the random job blips.
+							DEBUGOUT("Blip%i ID: %i ID2: %i Icon: %i Color: 0x%X Message: %s", i, blip->iID, blip->iID2, blip->bIcon, blip->dwColor, blip->szMessage == NULL ? "" : blip->szMessage);
+							if ((blip->dwColor == 0x42 && blip->bIcon == 1) /*Mission blip*/ ||
+								(blip->dwColor == 0x5 && blip->bIcon == 1) /*Yellow blip*/ ||
+								(blip->dwColor == 0x0 && blip->bIcon == 38) /*Race flag*/ ||
+								(blip->dwColor == 0x2 && blip->bIcon == 1) /*Green blips*/)
+							{
+								Entity e = playerPed;
+								if (playerVeh)
+									e = playerVeh;
+								NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(e);
+								ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, blip->x, blip->y, blip->z, FALSE, FALSE, TRUE);
+								break; //During a race there's sometimes 2 yellow markers. We want the first one.
+							}
+						}
+					}
+				}
+
+				//Teleport to waypoint.
+				static bool bNumpad0Pressed = false;
+				static int teleportIteratrions = -1;
+				if (isKeyPressedOnce(bNumpad0Pressed, VK_NUMPAD0) || teleportIteratrions > -1)
+				{
+					Entity e = playerPed;
+					if (playerVeh != NULL)
+						e = playerVeh;
+					static Vector3 coords, oldLocation;
+					if (teleportIteratrions == -1)
+					{
+						int blipIterator = UI::_GET_BLIP_INFO_ID_ITERATOR();
+						for (int i = UI::GET_FIRST_BLIP_INFO_ID(blipIterator); UI::DOES_BLIP_EXIST(i) != 0; i = UI::GET_NEXT_BLIP_INFO_ID(blipIterator))
+						{
+							if (UI::GET_BLIP_INFO_ID_TYPE(i) == 4)
+							{
+								coords = UI::GET_BLIP_INFO_ID_COORD(i);
+								teleportIteratrions = 19;
+								oldLocation = ENTITY::GET_ENTITY_COORDS(e, FALSE);
+								break;
+							}
+						}
+					}
+					if (teleportIteratrions > -1)
+					{
+						bool groundFound = false;
+						static float groundCheckHeight[] = { 800.0f, 750.0f, 700.0f, 650.0f, 600.0f, 550.0f, 500.0f, 450.0f, 400.0f, 350.0f, 300.0f, 250.0f, 200.0f, 100.0f, 150.0f, 50.0f, 100.0f, 150.0f, 150.0f, 0.0f };
+						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, coords.x, coords.y, groundCheckHeight[teleportIteratrions], FALSE, FALSE, TRUE);
+						if (GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(coords.x, coords.y, groundCheckHeight[teleportIteratrions], &coords.z) == TRUE)
+						{
+							groundFound = true;
+							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, coords.x, coords.y, coords.z + 3, FALSE, FALSE, TRUE);
+							teleportIteratrions = -1;
+						}
+						if (teleportIteratrions > -1)
+							teleportIteratrions--;
+						if (!groundFound && teleportIteratrions < 0)
+						{
+							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, oldLocation.x, oldLocation.y, oldLocation.z, FALSE, FALSE, TRUE);
+						}
+					}
+				}
+			}
+
+			//Increase wanted level.
+			static bool bAddPressed = false;
+			if (isKeyPressedOnce(bAddPressed, VK_ADD))
+			{
+				if (PLAYER::GET_PLAYER_WANTED_LEVEL(player) < 5)
+				{
+					PLAYER::SET_PLAYER_WANTED_LEVEL(player, PLAYER::GET_PLAYER_WANTED_LEVEL(player) + 1, FALSE);
+					PLAYER::SET_PLAYER_WANTED_LEVEL_NOW(player, FALSE);
+				}
+			}
+
+			//Clear Wanted Level
+			if (GetAsyncKeyState(VK_MULTIPLY) & 0x8000)
+			{
+				PLAYER::SET_PLAYER_WANTED_LEVEL(player, 0, FALSE);
+				PLAYER::SET_PLAYER_WANTED_LEVEL_NOW(player, FALSE);
+			}
+
+			//Fix player.
+			static bool bDecimalPressed = false;
+			if (isKeyPressedOnce(bDecimalPressed, VK_DECIMAL))
+			{
+				if (ENTITY::DOES_ENTITY_EXIST(playerVeh) && !ENTITY::IS_ENTITY_DEAD(playerVeh))
+				{
+					NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(playerVeh); //Can't hurt to try.
+					VEHICLE::SET_VEHICLE_FIXED(playerVeh);
+					VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(playerVeh);
+					BoostBaseCarStats(playerVeh);
+				}
+				PED::CLEAR_PED_BLOOD_DAMAGE(playerPed);
+				//We can only change stats that are not ServerAuthoritative="true" in mpstatssetup.xml.
+				STATS::STAT_SET_FLOAT(GAMEPLAY::GET_HASH_KEY("MP0_PLAYER_MENTAL_STATE"), 0.0f, TRUE);
+				Entity attachedEnt = ENTITY::GET_ENTITY_ATTACHED_TO(playerPed);
 				if (ENTITY::DOES_ENTITY_EXIST(attachedEnt))
 				{
 					if (ENTITY::IS_ENTITY_A_VEHICLE(attachedEnt) == FALSE)
 						ENTITY::DELETE_ENTITY(&attachedEnt);
 				}
+				//SetIntStatWithBothVarients("CHEAT_BITSET", 0, 0);
+				//SetIntStatWithBothVarients("BAD_SPORT_BITSET", 0, 0);
+				//STATS::STAT_SET_BOOL(GAMEPLAY::GET_HASH_KEY("MPPLY_IS_HIGH_EARNER"), FALSE, TRUE);
+				//STATS::STAT_SET_BOOL(GAMEPLAY::GET_HASH_KEY("MPPLY_IS_CHEATER"), FALSE, TRUE);
+				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_IS_CHEATER_TIME"), 0, TRUE);
+				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_WAS_I_BAD_SPORT"), 0, TRUE);
+				//STATS::STAT_SET_FLOAT(GAMEPLAY::GET_HASH_KEY("MPPLY_OVERALL_BADSPORT"), 0, TRUE);
+				//STATS::STAT_SET_FLOAT(GAMEPLAY::GET_HASH_KEY("MPPLY_OVERALL_CHEAT"), 0, TRUE);
+				//STATS::STAT_SET_BOOL(GAMEPLAY::GET_HASH_KEY("MPPLY_CHAR_IS_BADSPORT"), FALSE, TRUE);
+				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_BECAME_BADSPORT_NUM"), 0, TRUE);
+				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_BECAME_CHEATER_NUM"), 0, TRUE);
+				//Any date[12]; //Should be enough.
+				//memset(&date, 0, sizeof(date));
+				//STATS::STAT_SET_DATE(GAMEPLAY::GET_HASH_KEY("MPPLY_BECAME_CHEATER_DT"), &date[0], 7, TRUE);
+				//STATS::STAT_SET_DATE(GAMEPLAY::GET_HASH_KEY("MPPLY_BECAME_BADSPORT_DT"), &date[0], 7, TRUE);
+				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_DESTROYED_PVEHICLES"), 0, TRUE);
+				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_BADSPORT_MESSAGE"), 0, TRUE);
+				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_KILLS_PLAYERS_CHEATER"), 69, TRUE);
+				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_DEATHS_PLAYERS_CHEATER"), 420, TRUE);
+				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_LAST_REPORT_PENALTY"), 0, TRUE);
+				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_LAST_COMMEND_PENALTY"), 0, TRUE);
+				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_LAST_REPORT_RESTORE"), 0, TRUE);
+				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_LAST_COMMEND_RESTORE"), 0, TRUE);
+				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_REPORT_STRENGTH"), 32, TRUE);
+				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_COMMEND_STRENGTH"), 32, TRUE);
+				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_VOTED_OUT"), 0, TRUE);
+				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_VOTED_OUT_DELTA"), 0, TRUE);
+				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_VOTED_OUT_QUIT"), 0, TRUE);
+				//STATS::STAT_SET_BOOL(GAMEPLAY::GET_HASH_KEY("MPPLY_WAS_I_BAD_SPORT"), FALSE, TRUE);
+				//STATS::STAT_SET_BOOL(GAMEPLAY::GET_HASH_KEY("MPPLY_WAS_I_CHEATER"), FALSE, TRUE);
 			}
 
-			//Teleport to selected player on the menu.
-			static bool bNumpad0Pressed = false;
-			if (isKeyPressedOnce(bNumpad0Pressed, VK_NUMPAD0) && selectedPed != playerPed )
+			static bool F10Pressed = false;
+			if (isKeyPressedOnce(F10Pressed, VK_F10))
 			{
-				Entity e = playerPed;
-				if (playerVeh != NULL)
-					e = playerVeh;
-
-				Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
-				ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, playerPosition.x, playerPosition.y, playerPosition.z + 1, FALSE, FALSE, TRUE);
-			}
-
-			//https://www.youtube.com/watch?v=ON-7v4qnHP8
-			if (GetAsyncKeyState(VK_SUBTRACT) & 0x8000)
-			{
-				try
+				//Infinite Ammo - Get max ammo
+				if (WEAPON::GET_CURRENT_PED_WEAPON(playerPed, &currentWeapon, 1))
 				{
-					static bool bLoadsAMoney = false;
-					bLoadsAMoney = !bLoadsAMoney;
-					if (bLoadsAMoney)
+					if (WEAPON::IS_WEAPON_VALID(currentWeapon))
 					{
-						STREAMING::REQUEST_MODEL(0x113FD533); //Manchester United: Nil Loadsamoney United: LOADS
-						if (STREAMING::HAS_MODEL_LOADED(0x113FD533)) //Good evening and welcome to: Loads of Money.
+						int maxAmmo;
+						if (WEAPON::GET_MAX_AMMO(playerPed, currentWeapon, &maxAmmo))
 						{
-							Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE); //Dereck B? On your bike!
-							static Hash PICKUP_MONEY_CASE = GAMEPLAY::GET_HASH_KEY("PICKUP_MONEY_CASE"); //Right. Let's do up the house.
-							int MONEY_DROP_AMOUNT = rand() % 39000 + 25000; // lets make it more random so r* wont recognize a pattern mch
-							OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, playerPosition.x + 3.0f, playerPosition.y, playerPosition.z + 0.5f, 0, MONEY_DROP_AMOUNT, 0x113FD533, FALSE, TRUE); //WHOP YOUR WAD ON THE COUNTA
-							STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(0x113FD533); //SHUT YOUR MOUTH!
+							WEAPON::SET_PED_AMMO(playerPed, currentWeapon, maxAmmo);
 						}
 					}
 				}
-				catch (...){ Log::Error("Got too much money."); }
 			}
 
-			static bool bNumpad2Pressed = false;
-			if (isKeyPressedOnce(bNumpad2Pressed, VK_NUMPAD2))
+			static bool F9Pressed = false;
+			if (isKeyPressedOnce(F9Pressed, VK_F9))
 			{
-				Vehicle clonedVeh = ClonePedCar(selectedPed, playerPed);
-				BoostBaseCarStats(clonedVeh); //Gotta go fast
+				//Remove attached junk
+				if (ENTITY::IS_ENTITY_ATTACHED(PLAYER::PLAYER_PED_ID()))
+				{
+					ENTITY::DETACH_ENTITY(PLAYER::PLAYER_PED_ID(), TRUE, TRUE);
+				}
 			}
 
-			if (IsPlayerFriend(iSelectedPlayer) == FALSE)
+			static bool bMouse5Pressed = false;
+			if (isKeyPressedOnce(bMouse5Pressed, VK_XBUTTON1))
 			{
-				if (GetAsyncKeyState(VK_NUMPAD1) & 0x8000)
-				{
-					if (GetAsyncKeyState(VK_RCONTROL) & 0x8000)
-					{
-						Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
-						if (selectedPed != playerPed)
-						{
-							AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
-							FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f);
-						}
-						else
-						{
-							FIRE::ADD_EXPLOSION(playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f);
-						}
-					}
-					else
-					{
-						static int iCounter = 0;
-						for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
-						{
-							try
-							{
-								Ped playerPedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
-								if (ENTITY::DOES_ENTITY_EXIST(playerPedIterator) && playerPedIterator != playerPed) //If the iteration exists, and they're alive, and they're not me.
-								{
-									if (IsPlayerFriend(playerIterator) == FALSE && selectedPed != playerPedIterator)
-									{
-										if (iCounter == 5)
-										{
-											try
-											{
-												AI::CLEAR_PED_TASKS_IMMEDIATELY(playerPedIterator); //If they're in a jet, or something. Toss them out.
-												Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPedIterator, FALSE);
-												static bool bExplode = false;
-												bExplode = !bExplode;
-												if (bExplode)
-													FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f); //We can blame anyone for the explosion. Whoever is selected in the menu will be blamed.
-												else
-													FIRE::START_SCRIPT_FIRE(playerPosition.x, playerPosition.y, playerPosition.z, 5, TRUE); //For LEXD Godmode kids who don't set entity proofs properly.
-											}
-											catch (...) { break; Log::Error("Crashed"); iCounter = -10; } //IDK why, but if you call these functions too many times per tick, it causes a crash. We can just toss the exception. Hopefully this fixes the crash...
-										}
-									}
-								}
-							}
-							catch (...) { break; Log::Error("Crashed"); iCounter = -10; } //IDK why, but if you call these functions too many times per tick, it causes a crash. We can just toss the exception. Hopefully this fixes the crash...
-						}
-						iCounter++;
-						if (iCounter > 5)
-							iCounter = 0;
-					}
-				}
-
-				static bool bNumpad3Pressed = false;
-				if (isKeyPressedOnce(bNumpad3Pressed, VK_NUMPAD3))
-				{
-					if (iFreeze == selectedPed)
-						iFreeze = -1;
-					else
-						iFreeze = selectedPed;
-				}
-				if (iFreeze != -1 && (selectedPed != playerPed))
-				{
-					if (iFreeze == selectedPed)
-					{
-						WEAPON::REMOVE_ALL_PED_WEAPONS(selectedPed, TRUE);
-						AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
-					}
-				}
-			}
-		}
-		else
-		{
-			//Test IsPlayerFriend and give a sample player iteration
-			if (GetAsyncKeyState(VK_NUMPAD1) & 0x8000)
-			{
-				static int iCounter = 0;
-				for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
-				{
-					Ped playerPedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
-					if (ENTITY::DOES_ENTITY_EXIST(playerPedIterator) && playerPedIterator != playerPed) //If the iteration exists, and they're alive, and they're not me.
-					{
-						if (IsPlayerFriend(playerIterator) == FALSE )
-						{
-							if (iCounter == 5)
-							{
-								try
-								{
-									AI::CLEAR_PED_TASKS_IMMEDIATELY(playerPedIterator);
-									WEAPON::REMOVE_ALL_PED_WEAPONS(playerPedIterator, TRUE); //Why does this work? C'mon, Rockstar...
-									Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPedIterator, FALSE);
-									static bool bExplode = false;
-									bExplode = !bExplode;
-									if (bExplode)
-										FIRE::ADD_OWNED_EXPLOSION(playerPedIterator, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f);
-									else
-										FIRE::START_SCRIPT_FIRE(playerPosition.x, playerPosition.y, playerPosition.z, 5, TRUE); //For LEXD Godmode kids who don't set entity proofs properly.
-								}
-								catch (...) { break; Log::Error("Crashed"); iCounter = -10; } //IDK why, but if you call these functions too many times per tick, it causes a crash. We can just toss the exception. Hopefully this fixes the crash...
-							}
-						}
-					}
-				}
-				iCounter++;
-				if (iCounter > 5)
-					iCounter = 0;
+				static BOOL bThermalVision = FALSE;
+				bThermalVision = !bThermalVision;
+				GRAPHICS::SET_SEETHROUGH(bThermalVision);
 			}
 
-			//Spawn a test car.
-			static bool bNumpad2Pressed, bWaitingForModelCar = false;
-			if ((isKeyPressedOnce(bNumpad2Pressed, VK_NUMPAD2) || bWaitingForModelCar == true) && playerVeh == NULL)
+			static bool b1pressed = false;
+			if (isKeyPressedOnce(b1pressed, 0x31))
 			{
-				Hash vehicleModelHash = VEHICLE_KURUMA2;
-				if (GetAsyncKeyState(VK_RCONTROL) & 0x8000)
-					vehicleModelHash = VEHICLE_BTYPE;
-				if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
-					vehicleModelHash = VEHICLE_ZENTORNO;
-				if (GetAsyncKeyState(VK_DOWN) & 0x8000)
-					vehicleModelHash = VEHICLE_INSURGENT;
-				STREAMING::REQUEST_MODEL(vehicleModelHash);
-				if (STREAMING::HAS_MODEL_LOADED(vehicleModelHash) == TRUE)
-				{
-					Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPed, FALSE);
-					playerVeh = VEHICLE::CREATE_VEHICLE(vehicleModelHash, playerPosition.x, playerPosition.y, playerPosition.z, ENTITY::GET_ENTITY_HEADING(playerPed), TRUE, TRUE);
-					NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(playerVeh);
-					PED::SET_PED_INTO_VEHICLE(playerPed, playerVeh, SEAT_DRIVER);
-					BoostBaseCarStats(playerVeh);
-					if (vehicleModelHash == VEHICLE_KURUMA2) //Test that I can make a perfect 1:1 clone of my Kuruma with only calling natives.
-					{
-						VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SPOILER, MOD_INDEX_ONE, FALSE);
-						VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTBUMPER, MOD_INDEX_TWO, FALSE);
-						VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SIDESKIRT, MOD_INDEX_FIVE, FALSE);
-						VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_EXHAUST, MOD_INDEX_ONE, FALSE);
-						VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_SADTROMBONE, FALSE);
-						VEHICLE::SET_VEHICLE_WHEEL_TYPE(playerVeh, WHEEL_TYPE_HIGHEND);
-						VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTWHEELS, WHEEL_HIGHEND_SUPAGEE, TRUE); //TRUE because we want the Custom Tires.
-						VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_XENONLIGHTS, TRUE);
-						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(playerVeh, PLATE_YELLOWONBLACK);
-						VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_BLACK);
-						VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_BLACK);
-						//VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_TIRESMOKE, TRUE);
-						//VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVeh, TIRESMOKE_COLOR_BLACK);
-						VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_METALLIC_ULTRA_BLUE);
-						//for (int i = 0; i < NEON_BACK; i++) //This will turn on all the neon emitters except the back one. That shit's annoying when I'm trying to drive.
-						//{
-						//	VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, i, TRUE);
-						//}
-						//VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(playerVeh, NEON_COLOR_ELECTRICBLUE);
-					}
-					else if (vehicleModelHash == VEHICLE_ZENTORNO)
-					{
-						VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_CHASSIS, MOD_INDEX_TWO, FALSE);
-						VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SPOILER, MOD_INDEX_SEVEN, FALSE);
-						VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTBUMPER, MOD_INDEX_TWO, FALSE);
-						VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SIDESKIRT, MOD_INDEX_TWO, FALSE);
-						VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_EXHAUST, MOD_INDEX_FOUR, FALSE);
-						VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_SADTROMBONE, FALSE);
-						VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HOOD, MOD_INDEX_TWO, FALSE);
-						VEHICLE::SET_VEHICLE_WHEEL_TYPE(playerVeh, WHEEL_TYPE_HIGHEND);
-						VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTWHEELS, WHEEL_HIGHEND_SUPAGEE, TRUE);
-						VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_XENONLIGHTS, TRUE);
-						VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_BLACK);
-						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(playerVeh, PLATE_YELLOWONBLUE);
-						VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_METALLIC_ULTRA_BLUE, COLOR_MATTE_WHITE);
-						VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_TIRESMOKE, TRUE);
-						VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVeh, TIRESMOKE_COLOR_BLACK);
-						VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_METALLIC_ULTRA_BLUE);
-						for (int i = 0; i < NEON_BACK; i++) //This will turn on all the neon emitters except the back one. That shit's annoying when I'm trying to drive.
-						{
-							VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, i, TRUE);
-						}
-						VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(playerVeh, NEON_COLOR_ELECTRICBLUE);
-					}
-					else if (vehicleModelHash == VEHICLE_INSURGENT)
-					{
-						VEHICLE::SET_VEHICLE_WHEEL_TYPE(playerVeh, WHEEL_TYPE_SPORT);
-						VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTWHEELS, WHEEL_SPORT_DEEPFIVE, TRUE);
-						VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_FOREST_GREEN);
-						VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_TIRESMOKE, TRUE);
-						VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVeh, TIRESMOKE_COLOR_BLACK);
-						VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_MATTE_FOREST_GREEN);
-						VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_GREEN);
-						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(playerVeh, "GETFUCKD");
-						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(playerVeh, PLATE_YELLOWONBLACK);
-						VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_TRUCK, FALSE);
-					}
-					STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(vehicleModelHash);
-					bWaitingForModelCar = false;
-				}
+				if (currentWeapon == WEAPON_UNARMED)
+					CheckAndSelectWeapon(playerPed, WEAPON_KNIFE);
 				else
-				{
-					bWaitingForModelCar = true;
-				}
+					CheckAndSelectWeapon(playerPed, WEAPON_UNARMED);
 			}
-
-			//Spawn a test aircraft.
-			static bool bNumpad3Pressed, bWaitingForModelAircraft = false;
-			if (isKeyPressedOnce(bNumpad3Pressed, VK_NUMPAD3))
+			static bool b2pressed = false;
+			if (isKeyPressedOnce(b2pressed, 0x32))
 			{
-				if (bWaitingForModelAircraft || playerVeh == NULL)
-				{
-					Hash vehicleModelHash = (GetAsyncKeyState(VK_RCONTROL) & 0x8000) ? VEHICLE_BUZZARD : VEHICLE_VESTRA; //This was Vincentor's idea. See: https://www.youtube.com/watch?v=jAsgKuXaGb4
-					STREAMING::REQUEST_MODEL(vehicleModelHash);
-					if (STREAMING::HAS_MODEL_LOADED(vehicleModelHash) == TRUE)
-					{
-						Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPed, FALSE);
-						playerVeh = VEHICLE::CREATE_VEHICLE(vehicleModelHash, playerPosition.x, playerPosition.y, playerPosition.z + 800, ENTITY::GET_ENTITY_HEADING(playerPed), TRUE, TRUE);
-						PED::SET_PED_INTO_VEHICLE(playerPed, playerVeh, SEAT_DRIVER);
-						if (vehicleModelHash == VEHICLE_VESTRA)
-							VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_BLACK);
-						else
-						{
-							VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_BLACK);
-							VEHICLE::SET_HELI_BLADES_FULL_SPEED(playerVeh);
-						}
-						STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(vehicleModelHash);
-						bWaitingForModelAircraft = false;
-					}
-					else
-					{
-						bWaitingForModelAircraft = true;
-					}
-				}
-				if (playerVeh != NULL && (VEHICLE::IS_THIS_MODEL_A_PLANE(ENTITY::GET_ENTITY_MODEL(playerVeh)) == TRUE || VEHICLE::IS_THIS_MODEL_A_HELI(ENTITY::GET_ENTITY_MODEL(playerVeh)) || 
-					ENTITY::GET_ENTITY_MODEL(playerVeh) == VEHICLE_BLIMP || ENTITY::GET_ENTITY_MODEL(playerVeh) == VEHICLE_BLIMP2) == TRUE)
-				{
-					NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(playerVeh);
-					Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerVeh, FALSE);
-					if (playerPosition.z < 350.0f)
-						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(playerVeh, playerPosition.x, playerPosition.y, playerPosition.z + 800, FALSE, FALSE, TRUE);
-					VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVeh, 0.0f);
-					ENTITY::SET_ENTITY_PROOFS(playerVeh, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-					VEHICLE::SET_VEHICLE_STRONG(playerVeh, TRUE);
-					VEHICLE::SET_VEHICLE_IS_STOLEN(playerVeh, FALSE);
-					VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVeh, FALSE);
-					VEHICLE::SET_VEHICLE_FORWARD_SPEED(playerVeh, 500);
-					VEHICLE::SET_VEHICLE_CAN_BE_VISIBLY_DAMAGED(playerVeh, FALSE);
-				}
+				if (playerVeh == NULL)
+					CheckAndSelectWeapon(playerPed, WEAPON_HEAVYPISTOL);
+				else if (currentWeapon == WEAPON_MICROSMG)
+					CheckAndSelectWeapon(playerPed, WEAPON_FLAREGUN);
+				else
+					CheckAndSelectWeapon(playerPed, WEAPON_MICROSMG);
 			}
-
-			//TP to mission objective.
-			static bool bNumpad7Pressed = false;
-			if (isKeyPressedOnce(bNumpad7Pressed, VK_NUMPAD7))
+			static bool b3pressed = false;
+			if (isKeyPressedOnce(b3pressed, 0x33))
 			{
-				for (int i = 0; i <= 1000; i++)
-				{
-					Blip* blip = g_blipList->m_Blips[i].m_pBlip;
-					if (blip)
-					{
-						//if ( blip->dwColor != 0x3 && !(blip->bIcon == 150 && blip->dwColor == 1) ) //Cut out most of the random job blips.
-							DEBUGOUT("Blip%i ID: %i ID2: %i Icon: %i Color: 0x%X Message: %s", i, blip->iID, blip->iID2, blip->bIcon, blip->dwColor, blip->szMessage == NULL ? "" : blip->szMessage);
-						if ((blip->dwColor == 0x42 && blip->bIcon == 1) /*Mission blip*/ ||
-							(blip->dwColor == 0x5 && blip->bIcon == 1) /*Yellow blip*/ ||
-							(blip->dwColor == 0x0 && blip->bIcon == 38) /*Race flag*/ ||
-							(blip->dwColor == 0x2 && blip->bIcon == 1) /*Green blips*/)
-						{	
-							Entity e = playerPed;
-							if (playerVeh)
-								e = playerVeh;
-							NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(e);
-							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, blip->x, blip->y, blip->z, FALSE, FALSE, TRUE);
-							break; //During a race there's sometimes 2 yellow markers. We want the first one.
-						}
-					}
-				}
+				if (currentWeapon == WEAPON_ADVANCEDRIFLE)
+					CheckAndSelectWeapon(playerPed, WEAPON_COMBATMG);
+				else
+					CheckAndSelectWeapon(playerPed, WEAPON_ADVANCEDRIFLE);
 			}
-
-			//Teleport to waypoint.
-			static bool bNumpad0Pressed = false;
-			static int teleportIteratrions = -1;
-			if (isKeyPressedOnce(bNumpad0Pressed, VK_NUMPAD0) || teleportIteratrions > -1)
+			static bool b4pressed = false;
+			if (isKeyPressedOnce(b4pressed, 0x34))
 			{
-				Entity e = playerPed;
-				if (playerVeh != NULL)
-					e = playerVeh;
-				static Vector3 coords, oldLocation;
-				if (teleportIteratrions == -1)
-				{
-					int blipIterator = UI::_GET_BLIP_INFO_ID_ITERATOR();
-					for (int i = UI::GET_FIRST_BLIP_INFO_ID(blipIterator); UI::DOES_BLIP_EXIST(i) != 0; i = UI::GET_NEXT_BLIP_INFO_ID(blipIterator))
-					{
-						if (UI::GET_BLIP_INFO_ID_TYPE(i) == 4)
-						{
-							coords = UI::GET_BLIP_INFO_ID_COORD(i);
-							teleportIteratrions = 19;
-							oldLocation = ENTITY::GET_ENTITY_COORDS(e, FALSE);
-							break;
-						}
-					}
-				}
-				if (teleportIteratrions > -1)
-				{
-					bool groundFound = false;
-					static float groundCheckHeight[] = { 800.0f, 750.0f, 700.0f, 650.0f, 600.0f, 550.0f, 500.0f, 450.0f, 400.0f, 350.0f, 300.0f, 250.0f, 200.0f, 100.0f, 150.0f, 50.0f, 100.0f, 150.0f, 150.0f, 0.0f };
-					ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, coords.x, coords.y, groundCheckHeight[teleportIteratrions], FALSE, FALSE, TRUE);
-					if (GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(coords.x, coords.y, groundCheckHeight[teleportIteratrions], &coords.z) == TRUE)
-					{
-						groundFound = true;
-						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, coords.x, coords.y, coords.z + 3, FALSE, FALSE, TRUE);
-						teleportIteratrions = -1;
-					}
-					if (teleportIteratrions > -1)
-						teleportIteratrions--;
-					if (!groundFound && teleportIteratrions < 0)
-					{
-						ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, oldLocation.x, oldLocation.y, oldLocation.z, FALSE, FALSE, TRUE);
-					}
-				}
+				CheckAndSelectWeapon(playerPed, WEAPON_MINIGUN);
 			}
-		}
-
-		//Increase wanted level.
-		static bool bAddPressed = false;
-		if (isKeyPressedOnce(bAddPressed, VK_ADD))
-		{
-			if (PLAYER::GET_PLAYER_WANTED_LEVEL(player) < 5)
+			static bool b5pressed = false;
+			if (isKeyPressedOnce(b5pressed, 0x35))
 			{
-				PLAYER::SET_PLAYER_WANTED_LEVEL(player, PLAYER::GET_PLAYER_WANTED_LEVEL(player) + 1, FALSE);
-				PLAYER::SET_PLAYER_WANTED_LEVEL_NOW(player, FALSE);
+				if (currentWeapon == WEAPON_HEAVYSNIPER)
+					CheckAndSelectWeapon(playerPed, WEAPON_SNIPERRIFLE);
+				else
+					CheckAndSelectWeapon(playerPed, WEAPON_HEAVYSNIPER);
 			}
-		}
-
-		//Clear Wanted Level
-		if (GetAsyncKeyState(VK_MULTIPLY) & 0x8000)
-		{
-			PLAYER::SET_PLAYER_WANTED_LEVEL(player, 0, FALSE);
-			PLAYER::SET_PLAYER_WANTED_LEVEL_NOW(player, FALSE);
-		}
-
-		//Fix player.
-		static bool bDecimalPressed = false;
-		if (isKeyPressedOnce(bDecimalPressed, VK_DECIMAL))
-		{
-			if (ENTITY::DOES_ENTITY_EXIST(playerVeh) && !ENTITY::IS_ENTITY_DEAD(playerVeh))
+			static bool b6pressed = false;
+			if (isKeyPressedOnce(b6pressed, 0x36))
 			{
-				NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(playerVeh); //Can't hurt to try.
-				VEHICLE::SET_VEHICLE_FIXED(playerVeh);
-				VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(playerVeh);
-				BoostBaseCarStats(playerVeh);
+				if (playerVeh)
+					CheckAndSelectWeapon(playerPed, WEAPON_STICKYBOMB);
+				else
+					CheckAndSelectWeapon(playerPed, WEAPON_HOMINGLAUNCHER);
 			}
-			PED::CLEAR_PED_BLOOD_DAMAGE(playerPed);
-			//We can only change stats that are not ServerAuthoritative="true" in mpstatssetup.xml.
-			STATS::STAT_SET_FLOAT(GAMEPLAY::GET_HASH_KEY("MP0_PLAYER_MENTAL_STATE"), 0.0f, TRUE);
-			Entity attachedEnt = ENTITY::GET_ENTITY_ATTACHED_TO(playerPed);
-			if (ENTITY::DOES_ENTITY_EXIST(attachedEnt))
+
+			//How about some ESP? Commented out because it sucks.
+			/*for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
 			{
-				if (ENTITY::IS_ENTITY_A_VEHICLE(attachedEnt) == FALSE)
-					ENTITY::DELETE_ENTITY(&attachedEnt);
-			}
-			//SetIntStatWithBothVarients("CHEAT_BITSET", 0, 0);
-			//SetIntStatWithBothVarients("BAD_SPORT_BITSET", 0, 0);
-			//STATS::STAT_SET_BOOL(GAMEPLAY::GET_HASH_KEY("MPPLY_IS_HIGH_EARNER"), FALSE, TRUE);
-			//STATS::STAT_SET_BOOL(GAMEPLAY::GET_HASH_KEY("MPPLY_IS_CHEATER"), FALSE, TRUE);
-			//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_IS_CHEATER_TIME"), 0, TRUE);
-			//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_WAS_I_BAD_SPORT"), 0, TRUE);
-			//STATS::STAT_SET_FLOAT(GAMEPLAY::GET_HASH_KEY("MPPLY_OVERALL_BADSPORT"), 0, TRUE);
-			//STATS::STAT_SET_FLOAT(GAMEPLAY::GET_HASH_KEY("MPPLY_OVERALL_CHEAT"), 0, TRUE);
-			//STATS::STAT_SET_BOOL(GAMEPLAY::GET_HASH_KEY("MPPLY_CHAR_IS_BADSPORT"), FALSE, TRUE);
-			//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_BECAME_BADSPORT_NUM"), 0, TRUE);
-			//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_BECAME_CHEATER_NUM"), 0, TRUE);
-			//Any date[12]; //Should be enough.
-			//memset(&date, 0, sizeof(date));
-			//STATS::STAT_SET_DATE(GAMEPLAY::GET_HASH_KEY("MPPLY_BECAME_CHEATER_DT"), &date[0], 7, TRUE);
-			//STATS::STAT_SET_DATE(GAMEPLAY::GET_HASH_KEY("MPPLY_BECAME_BADSPORT_DT"), &date[0], 7, TRUE);
-			//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_DESTROYED_PVEHICLES"), 0, TRUE);
-			//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_BADSPORT_MESSAGE"), 0, TRUE);
-			//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_KILLS_PLAYERS_CHEATER"), 69, TRUE);
-			//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_DEATHS_PLAYERS_CHEATER"), 420, TRUE);
-			//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_LAST_REPORT_PENALTY"), 0, TRUE);
-			//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_LAST_COMMEND_PENALTY"), 0, TRUE);
-			//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_LAST_REPORT_RESTORE"), 0, TRUE);
-			//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_LAST_COMMEND_RESTORE"), 0, TRUE);
-			//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_REPORT_STRENGTH"), 32, TRUE);
-			//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_COMMEND_STRENGTH"), 32, TRUE);
-			//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_VOTED_OUT"), 0, TRUE);
-			//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_VOTED_OUT_DELTA"), 0, TRUE);
-			//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_VOTED_OUT_QUIT"), 0, TRUE);
-			//STATS::STAT_SET_BOOL(GAMEPLAY::GET_HASH_KEY("MPPLY_WAS_I_BAD_SPORT"), FALSE, TRUE);
-			//STATS::STAT_SET_BOOL(GAMEPLAY::GET_HASH_KEY("MPPLY_WAS_I_CHEATER"), FALSE, TRUE);
-		}
-
-		static bool F10Pressed = false;
-		if (isKeyPressedOnce(F10Pressed, VK_F10))
-		{
-			//Infinite Ammo - Get max ammo
-			if (WEAPON::GET_CURRENT_PED_WEAPON(playerPed, &currentWeapon, 1))
-			{
-				if (WEAPON::IS_WEAPON_VALID(currentWeapon))
-				{
-					int maxAmmo;
-					if (WEAPON::GET_MAX_AMMO(playerPed, currentWeapon, &maxAmmo))
-					{
-						WEAPON::SET_PED_AMMO(playerPed, currentWeapon, maxAmmo);
-					}
-				}
-			}
-		}
-
-		static bool F9Pressed = false;
-		if (isKeyPressedOnce(F9Pressed, VK_F9))
-		{
-			//Remove attached junk
-			if (ENTITY::IS_ENTITY_ATTACHED(PLAYER::PLAYER_PED_ID()))
-			{
-				ENTITY::DETACH_ENTITY(PLAYER::PLAYER_PED_ID(), TRUE, TRUE);
-			}
-		}
-
-		static bool bMouse5Pressed = false;
-		if (isKeyPressedOnce(bMouse5Pressed, VK_XBUTTON1))
-		{
-			static BOOL bThermalVision = FALSE;
-			bThermalVision = !bThermalVision;
-			GRAPHICS::SET_SEETHROUGH(bThermalVision);
-		}
-
-		static bool b1pressed = false;
-		if (isKeyPressedOnce(b1pressed, 0x31))
-		{
-			if (currentWeapon == WEAPON_UNARMED)
-				CheckAndSelectWeapon(playerPed, WEAPON_KNIFE);
-			else
-				CheckAndSelectWeapon(playerPed, WEAPON_UNARMED);
-		}
-		static bool b2pressed = false;
-		if (isKeyPressedOnce(b2pressed, 0x32))
-		{
-			if (playerVeh == NULL)
-				CheckAndSelectWeapon(playerPed, WEAPON_HEAVYPISTOL);
-			else if (currentWeapon == WEAPON_MICROSMG)
-				CheckAndSelectWeapon(playerPed, WEAPON_FLAREGUN);
-			else
-				CheckAndSelectWeapon(playerPed, WEAPON_MICROSMG);
-		}
-		static bool b3pressed = false;
-		if (isKeyPressedOnce(b3pressed, 0x33))
-		{
-			if (currentWeapon == WEAPON_ADVANCEDRIFLE)
-				CheckAndSelectWeapon(playerPed, WEAPON_COMBATMG);
-			else
-				CheckAndSelectWeapon(playerPed, WEAPON_ADVANCEDRIFLE);
-		}
-		static bool b4pressed = false;
-		if (isKeyPressedOnce(b4pressed, 0x34))
-		{
-			CheckAndSelectWeapon(playerPed, WEAPON_MINIGUN);
-		}
-		static bool b5pressed = false;
-		if (isKeyPressedOnce(b5pressed, 0x35))
-		{
-			if (currentWeapon == WEAPON_HEAVYSNIPER)
-				CheckAndSelectWeapon(playerPed, WEAPON_SNIPERRIFLE);
-			else
-				CheckAndSelectWeapon(playerPed, WEAPON_HEAVYSNIPER);
-		}
-		static bool b6pressed = false;
-		if (isKeyPressedOnce(b6pressed, 0x36))
-		{
-			if (playerVeh)
-				CheckAndSelectWeapon(playerPed, WEAPON_STICKYBOMB);
-			else
-				CheckAndSelectWeapon(playerPed, WEAPON_HOMINGLAUNCHER);
-		}
-
-		//How about some ESP? Commented out because it sucks.
-		/*for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
-		{
 			Ped playerPedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
 			if (ENTITY::DOES_ENTITY_EXIST(playerPedIterator) && !ENTITY::IS_ENTITY_DEAD(playerPedIterator) && playerPedIterator != playerPed)
 			{
-				//Remove this if you want to see everyone or people behind walls.
-				if (ENTITY::HAS_ENTITY_CLEAR_LOS_TO_ENTITY(playerPed, playerPedIterator))
-				{
-					Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPedIterator, FALSE);
-					float screenX, screenY;
-					if (GRAPHICS::_WORLD3D_TO_SCREEN2D(playerPosition.x, playerPosition.y, playerPosition.z +.5, &screenX, &screenY) == TRUE) //If we can see them.
-					{
-						//DEBUGOUT("Drawing on %s %f %f", PLAYER::GET_PLAYER_NAME(playerIterator), screenX, screenY);
-						draw_text(screenX, screenY, PLAYER::GET_PLAYER_NAME(playerIterator), color_t{ 0xFF, 0xFF, 0xFF, 0xFF }); //This isn't perfect because Run is called once per tick not once per frame, so expect some lag on the ESP.
-					}
-				}
+			//Remove this if you want to see everyone or people behind walls.
+			if (ENTITY::HAS_ENTITY_CLEAR_LOS_TO_ENTITY(playerPed, playerPedIterator))
+			{
+			Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPedIterator, FALSE);
+			float screenX, screenY;
+			if (GRAPHICS::_WORLD3D_TO_SCREEN2D(playerPosition.x, playerPosition.y, playerPosition.z +.5, &screenX, &screenY) == TRUE) //If we can see them.
+			{
+			//DEBUGOUT("Drawing on %s %f %f", PLAYER::GET_PLAYER_NAME(playerIterator), screenX, screenY);
+			draw_text(screenX, screenY, PLAYER::GET_PLAYER_NAME(playerIterator), color_t{ 0xFF, 0xFF, 0xFF, 0xFF }); //This isn't perfect because Run is called once per tick not once per frame, so expect some lag on the ESP.
 			}
-		}*/
-	}
+			}
+			}
+			}*/
+		}
 
-	//Return control to the thread we stole it from.
-	SetActiveThread(runningThread);
-	return gGtaThreadOriginal.Run(This);
+		//Return control to the thread we stole it from.
+		SetActiveThread(runningThread);
+		return gGtaThreadOriginal.Run(This);
+	}
 }
 
 bool AttemptScriptHook() {
