@@ -475,7 +475,7 @@ eThreadState new_Run(GtaThread* This) {
 		draw_menu_line("Hack inactive", 150.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false, false);
 	}
 	else {
-		draw_menu_line("Hack active", 150.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false, false);
+		
 
 		if (ENTITY::DOES_ENTITY_EXIST(playerPed) == TRUE)
 		{
@@ -486,7 +486,8 @@ eThreadState new_Run(GtaThread* This) {
 				playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
 
 			//Test that drawing works.
-			draw_menu_line("s0biet by gir489 - mch8-6-2015 ", 15.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false);
+			draw_menu_line("Hack active", 150.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false, false);
+			draw_menu_line("s0biet by gir489 - mch8-6-2015 ", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
 
 
 			//godmode function
@@ -510,8 +511,7 @@ eThreadState new_Run(GtaThread* This) {
 
 				//Max armor.
 				PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
-			}
-			else {
+			}else{
 				if (PLAYER::GET_PLAYER_INVINCIBLE(player))
 				{
 					draw_menu_line("Godmode inactive", 150.0f, 4.0f, 13.0f, 0.0f, 5.0f, false, false, false, false);
@@ -612,13 +612,14 @@ eThreadState new_Run(GtaThread* This) {
 						bLoadsAMoney = !bLoadsAMoney;
 						if (bLoadsAMoney)
 						{
+								//money bag has hash 0x113FD533
 							STREAMING::REQUEST_MODEL(0x113FD533); //Manchester United: Nil Loadsamoney United: LOADS
 							if (STREAMING::HAS_MODEL_LOADED(0x113FD533)) //Good evening and welcome to: Loads of Money.
 							{
 								Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE); //Dereck B? On your bike!
 								static Hash PICKUP_MONEY_CASE = GAMEPLAY::GET_HASH_KEY("PICKUP_MONEY_CASE"); //Right. Let's do up the house.
-								int MONEY_DROP_AMOUNT = rand() % 39000 + 25000; // lets make it more random so r* wont recognize a pattern mch
-								OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, playerPosition.x + 3.0f, playerPosition.y, playerPosition.z + 0.5f, 0, MONEY_DROP_AMOUNT, 0x113FD533, FALSE, TRUE); //WHOP YOUR WAD ON THE COUNTA
+								int MONEY_DROP_AMOUNT = rand() % 35000 + 25000; // lets make it more random so r* wont recognize a pattern mch
+								OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, playerPosition.x, playerPosition.y, playerPosition.z + 0.5f, 0, MONEY_DROP_AMOUNT, 0x113FD533, FALSE, TRUE); //WHOP YOUR WAD ON THE COUNTA
 								STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(0x113FD533); //SHUT YOUR MOUTH!
 							}
 						}
@@ -631,6 +632,27 @@ eThreadState new_Run(GtaThread* This) {
 				{
 					Vehicle clonedVeh = ClonePedCar(selectedPed, playerPed);
 					BoostBaseCarStats(clonedVeh); //Gotta go fast
+				}
+
+				static bool bNumpad4Pressed = false;
+				if (isKeyPressedOnce(bNumpad4Pressed, VK_NUMPAD4))
+				{
+					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
+					{
+						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
+						VEHICLE::SET_VEHICLE_ALARM(selectedVehicle, true);
+						VEHICLE::START_VEHICLE_ALARM(selectedVehicle);
+					}
+				}
+
+				static bool bNumpad5Pressed = false;
+				if (isKeyPressedOnce(bNumpad5Pressed, VK_NUMPAD5))
+				{
+					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
+					{
+						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
+						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(selectedPed, "Gut_Hakt");
+					}
 				}
 
 				if (IsPlayerFriend(iSelectedPlayer) == FALSE)
