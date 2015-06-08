@@ -997,6 +997,16 @@ eThreadState new_Run(GtaThread* This) {
 			}
 		}
 
+		static bool F9Pressed = false;
+		if (isKeyPressedOnce(F9Pressed, VK_F9))
+		{
+			//Remove attached junk
+			if (ENTITY::IS_ENTITY_ATTACHED(PLAYER::PLAYER_PED_ID()))
+			{
+				ENTITY::DETACH_ENTITY(PLAYER::PLAYER_PED_ID(), TRUE, TRUE);
+			}
+		}
+
 		static bool bMouse5Pressed = false;
 		if (isKeyPressedOnce(bMouse5Pressed, VK_XBUTTON1))
 		{

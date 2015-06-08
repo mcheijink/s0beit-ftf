@@ -1,4 +1,5 @@
 F10 - Max Ammo
+F9 - Verwijder UFO en troep
 Numpad . - Repareer en Tune voertuig, kenteken verandert.
 Numpad 0 - Teleporteer naar waypoint
 Numpad 2 - Spawn getunde Kuruma2
