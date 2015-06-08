@@ -473,20 +473,42 @@ eThreadState new_Run(GtaThread* This) {
 			playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
 
 		//Test that drawing works.
-		draw_menu_line("s0biet by gir489 - mch8-6-2015 ", 15.0f, 50.0f, 5.0f, 550.0f, 5.0f, false, false, false);
+		draw_menu_line("s0biet by gir489 - mch8-6-2015 ", 15.0f, 50.0f, 0.0f, 550.0f, 5.0f, false, false, false);
 
-		//Godmode
-		if (!PLAYER::GET_PLAYER_INVINCIBLE(player))
+		
+		//godmode function
+		static bool bGodmodeActive, bF8Pressed = false;
+		if (isKeyPressedOnce(bF8Pressed, VK_F8))
 		{
-			DEBUGOUT("Setting godmode");
-			PLAYER::SET_PLAYER_INVINCIBLE(player, true);
-			ENTITY::SET_ENTITY_PROOFS(playerPed, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-		//	PED::SET_PED_CAN_RAGDOLL(playerPed, FALSE);
-		//	PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, FALSE);
+			bGodmodeActive = !bGodmodeActive;
+		}
+		if (bGodmodeActive)
+		{
+			draw_menu_line("Godmode Active", 150.0f, 4.0f, 0.0f, 0.0f, 0.0f, false, false, false, false);
+			//Godmode
+			if (!PLAYER::GET_PLAYER_INVINCIBLE(player))
+			{
+				DEBUGOUT("Setting godmode");
+				PLAYER::SET_PLAYER_INVINCIBLE(player, true);
+				ENTITY::SET_ENTITY_PROOFS(playerPed, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+				//	PED::SET_PED_CAN_RAGDOLL(playerPed, FALSE);
+				//	PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, FALSE);
+			}
+
+			//Max armor.
+			PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
+		}
+		else {
+			if (PLAYER::GET_PLAYER_INVINCIBLE(player))
+			{
+				DEBUGOUT("Deactivating godmode");
+				PLAYER::SET_PLAYER_INVINCIBLE(player, false);
+				ENTITY::SET_ENTITY_PROOFS(playerPed, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
+				//	PED::SET_PED_CAN_RAGDOLL(playerPed, FALSE);
+				//	PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, FALSE);
+			}
 		}
 
-		//Max armor.
-		PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
 
 		static bool bMenuActive, bF3Pressed = false;
 		static int iFreeze = -1;
@@ -582,7 +604,7 @@ eThreadState new_Run(GtaThread* This) {
 							Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE); //Dereck B? On your bike!
 							static Hash PICKUP_MONEY_CASE = GAMEPLAY::GET_HASH_KEY("PICKUP_MONEY_CASE"); //Right. Let's do up the house.
 							int MONEY_DROP_AMOUNT = rand() % 39000 + 25000; // lets make it more random so r* wont recognize a pattern mch
-							OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, playerPosition.x, playerPosition.y, playerPosition.z + 0.5f, 0, MONEY_DROP_AMOUNT, 0x113FD533, FALSE, TRUE); //WHOP YOUR WAD ON THE COUNTA
+							OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, playerPosition.x + 3.0f, playerPosition.y, playerPosition.z + 0.5f, 0, MONEY_DROP_AMOUNT, 0x113FD533, FALSE, TRUE); //WHOP YOUR WAD ON THE COUNTA
 							STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(0x113FD533); //SHUT YOUR MOUTH!
 						}
 					}
