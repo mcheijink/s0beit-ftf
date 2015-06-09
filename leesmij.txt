@@ -30,3 +30,4 @@ Numpad 4 - Zet alarm van auto van speler aan
 Numpad 5 - Verander kentekenplaat naar "gut hakt"
 Numpad 6 - Sloop motor en brandstoftank van speler
 Numpad 7 - Maakt alle banden van speler lek
+Numpad 8 - Zet speler uit auto

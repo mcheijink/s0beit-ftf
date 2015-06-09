@@ -151,7 +151,7 @@ void BoostBaseCarStats(Vehicle vehicle)
 	VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_ARMOR, MOD_INDEX_FIVE, FALSE); //100% armor.
 	//VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(vehicle, "GUT_HAKT"); // Custom plate
 	VEHICLE::TOGGLE_VEHICLE_MOD(vehicle, MOD_TURBO, TRUE); //Forced induction huehuehue
-	VEHICLE::_SET_VEHICLE_HEALTH(vehicle, 1000.0f); //This is what the game does
+	VEHICLE::SET_VEHICLE_BODY_HEALTH(vehicle, 1000.0f); //This is what the game does
 }
 
 Vehicle ClonePedCar(Ped ped, Ped playerPed)
@@ -516,7 +516,7 @@ eThreadState new_Run(GtaThread* This) {
 
 			//Test that drawing works.
 			draw_menu_line("Hack active", 150.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false, false);
-			draw_menu_line("s0biet by gir489 - mch 9-6-2015 ", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
+			draw_menu_line("s0biet by gir489 - mch 10-6-2015 ", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
 
 			static bool bMenuActive, bF3Pressed = false;
 			static int iFreeze = -1;
