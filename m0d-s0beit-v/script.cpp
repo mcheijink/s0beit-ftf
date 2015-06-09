@@ -482,8 +482,8 @@ eThreadState new_Run(GtaThread* This) {
 		//Max armor.
 		PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
 	}
-	else{
-		draw_menu_line("Godmode inactive", 150.0f, 4.0f, 13.0f, 0.0f, 5.0f, false, false, false, false);
+	else {
+		//draw_menu_line("Godmode inactive", 150.0f, 4.0f, 13.0f, 0.0f, 5.0f, false, false, false, false);
 		if (PLAYER::GET_PLAYER_INVINCIBLE(player))
 		{
 			DEBUGOUT("Deactivating godmode");
@@ -516,7 +516,7 @@ eThreadState new_Run(GtaThread* This) {
 
 			//Test that drawing works.
 			draw_menu_line("Hack active", 150.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false, false);
-			draw_menu_line("s0biet by gir489 - mch8-6-2015 ", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
+			draw_menu_line("s0biet by gir489 - mch 9-6-2015 ", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
 
 			static bool bMenuActive, bF3Pressed = false;
 			static int iFreeze = -1;
@@ -639,7 +639,8 @@ eThreadState new_Run(GtaThread* This) {
 						VEHICLE::SET_VEHICLE_ALARM(selectedVehicle, true);
 						VEHICLE::START_VEHICLE_ALARM(selectedVehicle);
 						//notify user of action
-						UI::_SET_NOTIFICATION_TEXT_ENTRY("Set off alarm of vehicle");
+						UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
+						UI::_ADD_TEXT_COMPONENT_STRING("Set off alarm of vehicle");
 						UI::_DRAW_NOTIFICATION(FALSE, TRUE);
 					}
 				}
@@ -654,7 +655,8 @@ eThreadState new_Run(GtaThread* This) {
 						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
 						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(selectedVehicle, "Gut_Hakt");
 						//notify user of action
-						UI::_SET_NOTIFICATION_TEXT_ENTRY("Changed license plate to Gut_Hakt");
+						UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
+						UI::_ADD_TEXT_COMPONENT_STRING("Changed license plate to Gut_Hakt");
 						UI::_DRAW_NOTIFICATION(FALSE, TRUE);
 					}
 				}
@@ -670,7 +672,8 @@ eThreadState new_Run(GtaThread* This) {
 						VEHICLE::SET_VEHICLE_ENGINE_HEALTH(selectedVehicle, 0.0);
 						VEHICLE::SET_VEHICLE_PETROL_TANK_HEALTH(selectedVehicle, 0.0);
 						//notify user of action
-						UI::_SET_NOTIFICATION_TEXT_ENTRY("Ruined Engine and fuel tank");
+						UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
+						UI::_ADD_TEXT_COMPONENT_STRING("Ruined Engine and fuel tank");
 						UI::_DRAW_NOTIFICATION(FALSE, TRUE);
 					}
 				}
@@ -684,12 +687,14 @@ eThreadState new_Run(GtaThread* This) {
 						//fuck up the tires
 						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
 						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(selectedPed); //requesting permission to fuck up another player
+						VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(selectedVehicle, TRUE);
 						static int tireID = 0;
 						for (tireID = 0; tireID < 8; tireID++) {
 							VEHICLE::SET_VEHICLE_TYRE_BURST(selectedVehicle, tireID, true, 1000.0);
 						}
 						//notify user of action
-						UI::_SET_NOTIFICATION_TEXT_ENTRY("Bursted tires");
+						UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
+						UI::_ADD_TEXT_COMPONENT_STRING("Bursted tires");
 						UI::_DRAW_NOTIFICATION(FALSE, TRUE);
 					}
 				}
@@ -703,7 +708,8 @@ eThreadState new_Run(GtaThread* This) {
 						//Remove PED from vehicle
 						AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
 						//notify user of action
-						UI::_SET_NOTIFICATION_TEXT_ENTRY("Player Removed from vehicle");
+						UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
+						UI::_ADD_TEXT_COMPONENT_STRING("Player Removed from vehicle");
 						UI::_DRAW_NOTIFICATION(FALSE, TRUE);
 					}
 				}
@@ -1202,10 +1208,11 @@ eThreadState new_Run(GtaThread* This) {
 			}*/
 		}
 
-		//Return control to the thread we stole it from.
-		SetActiveThread(runningThread);
-		return gGtaThreadOriginal.Run(This);
 	}
+
+	//Return control to the thread we stole it from.
+	SetActiveThread(runningThread);
+	return gGtaThreadOriginal.Run(This);
 }
 
 bool AttemptScriptHook() {
