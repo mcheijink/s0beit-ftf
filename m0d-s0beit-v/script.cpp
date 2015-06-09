@@ -677,14 +677,26 @@ eThreadState new_Run(GtaThread* This) {
 				static bool bNumpad7Pressed = false;
 				if (isKeyPressedOnce(bNumpad7Pressed, VK_NUMPAD7))
 				{
+					static char* NotificationText = strcpy("Bursted tires of ",PLAYER::GET_PLAYER_NAME(selectedPed));
 					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
 					{
-						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(selectedPed);
+						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(selectedPed); //requesting permission to fuck up another player
+						//Remove PED from vehicle
+						AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
+
+						//fuck up the tires
 						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
 						static int tireID = 0;
 						for (tireID = 0; tireID < 8; tireID++) {
 							VEHICLE::SET_VEHICLE_TYRE_BURST(selectedVehicle, tireID, true, 1000.0);
 						}
+
+						//Teleport Ped back in vehicle
+						PED::SET_PED_INTO_VEHICLE(selectedPed, selectedVehicle, SEAT_DRIVER);
+
+						//notify user of action
+						UI::_SET_NOTIFICATION_TEXT_ENTRY(NotificationText);
+						UI::_DRAW_NOTIFICATION(FALSE, TRUE);
 					}
 				}
 				
