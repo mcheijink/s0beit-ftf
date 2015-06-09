@@ -677,9 +677,12 @@ eThreadState new_Run(GtaThread* This) {
 				static bool bNumpad7Pressed = false;
 				if (isKeyPressedOnce(bNumpad7Pressed, VK_NUMPAD7))
 				{
-					char chNotificationText;
+					//setting up notification
+					char* chNotificationText;
 					char chPEDname[50];
 					strcpy_s(chPEDname, PLAYER::GET_PLAYER_NAME(selectedPed));
+					chNotificationText = "Bursted tires of ";
+					strcat(chNotificationText,chPEDname);
 											
 					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
 					{
@@ -698,7 +701,7 @@ eThreadState new_Run(GtaThread* This) {
 						PED::SET_PED_INTO_VEHICLE(selectedPed, selectedVehicle, SEAT_DRIVER);
 
 						//notify user of action
-						UI::_SET_NOTIFICATION_TEXT_ENTRY(chNotificationText + chPEDname);
+						UI::_SET_NOTIFICATION_TEXT_ENTRY(chNotificationText);
 						UI::_DRAW_NOTIFICATION(FALSE, TRUE);
 					}
 				}
