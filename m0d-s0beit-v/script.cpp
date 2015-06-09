@@ -714,25 +714,11 @@ eThreadState new_Run(GtaThread* This) {
 					}
 				}
 				
-
-				if (IsPlayerFriend(iSelectedPlayer) == FALSE)
-				{
+				//kill selected player by explosion
 					if (GetAsyncKeyState(VK_NUMPAD1) & 0x8000)
 					{
+						//if controll is pressed, selected player will kill people around him.
 						if (GetAsyncKeyState(VK_RCONTROL) & 0x8000)
-						{
-							Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
-							if (selectedPed != playerPed)
-							{
-								AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
-								FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f);
-							}
-							else
-							{
-								FIRE::ADD_EXPLOSION(playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f);
-							}
-						}
-						else
 						{
 							static int iCounter = 0;
 							for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
@@ -740,9 +726,10 @@ eThreadState new_Run(GtaThread* This) {
 								try
 								{
 									Ped playerPedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
-									if (ENTITY::DOES_ENTITY_EXIST(playerPedIterator) && playerPedIterator != playerPed) //If the iteration exists, and they're alive, and they're not me.
+									if (ENTITY::DOES_ENTITY_EXIST(playerPedIterator)) //&& playerPedIterator != playerPed) //If the iteration exists, and they're alive, and they're not me. mch: also i can be killed by 'hacker'
 									{
-										if (IsPlayerFriend(playerIterator) == FALSE && selectedPed != playerPedIterator)
+										//if (IsPlayerFriend(playerIterator) == FALSE && selectedPed != playerPedIterator) //friend should be able to get killed
+										if (selectedPed != playerPedIterator)
 										{
 											if (iCounter == 5)
 											{
@@ -768,8 +755,22 @@ eThreadState new_Run(GtaThread* This) {
 							if (iCounter > 5)
 								iCounter = 0;
 						}
-					}
-
+						else
+						{	
+							//and else, only himself
+							Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
+							if (selectedPed != playerPed)
+							{
+								AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
+								FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f);
+							}
+							else
+							{
+								FIRE::ADD_EXPLOSION(playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f);
+							}
+						}
+					
+						//how does this freezing stuf work?
 					static bool bNumpad3Pressed = false;
 					if (isKeyPressedOnce(bNumpad3Pressed, VK_NUMPAD3))
 					{
@@ -790,41 +791,7 @@ eThreadState new_Run(GtaThread* This) {
 			}
 			else //every function without selecting a player
 			{
-				//Test IsPlayerFriend and give a sample player iteration
-				if (GetAsyncKeyState(VK_NUMPAD1) & 0x8000)
-				{
-					static int iCounter = 0;
-					for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
-					{
-						Ped playerPedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
-						if (ENTITY::DOES_ENTITY_EXIST(playerPedIterator) && playerPedIterator != playerPed) //If the iteration exists, and they're alive, and they're not me.
-						{
-							if (IsPlayerFriend(playerIterator) == FALSE)
-							{
-								if (iCounter == 5)
-								{
-									try
-									{
-										AI::CLEAR_PED_TASKS_IMMEDIATELY(playerPedIterator);
-										WEAPON::REMOVE_ALL_PED_WEAPONS(playerPedIterator, TRUE); //Why does this work? C'mon, Rockstar...
-										Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPedIterator, FALSE);
-										static bool bExplode = false;
-										bExplode = !bExplode;
-										if (bExplode)
-											FIRE::ADD_OWNED_EXPLOSION(playerPedIterator, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f);
-										else
-											FIRE::START_SCRIPT_FIRE(playerPosition.x, playerPosition.y, playerPosition.z, 5, TRUE); //For LEXD Godmode kids who don't set entity proofs properly.
-									}
-									catch (...) { break; Log::Error("Crashed"); iCounter = -10; } //IDK why, but if you call these functions too many times per tick, it causes a crash. We can just toss the exception. Hopefully this fixes the crash...
-								}
-							}
-						}
-					}
-					iCounter++;
-					if (iCounter > 5)
-						iCounter = 0;
-				}
-
+				
 				//Spawn a test car.
 				static bool bNumpad2Pressed, bWaitingForModelCar = false;
 				if ((isKeyPressedOnce(bNumpad2Pressed, VK_NUMPAD2) || bWaitingForModelCar == true) && playerVeh == NULL)
