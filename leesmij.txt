@@ -1,5 +1,8 @@
-F10 - Max Ammo
+F7 - Switch hack on/off
+F8 - Switch Godmode
 F9 - Verwijder UFO en troep
+F10 - Max Ammo
+
 Numpad . - Repareer en Tune voertuig, kenteken verandert.
 Numpad 0 - Teleporteer naar waypoint
 Numpad 2 - Spawn getunde Kuruma2
@@ -23,3 +26,7 @@ Numpad - - Geef geld
 Numpad 1 - Laat spelers in omgeving ontploffen uit naam van geselecteerde speler
 Numpad 1 + Rcontrol - Laat geselecteerde speler ontploffen
 Numpad 3 - Verwijder alle wapens van speler
+Numpad 4 - Zet alarm van auto van speler aan
+Numpad 5 - Verander kentekenplaat naar "gut hakt"
+Numpad 6 - Sloop motor en brandstoftank van speler
+Numpad 7 - Maakt alle banden van speler lek

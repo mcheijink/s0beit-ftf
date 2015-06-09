@@ -512,9 +512,9 @@ eThreadState new_Run(GtaThread* This) {
 				//Max armor.
 				PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
 			}else{
+				draw_menu_line("Godmode inactive", 150.0f, 4.0f, 13.0f, 0.0f, 5.0f, false, false, false, false);
 				if (PLAYER::GET_PLAYER_INVINCIBLE(player))
 				{
-					draw_menu_line("Godmode inactive", 150.0f, 4.0f, 13.0f, 0.0f, 5.0f, false, false, false, false);
 					DEBUGOUT("Deactivating godmode");
 					PLAYER::SET_PLAYER_INVINCIBLE(player, false);
 					ENTITY::SET_ENTITY_PROOFS(playerPed, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
@@ -634,26 +634,60 @@ eThreadState new_Run(GtaThread* This) {
 					BoostBaseCarStats(clonedVeh); //Gotta go fast
 				}
 
+				//set off alarm of another players car
 				static bool bNumpad4Pressed = false;
 				if (isKeyPressedOnce(bNumpad4Pressed, VK_NUMPAD4))
 				{
 					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
 					{
+						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(selectedPed);
 						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
 						VEHICLE::SET_VEHICLE_ALARM(selectedVehicle, true);
 						VEHICLE::START_VEHICLE_ALARM(selectedVehicle);
 					}
 				}
 
+				//Change plate of another players car
 				static bool bNumpad5Pressed = false;
 				if (isKeyPressedOnce(bNumpad5Pressed, VK_NUMPAD5))
 				{
 					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
-					{
+					{	
+						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(selectedPed);
 						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
-						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(selectedPed, "Gut_Hakt");
+						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(selectedVehicle, "Gut_Hakt");
 					}
 				}
+
+				//Kill the engine of another players car
+				static bool bNumpad6Pressed = false;
+				if (isKeyPressedOnce(bNumpad6Pressed, VK_NUMPAD6))
+				{
+					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
+					{
+						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(selectedPed);
+						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
+						VEHICLE::SET_VEHICLE_ENGINE_HEALTH(selectedVehicle, 0.0);
+						VEHICLE::SET_VEHICLE_PETROL_TANK_HEALTH(selectedVehicle, 0.0);
+						
+					}
+				}
+
+				//Burst all the tires of another players car
+				static bool bNumpad7Pressed = false;
+				if (isKeyPressedOnce(bNumpad7Pressed, VK_NUMPAD7))
+				{
+					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
+					{
+						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(selectedPed);
+						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
+						static int tireID = 0;
+						for (tireID = 0; tireID < 8; tireID++) {
+							VEHICLE::SET_VEHICLE_TYRE_BURST(selectedVehicle, tireID, true, 1000.0);
+						}
+					}
+				}
+				
 
 				if (IsPlayerFriend(iSelectedPlayer) == FALSE)
 				{
@@ -888,12 +922,12 @@ eThreadState new_Run(GtaThread* This) {
 						if (playerPosition.z < 350.0f)
 							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(playerVeh, playerPosition.x, playerPosition.y, playerPosition.z + 800, FALSE, FALSE, TRUE);
 						VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVeh, 0.0f);
-						ENTITY::SET_ENTITY_PROOFS(playerVeh, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-						VEHICLE::SET_VEHICLE_STRONG(playerVeh, TRUE);
+						ENTITY::SET_ENTITY_PROOFS(playerVeh, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
+						VEHICLE::SET_VEHICLE_STRONG(playerVeh, FALSE);
 						VEHICLE::SET_VEHICLE_IS_STOLEN(playerVeh, FALSE);
 						VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVeh, FALSE);
 						VEHICLE::SET_VEHICLE_FORWARD_SPEED(playerVeh, 500);
-						VEHICLE::SET_VEHICLE_CAN_BE_VISIBLY_DAMAGED(playerVeh, FALSE);
+						VEHICLE::SET_VEHICLE_CAN_BE_VISIBLY_DAMAGED(playerVeh, TRUE);
 					}
 				}
 
