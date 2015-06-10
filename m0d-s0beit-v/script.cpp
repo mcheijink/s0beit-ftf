@@ -154,6 +154,18 @@ void BoostBaseCarStats(Vehicle vehicle)
 	VEHICLE::SET_VEHICLE_BODY_HEALTH(vehicle, 1000.0f); //This is what the game does
 }
 
+bool RequestNetworkControl(Entity vehicle)
+{
+	if (NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle)) //requesting permission to fuck up another player
+	{
+		if (NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(vehicle))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 Vehicle ClonePedCar(Ped ped, Ped playerPed)
 {
 	Vehicle pedVeh = NULL;
@@ -464,48 +476,32 @@ eThreadState new_Run(GtaThread* This) {
 	//if (isKeyPressedOnce(F12, VK_F12)){ bQuit = true;}
 	//if (bQuit) { return gGtaThreadOriginal.Run(This); }
 
-	//godmode function
-	static bool bGodmodeActive, bF8Pressed = false;
-	if (bGodmodeActive)
-	{
-		draw_menu_line("Godmode active", 150.0f, 4.0f, 13.0f, 0.0f, 5.0f, false, false, false, false);
-		//Godmode
-		if (!PLAYER::GET_PLAYER_INVINCIBLE(player))
+	//var init
+	static bool bGodmodeActive, bF8Pressed, bHackActive, bF7Pressed, bMenuActive, bF3Pressed = false;
+	static int iFreeze = -1;
+
+	//main hack switch
+	if (isKeyPressedOnce(bF7Pressed, VK_F7))
 		{
-			DEBUGOUT("Setting godmode");
-			PLAYER::SET_PLAYER_INVINCIBLE(player, true);
-			ENTITY::SET_ENTITY_PROOFS(playerPed, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-			PED::SET_PED_CAN_RAGDOLL(playerPed, FALSE);
-			PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, FALSE);
+			bHackActive = !bHackActive;
 		}
 
-		//Max armor.
-		PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
-	}
-	else {
-		//draw_menu_line("Godmode inactive", 150.0f, 4.0f, 13.0f, 0.0f, 5.0f, false, false, false, false);
-		if (PLAYER::GET_PLAYER_INVINCIBLE(player))
+	//menu switch
+	if (isKeyPressedOnce(bF3Pressed, VK_F3))
 		{
-			DEBUGOUT("Deactivating godmode");
-			PLAYER::SET_PLAYER_INVINCIBLE(player, false);
-			ENTITY::SET_ENTITY_PROOFS(playerPed, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
-			PED::SET_PED_CAN_RAGDOLL(playerPed, TRUE);
-			PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, TRUE);
+			iFreeze = -1;
+			bMenuActive = !bMenuActive;
 		}
-	}
-	
-	static bool bHackActive, bF7Pressed = false;
-	if (isKeyPressedOnce(bF7Pressed, VK_F7))
-	{
-		bHackActive = !bHackActive;
-	}
+
 	if (!bHackActive)
-	{
-		//housekeeping of vars
-		bGodmodeActive = false;
-		draw_menu_line("Hack inactive", 150.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false, false);
-	}
-	else {
+		{
+			//housekeeping of vars
+			bGodmodeActive = false;
+			bMenuActive = false;
+			draw_menu_line("Hack inactive", 150.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false, false);
+		}
+	else 
+		{
 		if (ENTITY::DOES_ENTITY_EXIST(playerPed) == TRUE)
 		{
 			Hash currentWeapon;
@@ -518,13 +514,37 @@ eThreadState new_Run(GtaThread* This) {
 			draw_menu_line("Hack active", 150.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false, false);
 			draw_menu_line("s0biet by gir489 - mch 10-6-2015 ", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
 
-			static bool bMenuActive, bF3Pressed = false;
-			static int iFreeze = -1;
-			if (isKeyPressedOnce(bF3Pressed, VK_F3))
+			//godmode part
+			if (bGodmodeActive)
 			{
-				iFreeze = -1;
-				bMenuActive = !bMenuActive;
+				draw_menu_line("Godmode active", 150.0f, 4.0f, 13.0f, 0.0f, 5.0f, false, false, false, false);
+				//Godmode
+				if (!PLAYER::GET_PLAYER_INVINCIBLE(player))
+				{
+					DEBUGOUT("Setting godmode");
+					PLAYER::SET_PLAYER_INVINCIBLE(player, true);
+					ENTITY::SET_ENTITY_PROOFS(playerPed, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+					PED::SET_PED_CAN_RAGDOLL(playerPed, FALSE);
+					PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, FALSE);
+				}
+
+				//Max armor.
+				PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
 			}
+			else {
+				//draw_menu_line("Godmode inactive", 150.0f, 4.0f, 13.0f, 0.0f, 5.0f, false, false, false, false);
+				if (PLAYER::GET_PLAYER_INVINCIBLE(player))
+				{
+					DEBUGOUT("Deactivating godmode");
+					PLAYER::SET_PLAYER_INVINCIBLE(player, false);
+					ENTITY::SET_ENTITY_PROOFS(playerPed, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
+					PED::SET_PED_CAN_RAGDOLL(playerPed, TRUE);
+					PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, TRUE);
+				}
+			}
+
+
+			//menu subsystem
 			bool bReset = false;
 			if (bMenuActive)
 			{
@@ -633,15 +653,16 @@ eThreadState new_Run(GtaThread* This) {
 				if (isKeyPressedOnce(bNumpad4Pressed, VK_NUMPAD4))
 				{
 					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
-					{
-						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(selectedPed);
+					{						
 						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
-						VEHICLE::SET_VEHICLE_ALARM(selectedVehicle, true);
-						VEHICLE::START_VEHICLE_ALARM(selectedVehicle);
-						//notify user of action
-						UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
-						UI::_ADD_TEXT_COMPONENT_STRING("Set off alarm of vehicle");
-						UI::_DRAW_NOTIFICATION(FALSE, TRUE);
+						if (RequestNetworkControl(selectedVehicle)) {
+							VEHICLE::SET_VEHICLE_ALARM(selectedVehicle, true);
+							VEHICLE::START_VEHICLE_ALARM(selectedVehicle);
+							//notify user of action
+							UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
+							UI::_ADD_TEXT_COMPONENT_STRING("Set off alarm of vehicle");
+							UI::_DRAW_NOTIFICATION(FALSE, TRUE);
+						}
 					}
 				}
 
@@ -651,13 +672,15 @@ eThreadState new_Run(GtaThread* This) {
 				{
 					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
 					{	
-						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(selectedPed);
 						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
-						VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(selectedVehicle, "Gut_Hakt");
-						//notify user of action
-						UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
-						UI::_ADD_TEXT_COMPONENT_STRING("Changed license plate to Gut_Hakt");
-						UI::_DRAW_NOTIFICATION(FALSE, TRUE);
+						if (RequestNetworkControl(selectedVehicle)) {
+							NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(selectedVehicle);
+							VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(selectedVehicle, "Gut_Hakt");
+							//notify user of action
+							UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
+							UI::_ADD_TEXT_COMPONENT_STRING("Changed license plate to Gut_Hakt");
+							UI::_DRAW_NOTIFICATION(FALSE, TRUE);
+						}
 					}
 				}
 
@@ -666,15 +689,16 @@ eThreadState new_Run(GtaThread* This) {
 				if (isKeyPressedOnce(bNumpad6Pressed, VK_NUMPAD6))
 				{
 					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
-					{
-						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(selectedPed);
+					{						
 						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
-						VEHICLE::SET_VEHICLE_ENGINE_HEALTH(selectedVehicle, 0.0);
-						VEHICLE::SET_VEHICLE_PETROL_TANK_HEALTH(selectedVehicle, 0.0);
-						//notify user of action
-						UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
-						UI::_ADD_TEXT_COMPONENT_STRING("Ruined Engine and fuel tank");
-						UI::_DRAW_NOTIFICATION(FALSE, TRUE);
+						if (RequestNetworkControl(selectedVehicle)) {
+							VEHICLE::SET_VEHICLE_ENGINE_HEALTH(selectedVehicle, 0.0);
+							VEHICLE::SET_VEHICLE_PETROL_TANK_HEALTH(selectedVehicle, 0.0);
+							//notify user of action
+							UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
+							UI::_ADD_TEXT_COMPONENT_STRING("Ruined Engine and fuel tank");
+							UI::_DRAW_NOTIFICATION(FALSE, TRUE);
+						}
 					}
 				}
 
@@ -686,16 +710,17 @@ eThreadState new_Run(GtaThread* This) {
 					{
 						//fuck up the tires
 						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
-						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(selectedPed); //requesting permission to fuck up another player
-						VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(selectedVehicle, TRUE);
-						static int tireID = 0;
-						for (tireID = 0; tireID < 8; tireID++) {
-							VEHICLE::SET_VEHICLE_TYRE_BURST(selectedVehicle, tireID, true, 1000.0);
+						if (RequestNetworkControl(selectedVehicle)) {
+							VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(selectedVehicle, TRUE);
+							static int tireID = 0;
+							for (tireID = 0; tireID < 8; tireID++) {
+								VEHICLE::SET_VEHICLE_TYRE_BURST(selectedVehicle, tireID, true, 1000.0);
+							}
+							//notify user of action
+							UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
+							UI::_ADD_TEXT_COMPONENT_STRING("Bursted tires");
+							UI::_DRAW_NOTIFICATION(FALSE, TRUE);
 						}
-						//notify user of action
-						UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
-						UI::_ADD_TEXT_COMPONENT_STRING("Bursted tires");
-						UI::_DRAW_NOTIFICATION(FALSE, TRUE);
 					}
 				}
 
@@ -713,6 +738,33 @@ eThreadState new_Run(GtaThread* This) {
 						UI::_DRAW_NOTIFICATION(FALSE, TRUE);
 					}
 				}
+
+				/* still work in progress
+				//Player will get attacked by random peds
+				static bool bNumpad9Pressed = false;
+				if (isKeyPressedOnce(bNumpad9Pressed, VK_NUMPAD9))
+				{
+					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
+					{
+						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
+						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(selectedVehicle); //requesting permission to fuck up another player
+						
+						//Remove PED from vehicle and lock it up
+						AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
+						VEHICLE::SET_VEHICLE_DOORS_LOCKED_FOR_ALL_PLAYERS(selectedVehicle, true);
+
+						//notify user of action
+						UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
+						UI::_ADD_TEXT_COMPONENT_STRING("Player Removed from vehicle, ready to start the hit");
+						UI::_DRAW_NOTIFICATION(FALSE, TRUE);
+					}
+					//select a random ped arround player
+					Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
+					Ped selectedRandPed = PED::GET_RANDOM_PED_AT_COORD(playerPosition.x, playerPosition.y, playerPosition.z, 400.0f, 400.0f, 400.0f,-1);
+					PED::REGISTER_TARGET(selectedRandPed, selectedPed);
+					AI::TASK_COMBAT_PED(selectedRandPed, selectedPed, 0, 1);
+				}
+				*/
 				
 				//kill selected player by explosion
 					if (GetAsyncKeyState(VK_NUMPAD1) & 0x8000)
