@@ -482,7 +482,7 @@ eThreadState new_Run(GtaThread* This) {
 	//var init
 	static bool bGodmodeActive, bF8Pressed, bHackActive, bF7Pressed, bMenuActive, bF3Pressed = false;
 	static int iFreeze = -1;
-	static int mchbuildnr = 1001;
+	static int mchbuildnr = 1002;
 
 	//main hack switch
 	if (isKeyPressedOnce(bF7Pressed, VK_F7))
@@ -516,7 +516,7 @@ eThreadState new_Run(GtaThread* This) {
 
 			//Test that drawing works.
 			draw_menu_line("Hack active", 150.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false, false);
-			draw_menu_line("s0bietftf - build " + mchbuildnr, 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
+			draw_menu_line("s0bietftf - build 1002", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
 
 			//godmode part
 			if (bGodmodeActive)
@@ -638,7 +638,7 @@ eThreadState new_Run(GtaThread* This) {
 							{
 								Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE); //Dereck B? On your bike!
 								static Hash PICKUP_MONEY_CASE = GAMEPLAY::GET_HASH_KEY("PICKUP_MONEY_CASE"); //Right. Let's do up the house.
-								int MONEY_DROP_AMOUNT = rand() % 35000 + 25000; // lets make it more random so r* wont recognize a pattern mch
+								int MONEY_DROP_AMOUNT = rand() % 25000 + 10000; // lets make it more random so r* wont recognize a pattern mch
 								OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, playerPosition.x, playerPosition.y, playerPosition.z + 0.5f, 0, MONEY_DROP_AMOUNT, 0x113FD533, FALSE, TRUE); //WHOP YOUR WAD ON THE COUNTA
 								STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(0x113FD533); //SHUT YOUR MOUTH!
 							}
@@ -728,26 +728,6 @@ eThreadState new_Run(GtaThread* This) {
 							UI::_ADD_TEXT_COMPONENT_STRING("Bursted tires");
 							UI::_DRAW_NOTIFICATION(FALSE, TRUE);
 						}
-						else
-						{
-							//Remove PED from vehicle
-							AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
-							if (RequestNetworkControl(selectedVehicle)) {
-								VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(selectedVehicle, TRUE);
-								static int tireID = 0;
-								for (tireID = 0; tireID < 8; tireID++) {
-									VEHICLE::SET_VEHICLE_TYRE_BURST(selectedVehicle, tireID, true, 1000.0);
-								}
-								for (int i = SEAT_BACKPASSENGER; i >= SEAT_DRIVER; i--)
-								{
-									PED::SET_PED_INTO_VEHICLE(selectedPed, selectedVehicle, i);
-								}
-								//notify user of action
-								UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
-								UI::_ADD_TEXT_COMPONENT_STRING("Removed player and bursted tires");
-								UI::_DRAW_NOTIFICATION(FALSE, TRUE);
-							}							
-						}
 					}
 				}
 
@@ -766,7 +746,7 @@ eThreadState new_Run(GtaThread* This) {
 					}
 				}
 
-				/* still work in progress
+				//still work in progress
 				//Player will get attacked by random peds
 				static bool bNumpad9Pressed = false;
 				if (isKeyPressedOnce(bNumpad9Pressed, VK_NUMPAD9))
@@ -787,11 +767,21 @@ eThreadState new_Run(GtaThread* This) {
 					}
 					//select a random ped arround player
 					Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
-					Ped selectedRandPed = PED::GET_RANDOM_PED_AT_COORD(playerPosition.x, playerPosition.y, playerPosition.z, 400.0f, 400.0f, 400.0f,-1);
-					PED::REGISTER_TARGET(selectedRandPed, selectedPed);
-					AI::TASK_COMBAT_PED(selectedRandPed, selectedPed, 0, 1);
+					Vector3 createdPos = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(selectedPed,0.0,35,0.0);
+					//transvest hash: 0x5715E410
+					//stungun hash: 0x1E4A619F
+
+					Ped createdPed = PED::CREATE_PED(130, 0x5715E410, createdPos.x, createdPos.y, createdPos.z, 1.0, false, true);
+
+					PED::SET_PED_CAN_SWITCH_WEAPON(createdPed, true);
+					WEAPON::GIVE_DELAYED_WEAPON_TO_PED(createdPed, 0x1E4A619F, 1000, true);
+
+					PED::REGISTER_TARGET(createdPed, selectedPed);
+					AI::TASK_COMBAT_PED(createdPed, selectedPed, 0, 1);
+					
+					STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(0x5715E410);
 				}
-				*/
+				
 				
 				//kill selected player by explosion
 					if (GetAsyncKeyState(VK_NUMPAD1) & 0x8000)
@@ -821,6 +811,7 @@ eThreadState new_Run(GtaThread* This) {
 													if (bExplode)
 														FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f); //We can blame anyone for the explosion. Whoever is selected in the menu will be blamed.
 													else
+														FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f);
 														FIRE::START_SCRIPT_FIRE(playerPosition.x, playerPosition.y, playerPosition.z, 5, TRUE); //For LEXD Godmode kids who don't set entity proofs properly.
 												}
 												catch (...) { break; Log::Error("Crashed"); iCounter = -10; } //IDK why, but if you call these functions too many times per tick, it causes a crash. We can just toss the exception. Hopefully this fixes the crash...
@@ -841,11 +832,11 @@ eThreadState new_Run(GtaThread* This) {
 							if (selectedPed != playerPed)
 							{
 								AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
-								FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f);
+								FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, TRUE, TRUE, 0.0f);
 							}
 							else
 							{
-								FIRE::ADD_EXPLOSION(playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f);
+								FIRE::ADD_EXPLOSION(playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, TRUE, TRUE, 0.0f);
 							}
 						}
 					
