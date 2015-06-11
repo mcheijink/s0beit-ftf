@@ -74,7 +74,7 @@ void CheckPlayer(int& iPlayer, bool direction)
 void BruteForceWeaponAddons(Ped ped, Hash weaponHash, bool bSilencer )
 {
 	//Since only I get these anyway, might as well craft it for me.
-	static Hash weaponAddons[] = { COMPONENT_AT_SCOPE_MACRO, COMPONENT_AT_SCOPE_MACRO_02, COMPONENT_AT_SCOPE_SMALL, COMPONENT_AT_SCOPE_SMALL_02, COMPONENT_AT_SCOPE_MEDIUM, COMPONENT_AT_SCOPE_LARGE, COMPONENT_AT_SCOPE_MAX, COMPONENT_AT_RAILCOVER_01, COMPONENT_AT_AR_AFGRIP, COMPONENT_AT_PI_FLSH, COMPONENT_AT_AR_FLSH, COMPONENT_PISTOL_CLIP_02, COMPONENT_COMBATPISTOL_CLIP_02, COMPONENT_APPISTOL_CLIP_02, COMPONENT_MICROSMG_CLIP_02, COMPONENT_SMG_CLIP_02, COMPONENT_ASSAULTRIFLE_CLIP_02, COMPONENT_CARBINERIFLE_CLIP_02, COMPONENT_ADVANCEDRIFLE_CLIP_02, COMPONENT_MG_CLIP_02, COMPONENT_COMBATMG_CLIP_02, COMPONENT_ASSAULTSHOTGUN_CLIP_02, COMPONENT_PISTOL50_CLIP_02, COMPONENT_ASSAULTSMG_CLIP_02, COMPONENT_SNSPISTOL_CLIP_02, COMPONENT_HEAVYPISTOL_CLIP_02, COMPONENT_SPECIALCARBINE_CLIP_02, COMPONENT_BULLPUPRIFLE_CLIP_02, COMPONENT_VINTAGEPISTOL_CLIP_02, COMPONENT_MARKSMANRIFLE_CLIP_02, COMPONENT_HEAVYSHOTGUN_CLIP_02, COMPONENT_GUSENBERG_CLIP_02 };
+	static Hash weaponAddons[] = { COMPONENT_AT_SCOPE_MACRO, COMPONENT_AT_SCOPE_MACRO_02, COMPONENT_AT_SCOPE_SMALL, COMPONENT_AT_SCOPE_SMALL_02, COMPONENT_AT_SCOPE_MEDIUM, COMPONENT_AT_SCOPE_LARGE, COMPONENT_AT_SCOPE_MAX, COMPONENT_AT_RAILCOVER_01, COMPONENT_AT_AR_AFGRIP, COMPONENT_AT_PI_FLSH, COMPONENT_AT_AR_FLSH, COMPONENT_PISTOL_CLIP_02, COMPONENT_COMBATPISTOL_CLIP_02, COMPONENT_APPISTOL_CLIP_02, COMPONENT_MICROSMG_CLIP_02, COMPONENT_SMG_CLIP_02, COMPONENT_ASSAULTRIFLE_CLIP_02, COMPONENT_CARBINERIFLE_CLIP_02, COMPONENT_ADVANCEDRIFLE_CLIP_02, COMPONENT_MG_CLIP_02, COMPONENT_COMBATMG_CLIP_02, COMPONENT_ASSAULTSHOTGUN_CLIP_02, COMPONENT_PISTOL50_CLIP_02, COMPONENT_ASSAULTSMG_CLIP_02, COMPONENT_SNSPISTOL_CLIP_02, COMPONENT_COMBATPDW_CLIP_02, COMPONENT_HEAVYPISTOL_CLIP_02, COMPONENT_SPECIALCARBINE_CLIP_02, COMPONENT_BULLPUPRIFLE_CLIP_02, COMPONENT_VINTAGEPISTOL_CLIP_02, COMPONENT_MARKSMANRIFLE_CLIP_02, COMPONENT_HEAVYSHOTGUN_CLIP_02, COMPONENT_GUSENBERG_CLIP_02 };
 	for each (Hash addonHash in weaponAddons)
 	{
 		if (WEAPON::_CAN_WEAPON_HAVE_COMPONENT(weaponHash, addonHash))
@@ -100,7 +100,7 @@ void GiveAllWeaponsToPed(Ped ped, WeaponTints weaponTint, bool removeWeaponsFirs
 {
 	if (removeWeaponsFirst)
 		WEAPON::REMOVE_ALL_PED_WEAPONS(ped, TRUE);
-	static Hash weaponList[] = { WEAPON_ADVANCEDRIFLE, WEAPON_APPISTOL, WEAPON_ASSAULTRIFLE, WEAPON_ASSAULTSHOTGUN, WEAPON_ASSAULTSMG, WEAPON_BALL, WEAPON_BAT, WEAPON_BOTTLE, WEAPON_BULLPUPSHOTGUN, WEAPON_CARBINERIFLE, WEAPON_COMBATMG, WEAPON_COMBATPISTOL, WEAPON_CROWBAR, WEAPON_DAGGER, WEAPON_FIREEXTINGUISHER, WEAPON_FIREWORK, WEAPON_FLAREGUN, WEAPON_GOLFCLUB, WEAPON_GRENADE, WEAPON_GRENADELAUNCHER, WEAPON_GUSENBERG, WEAPON_HAMMER, WEAPON_HEAVYPISTOL, WEAPON_HEAVYSHOTGUN, WEAPON_HEAVYSNIPER, WEAPON_HOMINGLAUNCHER, WEAPON_KNIFE, WEAPON_MARKSMANRIFLE, WEAPON_MG, WEAPON_MICROSMG, WEAPON_MOLOTOV, WEAPON_MUSKET, WEAPON_NIGHTSTICK, WEAPON_PETROLCAN, WEAPON_PISTOL, WEAPON_PISTOL50, WEAPON_PROXMINE, WEAPON_PUMPSHOTGUN, WEAPON_RAILGUN, WEAPON_RPG, WEAPON_SAWNOFFSHOTGUN, WEAPON_SMG, WEAPON_SMOKEGRENADE, WEAPON_SNIPERRIFLE, WEAPON_SNOWBALL, WEAPON_SNSPISTOL, WEAPON_SPECIALCARBINE, WEAPON_STICKYBOMB, WEAPON_STUNGUN, WEAPON_VINTAGEPISTOL, WEAPON_MINIGUN };
+	static Hash weaponList[] = { WEAPON_ADVANCEDRIFLE, WEAPON_APPISTOL, WEAPON_ASSAULTRIFLE, WEAPON_ASSAULTSHOTGUN, WEAPON_ASSAULTSMG, WEAPON_BALL, WEAPON_BAT, WEAPON_BOTTLE, WEAPON_BULLPUPSHOTGUN, WEAPON_CARBINERIFLE, WEAPON_COMBATMG, WEAPON_COMBATPDW, WEAPON_COMBATPISTOL, WEAPON_CROWBAR, WEAPON_DAGGER, WEAPON_FIREEXTINGUISHER, WEAPON_FIREWORK, WEAPON_FLAREGUN, WEAPON_GOLFCLUB, WEAPON_GRENADE, WEAPON_GRENADELAUNCHER, WEAPON_GUSENBERG, WEAPON_HAMMER, WEAPON_HEAVYPISTOL, WEAPON_HEAVYSHOTGUN, WEAPON_HEAVYSNIPER, WEAPON_HOMINGLAUNCHER, WEAPON_KNIFE, WEAPON_MARKSMANRIFLE, WEAPON_MG, WEAPON_MICROSMG, WEAPON_MOLOTOV, WEAPON_MUSKET, WEAPON_NIGHTSTICK, WEAPON_PETROLCAN, WEAPON_PISTOL, WEAPON_PISTOL50, WEAPON_PROXMINE, WEAPON_PUMPSHOTGUN, WEAPON_RAILGUN, WEAPON_RPG, WEAPON_SAWNOFFSHOTGUN, WEAPON_SMG, WEAPON_SMOKEGRENADE, WEAPON_SNIPERRIFLE, WEAPON_SNOWBALL, WEAPON_SNSPISTOL, WEAPON_SPECIALCARBINE, WEAPON_STICKYBOMB, WEAPON_STUNGUN, WEAPON_VINTAGEPISTOL, WEAPON_MINIGUN };
 	for each (Hash var in weaponList)
 	{
 		int maxAmmo;
@@ -130,27 +130,30 @@ void CheckAndSelectWeapon(Ped ped, Hash weaponHash)
 	WEAPON::SET_CURRENT_PED_WEAPON(ped, weaponHash, TRUE);
 }
 
-void BoostBaseCarStats(Vehicle vehicle)
+void BoostBaseVehicleStats(Vehicle vehicle)
 {
-	VEHICLE::SET_VEHICLE_MOD_KIT(vehicle, 0); //IDK what this does, but I guess it allows individual mods to be added? It's what the game does before calling SET_VEHICLE_MOD.
 	VEHICLE::SET_VEHICLE_DIRT_LEVEL(vehicle, 0.0f);
-	BOOL IsRCtrlUp = !(GetAsyncKeyState(VK_RCONTROL) & 0x8000);
-	//ENTITY::SET_ENTITY_INVINCIBLE(vehicle, IsRCtrlUp); //That should do the trick.
+	BOOL IsRCtrlUp = (GetAsyncKeyState(VK_RCONTROL) & 0x8000);
+	ENTITY::SET_ENTITY_INVINCIBLE(vehicle, IsRCtrlUp); //That should do the trick.
 	ENTITY::SET_ENTITY_PROOFS(vehicle, IsRCtrlUp, IsRCtrlUp, IsRCtrlUp, IsRCtrlUp, IsRCtrlUp, IsRCtrlUp, IsRCtrlUp, IsRCtrlUp);
-	//VEHICLE::SET_VEHICLE_STRONG(vehicle, TRUE); //2stronk
-	//VEHICLE::SET_VEHICLE_HAS_STRONG_AXLES(vehicle, TRUE); //6stronk9meme
+	VEHICLE::SET_VEHICLE_STRONG(vehicle, IsRCtrlUp); //2stronk
+	VEHICLE::SET_VEHICLE_CAN_BE_VISIBLY_DAMAGED(vehicle, !IsRCtrlUp); //I don't think this really works, but fuck it. Call it anyway.
+	VEHICLE::SET_VEHICLE_CAN_BREAK(vehicle, !IsRCtrlUp); //Hopefully this fixes the car blowing up after getting hit by a train...
+	VEHICLE::SET_VEHICLE_ENGINE_CAN_DEGRADE(vehicle, !IsRCtrlUp);
 	VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE); //What seems to be the officer, problem? *le9gagmemeface*
 	VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(vehicle, FALSE); //Bulletproof Tires.
-	//VEHICLE::SET_VEHICLE_CAN_BE_VISIBLY_DAMAGED(vehicle, FALSE); //I don't think this really works, but fuck it. Call it anyway.
-	//VEHICLE::SET_VEHICLE_CAN_BREAK(vehicle, FALSE); //Hopefully this fixes the car blowing up after getting hit by a train...
-	//VEHICLE::SET_VEHICLE_ENGINE_CAN_DEGRADE(vehicle, FALSE);
-	VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_ENGINE, MOD_INDEX_FOUR, FALSE); //6fast9furious
-	VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_BRAKES, MOD_INDEX_THREE, FALSE); //GOTTA STOP FAST
-	VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_TRANSMISSION, MOD_INDEX_THREE, FALSE); //Not when I shift in to MAXIMUM OVERMEME!
-	VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_SUSPENSION, MOD_INDEX_FOUR, FALSE); //How low can you go?
-	VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_ARMOR, MOD_INDEX_FIVE, FALSE); //100% armor.
-	//VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(vehicle, "GUT_HAKT"); // Custom plate
-	VEHICLE::TOGGLE_VEHICLE_MOD(vehicle, MOD_TURBO, TRUE); //Forced induction huehuehue
+	Hash vehicleModel = ENTITY::GET_ENTITY_MODEL(vehicle);
+	if (VEHICLE::IS_THIS_MODEL_A_CAR(vehicleModel) || VEHICLE::IS_THIS_MODEL_A_BIKE(vehicleModel))
+	{
+		VEHICLE::SET_VEHICLE_MOD_KIT(vehicle, 0); //IDK what this does, but I guess it allows individual mods to be added? It's what the game does before calling SET_VEHICLE_MOD.
+		VEHICLE::SET_VEHICLE_HAS_STRONG_AXLES(vehicle, IsRCtrlUp); //6stronk9meme
+		VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_ENGINE, MOD_INDEX_FOUR, FALSE); //6fast9furious
+		VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_BRAKES, MOD_INDEX_THREE, FALSE); //GOTTA STOP FAST
+		VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_TRANSMISSION, MOD_INDEX_THREE, FALSE); //Not when I shift in to MAXIMUM OVERMEME!
+		VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_SUSPENSION, MOD_INDEX_FOUR, FALSE); //How low can you go?
+		VEHICLE::SET_VEHICLE_MOD(vehicle, MOD_ARMOR, MOD_INDEX_FIVE, FALSE); //100% armor.
+		VEHICLE::TOGGLE_VEHICLE_MOD(vehicle, MOD_TURBO, TRUE); //Forced induction huehuehue
+	}
 	VEHICLE::SET_VEHICLE_BODY_HEALTH(vehicle, 1000.0f); //This is what the game does
 }
 
@@ -622,10 +625,12 @@ eThreadState new_Run(GtaThread* This) {
 				{
 					try
 					{
-						static bool bLoadsAMoney = false;
-						bLoadsAMoney = !bLoadsAMoney;
-						if (bLoadsAMoney)
-						{
+						static int iMoney = 0;
+						iMoney++;
+						if (!STREAMING::HAS_MODEL_LOADED(0x113FD533))
+							STREAMING::REQUEST_MODEL(0x113FD533); //Manchester United: Nil Loadsamoney United: LOADS
+						if (iMoney >= 2)
+							{
 								//money bag has hash 0x113FD533
 							STREAMING::REQUEST_MODEL(0x113FD533); //Manchester United: Nil Loadsamoney United: LOADS
 							if (STREAMING::HAS_MODEL_LOADED(0x113FD533)) //Good evening and welcome to: Loads of Money.
@@ -636,6 +641,7 @@ eThreadState new_Run(GtaThread* This) {
 								OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, playerPosition.x, playerPosition.y, playerPosition.z + 0.5f, 0, MONEY_DROP_AMOUNT, 0x113FD533, FALSE, TRUE); //WHOP YOUR WAD ON THE COUNTA
 								STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(0x113FD533); //SHUT YOUR MOUTH!
 							}
+							iMoney = 0;
 						}
 					}
 					catch (...){ Log::Error("Got too much money."); }
@@ -645,7 +651,7 @@ eThreadState new_Run(GtaThread* This) {
 				if (isKeyPressedOnce(bNumpad2Pressed, VK_NUMPAD2))
 				{
 					Vehicle clonedVeh = ClonePedCar(selectedPed, playerPed);
-					BoostBaseCarStats(clonedVeh); //Gotta go fast
+					BoostBaseVehicleStats(clonedVeh); //Gotta go fast
 				}
 
 				//set off alarm of another players car
@@ -833,11 +839,22 @@ eThreadState new_Run(GtaThread* This) {
 					}
 					if (iFreeze != -1 && (selectedPed != playerPed))
 					{
-						if (iFreeze == selectedPed)
+						try
 						{
-							WEAPON::REMOVE_ALL_PED_WEAPONS(selectedPed, TRUE);
-							AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
+							
+							
+							if (iFreeze == selectedPed)
+								 {
+								static bool bFreeze = false;
+								bFreeze = !bFreeze;
+								if (bFreeze)
+									{
+									WEAPON::REMOVE_ALL_PED_WEAPONS(selectedPed, TRUE);
+									AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
+									}
+								}
 						}
+						catch (...) {}
 					}
 				}
 			}
@@ -862,7 +879,7 @@ eThreadState new_Run(GtaThread* This) {
 						playerVeh = VEHICLE::CREATE_VEHICLE(vehicleModelHash, playerPosition.x, playerPosition.y, playerPosition.z, ENTITY::GET_ENTITY_HEADING(playerPed), TRUE, TRUE);
 						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(playerVeh);
 						PED::SET_PED_INTO_VEHICLE(playerPed, playerVeh, SEAT_DRIVER);
-						BoostBaseCarStats(playerVeh);
+						BoostBaseVehicleStats(playerVeh);
 						if (vehicleModelHash == VEHICLE_KURUMA2) //Test that I can make a perfect 1:1 clone of my Kuruma with only calling natives.
 						{
 							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SPOILER, MOD_INDEX_ONE, FALSE);
@@ -951,6 +968,7 @@ eThreadState new_Run(GtaThread* This) {
 								VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_BLACK);
 								VEHICLE::SET_HELI_BLADES_FULL_SPEED(playerVeh);
 							}
+							BoostBaseVehicleStats(playerVeh);
 							STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(vehicleModelHash);
 							bWaitingForModelAircraft = false;
 						}
@@ -966,13 +984,8 @@ eThreadState new_Run(GtaThread* This) {
 						Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerVeh, FALSE);
 						if (playerPosition.z < 350.0f)
 							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(playerVeh, playerPosition.x, playerPosition.y, playerPosition.z + 800, FALSE, FALSE, TRUE);
-						VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVeh, 0.0f);
-						ENTITY::SET_ENTITY_PROOFS(playerVeh, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
-						VEHICLE::SET_VEHICLE_STRONG(playerVeh, FALSE);
-						VEHICLE::SET_VEHICLE_IS_STOLEN(playerVeh, FALSE);
-						VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVeh, FALSE);
-						VEHICLE::SET_VEHICLE_FORWARD_SPEED(playerVeh, 500);
-						VEHICLE::SET_VEHICLE_CAN_BE_VISIBLY_DAMAGED(playerVeh, TRUE);
+						VEHICLE::SET_VEHICLE_FORWARD_SPEED(playerVeh, 500.0f);
+						BoostBaseVehicleStats(playerVeh);
 					}
 				}
 
@@ -986,8 +999,7 @@ eThreadState new_Run(GtaThread* This) {
 						if (blip)
 						{
 							//if ( blip->dwColor != 0x3 && !(blip->bIcon == 150 && blip->dwColor == 1) ) //Cut out most of the random job blips.
-							DEBUGOUT("Blip%i ID: %i ID2: %i Icon: %i Color: 0x%X Message: %s", i, blip->iID, blip->iID2, blip->bIcon, blip->dwColor, blip->szMessage == NULL ? "" : blip->szMessage);
-							if ((blip->dwColor == 0x42 && blip->bIcon == 1) /*Mission blip*/ ||
+							DEBUGOUT("Blip%i ID: %i ID2: %i Scale: %f Icon: %i Color: 0x%X Message: %s", i, blip->iID, blip->iID2, blip->fScale, blip->bIcon, blip->dwColor, blip->szMessage == NULL ? "" : blip->szMessage);							if ((blip->dwColor == 0x42 && blip->bIcon == 1) /*Mission blip*/ ||
 								(blip->dwColor == 0x5 && blip->bIcon == 1) /*Yellow blip*/ ||
 								(blip->dwColor == 0x0 && blip->bIcon == 38) /*Race flag*/ ||
 								(blip->dwColor == 0x2 && blip->bIcon == 1) /*Green blips*/)
@@ -1047,6 +1059,39 @@ eThreadState new_Run(GtaThread* This) {
 				}
 			}
 
+			//Shoot all spaghettios (Fuck Deliver EMP)
+			static bool bNumpad9Pressed = false;
+			if (GetAsyncKeyState(VK_NUMPAD9) & 0x8000)
+				 {
+				for (int i = 0; i <= 1000; i++)
+					{
+					Blip* blip = g_blipList->m_Blips[i].m_pBlip;
+					if (blip)
+						{
+												//You can add more here if you want, like people during TDM. But they have to appear on your map first. It'd probably be easier to just use the SHOOT_SINGLE_BULLET_BETWEEN_COORDS function on all players in //the server. I tried iterating through every single possible entity in the server and checking if they are a ped or exists, but it crashed on random entities and I got mixed results. Getting the closest ped /to the /blip seems to be the safest.
+							if (blip->bIcon == 3 /*cop*/ || blip->bIcon == 14 /*spaghettio*/)
+							 {
+							static bool bShoot = false;
+							bShoot = !bShoot;
+							if (bShoot)
+								{
+								if (blip->fScale == 1.0f)
+									 FIRE::ADD_OWNED_EXPLOSION(playerPed, blip->x, blip->y, blip->z, 4, 10.0f, FALSE, TRUE, 0.0f);
+								else
+									 GAMEPLAY::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(blip->x + 0.1f, blip->y, blip->z - 0.1f, blip->x - 0.1f, blip->y, blip->z + 1, 10, TRUE, WEAPON_PISTOL, playerPed, TRUE, TRUE, 1.0f); //FWARRRRRRAING! ~benji Alasa 2277
+								}
+							}
+						if ((blip->dwColor == 0x0 && blip->bIcon == 97) /*helicopter*/ ||
+							(blip->dwColor == 0x0 && blip->bIcon == 15) /*helicopter*/ ||
+							(blip->dwColor == 0x36 && blip->bIcon == 167) /*helicopter*/)
+							{
+							FIRE::ADD_OWNED_EXPLOSION(playerPed, blip->x, blip->y, blip->z, 4, 10.0f, FALSE, TRUE, 0.0f);
+							}
+						}
+					}
+				}
+
+
 			//Increase wanted level.
 			static bool bAddPressed = false;
 			if (isKeyPressedOnce(bAddPressed, VK_ADD))
@@ -1074,7 +1119,7 @@ eThreadState new_Run(GtaThread* This) {
 					NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(playerVeh); //Can't hurt to try.
 					VEHICLE::SET_VEHICLE_FIXED(playerVeh);
 					VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(playerVeh);
-					BoostBaseCarStats(playerVeh);
+					BoostBaseVehicleStats(playerVeh);
 				}
 				PED::CLEAR_PED_BLOOD_DAMAGE(playerPed);
 				//We can only change stats that are not ServerAuthoritative="true" in mpstatssetup.xml.

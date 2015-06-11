@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "GTA5_NativeUpdater.h"
 
 MODULEINFO g_MainModuleInfo = { 0 };
 
@@ -15,7 +14,6 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReser
 
 		DEBUGOUT("GTA5 [0x%I64X][0x%X]", g_MainModuleInfo.lpBaseOfDll, g_MainModuleInfo.SizeOfImage);
 
-		GetNativeHashes(); //Grab the hashes for natives.h from the EXE.
 		SpawnScriptHook(); //Hook that shit.
 		BypassOnlineModelRequestBlock(); //This allows us to spawn models on the LE XD INTERNET
 	}
