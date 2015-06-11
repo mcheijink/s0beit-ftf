@@ -3,13 +3,13 @@ F8 - Switch Godmode
 F9 - Verwijder UFO en troep
 F10 - Max Ammo
 
-Numpad . - Repareer en Tune voertuig, kenteken verandert.
+Numpad . - Repareer en Tune voertuig, druk Rcontrol voor een sterke auto
 Numpad 0 - Teleporteer naar waypoint
-Numpad 2 - Spawn getunde Kuruma2
-Numpad 2 + Rcontrol - Spawn BType
-Numpad 2 + Pijl Rechts - Spawn Zenterno
-Numpad 2 + Pijl Beneden - Spawn insurgent
-Numpad 3 - Spawn Vestra
+Numpad 2 - Spawn getunde Kuruma2, druk Rcontrol voor een sterke auto
+Numpad 2 + Rcontrol - 
+Numpad 2 + Pijl Rechts - Spawn Zenterno druk Rcontrol voor een sterke auto
+Numpad 2 + Pijl Beneden - Spawn insurgent druk Rcontrol voor een sterke auto
+Numpad 3 - Spawn Vestra druk Rcontrol voor een sterk voertuig
 Numpad 3 + Rcontrol - Spawn buzzard
 Numpad 7 - Teleporteer naar Objective
 Numpad + - Verhoog wanted level

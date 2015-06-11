@@ -482,6 +482,7 @@ eThreadState new_Run(GtaThread* This) {
 	//var init
 	static bool bGodmodeActive, bF8Pressed, bHackActive, bF7Pressed, bMenuActive, bF3Pressed = false;
 	static int iFreeze = -1;
+	static int mchbuildnr = 1001;
 
 	//main hack switch
 	if (isKeyPressedOnce(bF7Pressed, VK_F7))
@@ -515,7 +516,7 @@ eThreadState new_Run(GtaThread* This) {
 
 			//Test that drawing works.
 			draw_menu_line("Hack active", 150.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false, false);
-			draw_menu_line("s0biet by gir489 - mch 10-6-2015 ", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
+			draw_menu_line("s0bietftf - build " + mchbuildnr, 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
 
 			//godmode part
 			if (bGodmodeActive)
@@ -726,6 +727,26 @@ eThreadState new_Run(GtaThread* This) {
 							UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
 							UI::_ADD_TEXT_COMPONENT_STRING("Bursted tires");
 							UI::_DRAW_NOTIFICATION(FALSE, TRUE);
+						}
+						else
+						{
+							//Remove PED from vehicle
+							AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
+							if (RequestNetworkControl(selectedVehicle)) {
+								VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(selectedVehicle, TRUE);
+								static int tireID = 0;
+								for (tireID = 0; tireID < 8; tireID++) {
+									VEHICLE::SET_VEHICLE_TYRE_BURST(selectedVehicle, tireID, true, 1000.0);
+								}
+								for (int i = SEAT_BACKPASSENGER; i >= SEAT_DRIVER; i--)
+								{
+									PED::SET_PED_INTO_VEHICLE(selectedPed, selectedVehicle, i);
+								}
+								//notify user of action
+								UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
+								UI::_ADD_TEXT_COMPONENT_STRING("Removed player and bursted tires");
+								UI::_DRAW_NOTIFICATION(FALSE, TRUE);
+							}							
 						}
 					}
 				}
