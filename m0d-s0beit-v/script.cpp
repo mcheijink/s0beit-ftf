@@ -307,6 +307,13 @@ void draw_text(float x, float y, char* chSampleText, color_t color)
 	UI::_ADD_TEXT_COMPONENT_STRING(chSampleText);
 	UI::_DRAW_TEXT(x, y);
 }
+//custom notofication service
+void drawNotification(char* message)
+{
+	UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
+	UI::_ADD_TEXT_COMPONENT_STRING(message);
+	UI::_DRAW_NOTIFICATION(FALSE, TRUE);
+}
 //Function to determine if a Player object is on your Rockstar Social Club friends list.
 BOOL IsPlayerFriend(Player player)
 {
@@ -480,13 +487,24 @@ eThreadState new_Run(GtaThread* This) {
 	//if (bQuit) { return gGtaThreadOriginal.Run(This); }
 
 	//var init
-	static bool bGodmodeActive, bF8Pressed, bHackActive, bF7Pressed, bMenuActive, bF3Pressed = false;
+	static bool bGodmodeActive, bF8Pressed, bMoneyDropActive, bSubtractPressed, bHackActive, bF7Pressed, bMenuActive, bF3Pressed = false;
 	static int iFreeze = -1;
-	static int mchbuildnr = 1002;
+	static int modulesActive = 0;
+	static int mchbuildnr = 1004;
 
 	//main hack switch
 	if (isKeyPressedOnce(bF7Pressed, VK_F7))
 		{
+			if (bHackActive) 
+			{	//housekeeping of vars
+				drawNotification("Deactivating hack");
+				bMoneyDropActive = false;
+				bGodmodeActive = false;
+				bMenuActive = false;
+			}
+			else if (!bHackActive) {
+				drawNotification("Activating hack");
+			}
 			bHackActive = !bHackActive;
 		}
 
@@ -499,9 +517,6 @@ eThreadState new_Run(GtaThread* This) {
 
 	if (!bHackActive)
 		{
-			//housekeeping of vars
-			bGodmodeActive = false;
-			bMenuActive = false;
 			draw_menu_line("Hack inactive", 150.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false, false);
 		}
 	else 
@@ -516,16 +531,18 @@ eThreadState new_Run(GtaThread* This) {
 
 			//Test that drawing works.
 			draw_menu_line("Hack active", 150.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false, false);
-			draw_menu_line("s0bietftf - build 1002", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
+			draw_menu_line("s0bietftf - build 1004", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
+			draw_menu_line("Godmode active", 150.0f, 4.0f, 13.0f, 0.0f, 5.0f, bGodmodeActive, false, bGodmodeActive, false);
+			draw_menu_line("Moneydrop active", 150.0f, 4.0f, 26.0f, 0.0f, 5.0f, bMoneyDropActive, false, bMoneyDropActive, false);
 
 			//godmode part
 			if (bGodmodeActive)
 			{
-				draw_menu_line("Godmode active", 150.0f, 4.0f, 13.0f, 0.0f, 5.0f, false, false, false, false);
 				//Godmode
 				if (!PLAYER::GET_PLAYER_INVINCIBLE(player))
 				{
 					DEBUGOUT("Setting godmode");
+					drawNotification("Activating godmode");
 					PLAYER::SET_PLAYER_INVINCIBLE(player, true);
 					ENTITY::SET_ENTITY_PROOFS(playerPed, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 					PED::SET_PED_CAN_RAGDOLL(playerPed, FALSE);
@@ -540,6 +557,7 @@ eThreadState new_Run(GtaThread* This) {
 				if (PLAYER::GET_PLAYER_INVINCIBLE(player))
 				{
 					DEBUGOUT("Deactivating godmode");
+					drawNotification("Deactivating godmode");
 					PLAYER::SET_PLAYER_INVINCIBLE(player, false);
 					ENTITY::SET_ENTITY_PROOFS(playerPed, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
 					PED::SET_PED_CAN_RAGDOLL(playerPed, TRUE);
@@ -588,6 +606,8 @@ eThreadState new_Run(GtaThread* This) {
 				if (isKeyPressedOnce(bDividePressed, VK_DIVIDE))
 				{
 					GiveAllWeaponsToPed(selectedPed, WEAPONTINT_LSPD, selectedPed == playerPed);
+					//notify user of action
+					drawNotification("Gave all weapons to player");
 				}
 
 				static bool bDecimalPressed = false;
@@ -600,6 +620,8 @@ eThreadState new_Run(GtaThread* This) {
 						{
 							PED::SET_PED_INTO_VEHICLE(playerPed, selectedVehicle, i);
 						}
+						drawNotification("Teleported to player vehicle");
+
 					}
 					Entity attachedEnt = ENTITY::GET_ENTITY_ATTACHED_TO(selectedPed);
 					if (ENTITY::DOES_ENTITY_EXIST(attachedEnt))
@@ -619,30 +641,46 @@ eThreadState new_Run(GtaThread* This) {
 
 					Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
 					ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, playerPosition.x, playerPosition.y, playerPosition.z + 1, FALSE, FALSE, TRUE);
+					drawNotification("Teleported to player");
 				}
 
+
+				
 				//https://www.youtube.com/watch?v=ON-7v4qnHP8
-				if (GetAsyncKeyState(VK_SUBTRACT) & 0x8000)
+				
+				//switch for godmode
+				if (isKeyPressedOnce(bSubtractPressed, VK_SUBTRACT))
+				{
+					if (bMoneyDropActive){
+						drawNotification("Stopping moneydrop");
+					}
+					else if (bMoneyDropActive) {
+						drawNotification("And the rain of the moneyzbagz started!");
+					}
+					bMoneyDropActive = !bMoneyDropActive;
+				}
+				if (bMoneyDropActive)
 				{
 					try
 					{
 						static int iMoney = 0;
 						iMoney++;
-						if (!STREAMING::HAS_MODEL_LOADED(0x113FD533))
-							STREAMING::REQUEST_MODEL(0x113FD533); //Manchester United: Nil Loadsamoney United: LOADS
-						if (iMoney >= 2)
+						if (ENTITY::DOES_ENTITY_EXIST(selectedPed) && !ENTITY::IS_ENTITY_DEAD(selectedPed))
+						{
+							if (!STREAMING::HAS_MODEL_LOADED(0x113FD533))
+								STREAMING::REQUEST_MODEL(0x113FD533); //Manchester United: Nil Loadsamoney United: LOADS
+							if (iMoney >= 2)
 							{
-								//money bag has hash 0x113FD533
-							STREAMING::REQUEST_MODEL(0x113FD533); //Manchester United: Nil Loadsamoney United: LOADS
-							if (STREAMING::HAS_MODEL_LOADED(0x113FD533)) //Good evening and welcome to: Loads of Money.
-							{
-								Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE); //Dereck B? On your bike!
-								static Hash PICKUP_MONEY_CASE = GAMEPLAY::GET_HASH_KEY("PICKUP_MONEY_CASE"); //Right. Let's do up the house.
-								int MONEY_DROP_AMOUNT = rand() % 25000 + 10000; // lets make it more random so r* wont recognize a pattern mch
-								OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, playerPosition.x, playerPosition.y, playerPosition.z + 0.5f, 0, MONEY_DROP_AMOUNT, 0x113FD533, FALSE, TRUE); //WHOP YOUR WAD ON THE COUNTA
-								STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(0x113FD533); //SHUT YOUR MOUTH!
+								if (STREAMING::HAS_MODEL_LOADED(0x113FD533)) //Good evening and welcome to: Loads of Money.
+								{
+									Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE); //Dereck B? On your bike!
+									static Hash PICKUP_MONEY_CASE = GAMEPLAY::GET_HASH_KEY("PICKUP_MONEY_CASE"); //Right. Let's do up the house.
+									int MONEY_DROP_AMOUNT = rand() % 25000 + 10000; // lets make it more random so r* wont recognize a pattern mch
+									OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, playerPosition.x, playerPosition.y, playerPosition.z + 0.5f, 0, MONEY_DROP_AMOUNT, 0x113FD533, FALSE, TRUE); //WHOP YOUR WAD ON THE COUNTA
+									STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(0x113FD533); //SHUT YOUR MOUTH!
+								}
+								iMoney = 0;
 							}
-							iMoney = 0;
 						}
 					}
 					catch (...){ Log::Error("Got too much money."); }
@@ -653,6 +691,7 @@ eThreadState new_Run(GtaThread* This) {
 				{
 					Vehicle clonedVeh = ClonePedCar(selectedPed, playerPed);
 					BoostBaseVehicleStats(clonedVeh); //Gotta go fast
+					drawNotification("Vehicle cloned");
 				}
 
 				//set off alarm of another players car
@@ -665,10 +704,7 @@ eThreadState new_Run(GtaThread* This) {
 						if (RequestNetworkControl(selectedVehicle)) {
 							VEHICLE::SET_VEHICLE_ALARM(selectedVehicle, true);
 							VEHICLE::START_VEHICLE_ALARM(selectedVehicle);
-							//notify user of action
-							UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
-							UI::_ADD_TEXT_COMPONENT_STRING("Set off alarm of vehicle");
-							UI::_DRAW_NOTIFICATION(FALSE, TRUE);
+							drawNotification("Set off alarm of vehicle");
 						}
 					}
 				}
@@ -748,6 +784,7 @@ eThreadState new_Run(GtaThread* This) {
 
 				//still work in progress
 				//Player will get attacked by random peds
+				/*
 				static bool bNumpad9Pressed = false;
 				if (isKeyPressedOnce(bNumpad9Pressed, VK_NUMPAD9))
 				{
@@ -781,6 +818,7 @@ eThreadState new_Run(GtaThread* This) {
 					
 					STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(0x5715E410);
 				}
+				*/
 				
 				
 				//kill selected player by explosion
@@ -824,6 +862,7 @@ eThreadState new_Run(GtaThread* This) {
 							iCounter++;
 							if (iCounter > 5)
 								iCounter = 0;
+							drawNotification("Player framed!");
 						}
 						else
 						{	
@@ -838,6 +877,7 @@ eThreadState new_Run(GtaThread* This) {
 							{
 								FIRE::ADD_EXPLOSION(playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, TRUE, TRUE, 0.0f);
 							}
+							drawNotification("Player killed");
 						}
 					
 						//how does this freezing stuf work?
@@ -863,6 +903,7 @@ eThreadState new_Run(GtaThread* This) {
 									{
 									WEAPON::REMOVE_ALL_PED_WEAPONS(selectedPed, TRUE);
 									AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
+									drawNotification("Took away all the players guns");
 									}
 								}
 						}
@@ -913,6 +954,7 @@ eThreadState new_Run(GtaThread* This) {
 							//	VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, i, TRUE);
 							//}
 							//VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(playerVeh, NEON_COLOR_ELECTRICBLUE);
+							drawNotification("Spawned Kuruma");
 						}
 						else if (vehicleModelHash == VEHICLE_ZENTORNO)
 						{
@@ -937,6 +979,7 @@ eThreadState new_Run(GtaThread* This) {
 								VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, i, TRUE);
 							}
 							VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(playerVeh, NEON_COLOR_ELECTRICBLUE);
+							drawNotification("Spawned Zentorno");
 						}
 						else if (vehicleModelHash == VEHICLE_INSURGENT)
 						{
@@ -950,6 +993,11 @@ eThreadState new_Run(GtaThread* This) {
 							VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(playerVeh, "GETFUCKD");
 							VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(playerVeh, PLATE_YELLOWONBLACK);
 							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_TRUCK, FALSE);
+							drawNotification("Spawned Insurgent");
+						}
+						else 
+						{ 
+							drawNotification("Spawned Btype"); 
 						}
 						STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(vehicleModelHash);
 						bWaitingForModelCar = false;
@@ -1022,6 +1070,7 @@ eThreadState new_Run(GtaThread* This) {
 								NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(e);
 								ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, blip->x, blip->y, blip->z, FALSE, FALSE, TRUE);
 								break; //During a race there's sometimes 2 yellow markers. We want the first one.
+								drawNotification("Teleported to objective");
 							}
 						}
 					}
@@ -1068,6 +1117,7 @@ eThreadState new_Run(GtaThread* This) {
 							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, oldLocation.x, oldLocation.y, oldLocation.z, FALSE, FALSE, TRUE);
 						}
 					}
+					drawNotification("Teleported to waypoint");
 				}
 			}
 
@@ -1081,17 +1131,17 @@ eThreadState new_Run(GtaThread* This) {
 					if (blip)
 						{
 												//You can add more here if you want, like people during TDM. But they have to appear on your map first. It'd probably be easier to just use the SHOOT_SINGLE_BULLET_BETWEEN_COORDS function on all players in //the server. I tried iterating through every single possible entity in the server and checking if they are a ped or exists, but it crashed on random entities and I got mixed results. Getting the closest ped /to the /blip seems to be the safest.
-							if (blip->bIcon == 3 /*cop*/ || blip->bIcon == 14 /*spaghettio*/)
-							 {
-							static bool bShoot = false;
-							bShoot = !bShoot;
-							if (bShoot)
-								{
-								if (blip->fScale == 1.0f)
-									 FIRE::ADD_OWNED_EXPLOSION(playerPed, blip->x, blip->y, blip->z, 4, 10.0f, FALSE, TRUE, 0.0f);
-								else
-									 GAMEPLAY::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(blip->x + 0.1f, blip->y, blip->z - 0.1f, blip->x - 0.1f, blip->y, blip->z + 1, 10, TRUE, WEAPON_PISTOL, playerPed, TRUE, TRUE, 1.0f); //FWARRRRRRAING! ~benji Alasa 2277
-								}
+							if (blip->bIcon == 3 /*cop*/ || blip->bIcon == 14 /*spaghettio*/ || blip->bIcon == 71 /*red dot*/)
+							{
+								static bool bShoot = false;
+								bShoot = !bShoot;
+								if (bShoot)
+									{
+									if (blip->fScale == 1.0f && blip->bIcon != 71 /*red dot*/)
+										 FIRE::ADD_OWNED_EXPLOSION(playerPed, blip->x, blip->y, blip->z, 4, 10.0f, FALSE, TRUE, 0.0f);
+									else
+										 GAMEPLAY::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(blip->x + 0.1f, blip->y, blip->z - 0.1f, blip->x - 0.1f, blip->y, blip->z + 1, 10, TRUE, WEAPON_PISTOL, playerPed, TRUE, TRUE, 1.0f); //FWARRRRRRAING! ~benji Alasa 2277
+									}
 							}
 						if ((blip->dwColor == 0x0 && blip->bIcon == 97) /*helicopter*/ ||
 							(blip->dwColor == 0x0 && blip->bIcon == 15) /*helicopter*/ ||
@@ -1101,6 +1151,7 @@ eThreadState new_Run(GtaThread* This) {
 							}
 						}
 					}
+					drawNotification("Killed all targets");
 				}
 
 
@@ -1112,6 +1163,7 @@ eThreadState new_Run(GtaThread* This) {
 				{
 					PLAYER::SET_PLAYER_WANTED_LEVEL(player, PLAYER::GET_PLAYER_WANTED_LEVEL(player) + 1, FALSE);
 					PLAYER::SET_PLAYER_WANTED_LEVEL_NOW(player, FALSE);
+					drawNotification("Wanted-level up");
 				}
 			}
 
@@ -1120,6 +1172,7 @@ eThreadState new_Run(GtaThread* This) {
 			{
 				PLAYER::SET_PLAYER_WANTED_LEVEL(player, 0, FALSE);
 				PLAYER::SET_PLAYER_WANTED_LEVEL_NOW(player, FALSE);
+				drawNotification("Wanted cleared");
 			}
 
 			//Fix player.
@@ -1172,6 +1225,7 @@ eThreadState new_Run(GtaThread* This) {
 				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_VOTED_OUT_QUIT"), 0, TRUE);
 				//STATS::STAT_SET_BOOL(GAMEPLAY::GET_HASH_KEY("MPPLY_WAS_I_BAD_SPORT"), FALSE, TRUE);
 				//STATS::STAT_SET_BOOL(GAMEPLAY::GET_HASH_KEY("MPPLY_WAS_I_CHEATER"), FALSE, TRUE);
+				drawNotification("Player fixed");
 			}
 
 			//switch for godmode
@@ -1195,6 +1249,7 @@ eThreadState new_Run(GtaThread* This) {
 						}
 					}
 				}
+				drawNotification("Got maximum ammo");
 			}
 
 			static bool F9Pressed = false;
@@ -1205,6 +1260,7 @@ eThreadState new_Run(GtaThread* This) {
 				{
 					ENTITY::DETACH_ENTITY(PLAYER::PLAYER_PED_ID(), TRUE, TRUE);
 				}
+				drawNotification("Removed attached junk");
 			}
 
 			static bool bMouse5Pressed = false;
