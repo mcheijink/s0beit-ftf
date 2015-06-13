@@ -533,10 +533,10 @@ eThreadState new_Run(GtaThread* This) {
 	//if (bQuit) { return gGtaThreadOriginal.Run(This); }
 
 	//var init
-	static bool bGodmodeActive, bF7Pressed, bMoneyDropActive, bSubtractPressed, bHackActive, bF5Pressed, bMenuActive, bF6Pressed, bKillTargetsActive, bNumpad9Pressed = false;
+	static bool bGodmodeActive, bGodmodeSwitchset, bF7Pressed, bMoneyDropActive, bSubtractPressed, bHackActive, bF5Pressed, bMenuActive, bF6Pressed, bKillTargetsActive, bNumpad9Pressed = false;
 	static int iFreeze = -1;
 	static int modulesActive = 0;
-	static int mchbuildnr = 1009;
+	static int mchbuildnr = 1010;
 
 	float menuLeft = 1030.0;
 	float menuWidth = 250.0;
@@ -584,7 +584,7 @@ eThreadState new_Run(GtaThread* This) {
 				playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
 
 			//draw the UI for when hack is active
-			draw_menu_line("s0bietftf - build 1009", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
+			draw_menu_line("s0bietftf - build 1010", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
 			
 			draw_menu_line("F5			- Hack active", menuWidth, 4.0f, menuTop, menuLeft, 5.0f, bHackActive, false, bHackActive, false);
 			draw_menu_line("F6			- Player menu", menuWidth, 4.0f, menuTop + 13.0f * 1, menuLeft, 5.0f, bMenuActive, false, bMenuActive, false);
@@ -594,7 +594,7 @@ eThreadState new_Run(GtaThread* This) {
 			if (bGodmodeActive)
 			{
 				//Godmode
-				if (!PLAYER::GET_PLAYER_INVINCIBLE(player))
+				if (!bGodmodeSwitchset)
 				{
 					DEBUGOUT("Setting godmode");
 					drawNotification("Activating godmode");
@@ -602,14 +602,14 @@ eThreadState new_Run(GtaThread* This) {
 					ENTITY::SET_ENTITY_PROOFS(playerPed, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 					PED::SET_PED_CAN_RAGDOLL(playerPed, FALSE);
 					PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, FALSE);
+					bGodmodeSwitchset = true;
 				}
 
 				//Max armor.
 				PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
-			}
-			else {
+			} else {
 				//draw_menu_line("Godmode inactive", menuWidth, 4.0f, menuTop + 13.0f, menuLeft, 5.0f, false, false, false, false);
-				if (PLAYER::GET_PLAYER_INVINCIBLE(player))
+				if (bGodmodeActive && bGodmodeSwitchset)
 				{
 					DEBUGOUT("Deactivating godmode");
 					drawNotification("Deactivating godmode");
@@ -617,6 +617,7 @@ eThreadState new_Run(GtaThread* This) {
 					ENTITY::SET_ENTITY_PROOFS(playerPed, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
 					PED::SET_PED_CAN_RAGDOLL(playerPed, TRUE);
 					PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, TRUE);
+					bGodmodeSwitchset = false;
 				}
 			}
 
