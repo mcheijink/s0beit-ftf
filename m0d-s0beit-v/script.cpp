@@ -16,9 +16,9 @@ void SetActiveThread(rage::scrThread* thread)
 	*reinterpret_cast<rage::scrThread**>(moduleTls + 2096) = thread;
 }
 
-void draw_rect(float A_0, float A_1, float A_2, float A_3, int A_4, int A_5, int A_6, int A_7)
+void draw_rect(float Top, float Left, float Height, float Width, int Red, int Green, int Bleu, int Alpha)
 {
-	GRAPHICS::DRAW_RECT((A_0 + (A_2 * 0.5f)), (A_1 + (A_3 * 0.5f)), A_2, A_3, A_4, A_5, A_6, A_7);
+	GRAPHICS::DRAW_RECT((Top + (Height * 0.5f)), (Left + (Width * 0.5f)), Height, Width, Red, Green, Bleu, Alpha);
 }
 
 bool isKeyPressedOnce(bool& bIsPressed, DWORD vk)
@@ -42,6 +42,31 @@ void ReleaseKeys()
 {
 	keybd_event(VK_NUMPAD1, 0, KEYEVENTF_KEYUP, 0);
 	keybd_event(VK_SUBTRACT, 0, KEYEVENTF_KEYUP, 0);
+}
+
+bool isKnownBlip(Blip* blip)
+{
+	switch (blip->bIcon)
+	{
+	case 6: /*Local Player*/
+	case 48: /*Mission*/
+	case 49: /*Survival*/
+	case 54: /*Deathmatch*/
+	case 58: /*Air Race*/
+	case 59: /*Land Race*/
+	case 60: /*Sea Race*/
+	case 90: /*San Andreas Flight School*/
+	case 94: /*Parachuting*/
+	case 120: /*Bike Race*/
+	case 122: /*Team Deathmatch*/
+	case 124: /*Vehicle Deathmatch*/
+	case 150: /*Gang Attack*/
+	case 153: /*Last Team Standing*/
+	case 152: /*Capture*/
+		return true;
+	default:
+		return false;
+	}
 }
 
 void CheckPlayer(int& iPlayer, bool direction)
@@ -237,7 +262,7 @@ void draw_menu_line(std::string caption, float lineWidth, float lineHeight, floa
 {
 	// default values
 	int text_col[4] = { 255, 255, 255, 255 },
-		rect_col[4] = { 70, 95, 95, 255 };
+		rect_col[4] = { 70, 95, 95, 150 };
 	float text_scale = 0.30f;
 	int font = 0; //Maybe make this a parameter in the future.
 
@@ -294,6 +319,26 @@ void draw_menu_line(std::string caption, float lineWidth, float lineHeight, floa
 	if (bDrawRect)
 		draw_rect(lineLeftScaled, lineTopScaled + (0.007f), lineWidthScaled, ((((float)(num25)*num26) + (lineHeightScaled * 2.0f)) + 0.005f), rect_col[0], rect_col[1], rect_col[2], rect_col[3]);
 }
+void draw_rect_sc(float lineTop, float lineLeft, float lineWidth, float lineHeight)
+{
+	// default values
+	int rect_col[4] = { 50, 50, 50, 100 };
+	float text_scale = 0.30f;
+	int screen_w, screen_h;
+	GRAPHICS::GET_SCREEN_RESOLUTION(&screen_w, &screen_h);
+
+
+	float lineWidthScaled = lineWidth / (float)screen_w; // line width
+	float lineTopScaled = lineTop / (float)screen_h; // line top offset
+	float lineHeightScaled = lineHeight / (float)screen_h; // line height
+	float lineLeftScaled = lineLeft / (float)screen_w;
+	float textLeftScaled = 5.0f / (float)screen_w; // text left offset
+
+	int num25 = UI::_0x9040DFB09BE75706(textLeftScaled, (((lineTopScaled + 0.00278f) + lineHeightScaled) - 0.005f));
+	float num26 = UI::_0xDB88A37483346780(text_scale, 0);
+	draw_rect(lineLeftScaled, lineTopScaled + (0.007f), lineWidthScaled, ((((float)(num25)*num26) + (lineHeightScaled * 2.0f)) + 0.005f), rect_col[0], rect_col[1], rect_col[2], rect_col[3]);
+}
+
 
 void draw_text(float x, float y, char* chSampleText, color_t color)
 {
@@ -371,7 +416,6 @@ NativeHandler GetNativeHandler(UINT64 hash) {
 			}
 		}
 	}
-
 	return nullptr;
 }
 
@@ -487,13 +531,17 @@ eThreadState new_Run(GtaThread* This) {
 	//if (bQuit) { return gGtaThreadOriginal.Run(This); }
 
 	//var init
-	static bool bGodmodeActive, bF8Pressed, bMoneyDropActive, bSubtractPressed, bHackActive, bF7Pressed, bMenuActive, bF3Pressed = false;
+	static bool bGodmodeActive, bF7Pressed, bMoneyDropActive, bSubtractPressed, bHackActive, bF5Pressed, bMenuActive, bF6Pressed, bKillTargetsActive, bNumpad9Pressed = false;
 	static int iFreeze = -1;
 	static int modulesActive = 0;
-	static int mchbuildnr = 1004;
+	static int mchbuildnr = 1008;
+
+	float menuLeft = 1030.0;
+	float menuWidth = 250.0;
+	float menuTop = 65.0;
 
 	//main hack switch
-	if (isKeyPressedOnce(bF7Pressed, VK_F7))
+	if (isKeyPressedOnce(bF5Pressed, VK_F5))
 		{
 			if (bHackActive) 
 			{	//housekeeping of vars
@@ -509,15 +557,19 @@ eThreadState new_Run(GtaThread* This) {
 		}
 
 	//menu switch
-	if (isKeyPressedOnce(bF3Pressed, VK_F3))
+	if (isKeyPressedOnce(bF6Pressed, VK_F6))
 		{
+			if (bMenuActive){
+				bMoneyDropActive = false;
+			}
 			iFreeze = -1;
 			bMenuActive = !bMenuActive;
 		}
 
 	if (!bHackActive)
-		{
-			draw_menu_line("Hack inactive", 150.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false, false);
+		{	
+			draw_rect_sc(menuTop, menuLeft, 4.0, 100.0);
+			draw_menu_line("F5 - Hack inactive", 100.0f, 4.0f, menuTop, menuLeft, 5.0f, false, false, false, false);
 		}
 	else 
 		{
@@ -529,11 +581,12 @@ eThreadState new_Run(GtaThread* This) {
 			if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, FALSE))
 				playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
 
-			//Test that drawing works.
-			draw_menu_line("Hack active", 150.0f, 4.0f, 0.0f, 0.0f, 5.0f, false, false, false, false);
-			draw_menu_line("s0bietftf - build 1004", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
-			draw_menu_line("Godmode active", 150.0f, 4.0f, 13.0f, 0.0f, 5.0f, bGodmodeActive, false, bGodmodeActive, false);
-			draw_menu_line("Moneydrop active", 150.0f, 4.0f, 26.0f, 0.0f, 5.0f, bMoneyDropActive, false, bMoneyDropActive, false);
+			//draw the UI for when hack is active
+			draw_menu_line("s0bietftf - build 1008", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
+			
+			draw_menu_line("F5			- Hack active", menuWidth, 4.0f, menuTop, menuLeft, 5.0f, bHackActive, false, bHackActive, false);
+			draw_menu_line("F6			- Player menu", menuWidth, 4.0f, menuTop + 13.0f * 1, menuLeft, 5.0f, bMenuActive, false, bMenuActive, false);
+			draw_menu_line("F7			- Godmode active", menuWidth, 4.0f, menuTop + 13.0f * 2, menuLeft, 5.0f, bGodmodeActive, false, bGodmodeActive, false);
 
 			//godmode part
 			if (bGodmodeActive)
@@ -553,7 +606,7 @@ eThreadState new_Run(GtaThread* This) {
 				PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
 			}
 			else {
-				//draw_menu_line("Godmode inactive", 150.0f, 4.0f, 13.0f, 0.0f, 5.0f, false, false, false, false);
+				//draw_menu_line("Godmode inactive", menuWidth, 4.0f, menuTop + 13.0f, menuLeft, 5.0f, false, false, false, false);
 				if (PLAYER::GET_PLAYER_INVINCIBLE(player))
 				{
 					DEBUGOUT("Deactivating godmode");
@@ -570,6 +623,24 @@ eThreadState new_Run(GtaThread* This) {
 			bool bReset = false;
 			if (bMenuActive)
 			{
+				//Hack modes for Inside menu
+				draw_rect_sc(menuTop, menuLeft, menuWidth, 212.0);
+				draw_menu_line("Pageup		- Prev player in list", menuWidth, 4.0f, menuTop + 13.0f * 3, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Pagedown	- Next player in list", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad/		- Give player all weapons", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad.		- Teleport to player vehicle", menuWidth, 4.0f, menuTop + 13.0f * 6, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad-		- Spawn money for player", menuWidth, 4.0f, menuTop + 13.0f * 7, menuLeft, 5.0f, bMoneyDropActive, false, bMoneyDropActive, false);
+				draw_menu_line("Numpad1		- Explode player", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("N1+Rcont	- Frame player", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad2		- Clone player vehicle", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad3		- Remove all weapons", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad4		- (alpha) set of alarm", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad5		- (alpha) change plate", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad6		- (alpha) destroy engine", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad7		- (alpha) destroy tires", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad8		- remove player from vehicle", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
+
+
 				static int iSelectedPlayer = 0;
 				static bool bPgUpPressed, bPgDwnPressed = false;
 				if (isKeyPressedOnce(bPgUpPressed, VK_PRIOR))
@@ -597,10 +668,11 @@ eThreadState new_Run(GtaThread* This) {
 						strcpy_s(chStringToDraw, PLAYER::GET_PLAYER_NAME(playerIterator));
 						if (bSelectedPed)
 							sprintf_s(chStringToDraw, "%s F:%i", chStringToDraw, iFreeze == selectedPed);
-						draw_menu_line(chStringToDraw, 150.0f, 4.0f, 25.0f + iLineNum * 13.0f, 350.0f, 0.0f, false, false, bSelectedPed, false);
+						draw_menu_line(chStringToDraw, 145.0f, 4.0f, menuTop + 13.0f + iLineNum * 13.0f, menuLeft - 145.0f, 0.0f, false, false, bSelectedPed, false);
 						iLineNum++;
-					}
+					}					
 				}
+				draw_rect_sc(menuTop + 13.0f, menuLeft - 145, 145.0, 4 + iLineNum * 13.0f);
 
 				static bool bDividePressed = false;
 				if (isKeyPressedOnce(bDividePressed, VK_DIVIDE))
@@ -648,7 +720,7 @@ eThreadState new_Run(GtaThread* This) {
 				
 				//https://www.youtube.com/watch?v=ON-7v4qnHP8
 				
-				//switch for godmode
+				//switch for moneydrop
 				if (isKeyPressedOnce(bSubtractPressed, VK_SUBTRACT))
 				{
 					if (bMoneyDropActive){
@@ -830,34 +902,28 @@ eThreadState new_Run(GtaThread* This) {
 							static int iCounter = 0;
 							for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
 							{
-								try
+								Ped playerPedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
+								if (ENTITY::DOES_ENTITY_EXIST(playerPedIterator) && playerPedIterator != playerPed) //If the iteration exists, and they're alive, and they're not me.
 								{
-									Ped playerPedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
-									if (ENTITY::DOES_ENTITY_EXIST(playerPedIterator)) //&& playerPedIterator != playerPed) //If the iteration exists, and they're alive, and they're not me. mch: also i can be killed by 'hacker'
+									if (IsPlayerFriend(playerIterator) == FALSE && selectedPed != playerPedIterator)
 									{
-										//if (IsPlayerFriend(playerIterator) == FALSE && selectedPed != playerPedIterator) //friend should be able to get killed
-										if (selectedPed != playerPedIterator)
+										if (iCounter == 5)
 										{
-											if (iCounter == 5)
+											try
 											{
-												try
-												{
-													AI::CLEAR_PED_TASKS_IMMEDIATELY(playerPedIterator); //If they're in a jet, or something. Toss them out.
-													Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPedIterator, FALSE);
-													static bool bExplode = false;
-													bExplode = !bExplode;
-													if (bExplode)
-														FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f); //We can blame anyone for the explosion. Whoever is selected in the menu will be blamed.
-													else
-														FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f);
-														FIRE::START_SCRIPT_FIRE(playerPosition.x, playerPosition.y, playerPosition.z, 5, TRUE); //For LEXD Godmode kids who don't set entity proofs properly.
-												}
-												catch (...) { break; Log::Error("Crashed"); iCounter = -10; } //IDK why, but if you call these functions too many times per tick, it causes a crash. We can just toss the exception. Hopefully this fixes the crash...
+												AI::CLEAR_PED_TASKS_IMMEDIATELY(playerPedIterator); //If they're in a jet, or something. Toss them out.
+												Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPedIterator, FALSE);
+												static bool bExplode = false;
+												bExplode = !bExplode;
+												if (bExplode)
+													FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f); //We can blame anyone for the explosion. Whoever is selected in the menu will be blamed.
+												else
+													FIRE::START_SCRIPT_FIRE(playerPosition.x, playerPosition.y, playerPosition.z, 5, TRUE); //For LEXD Godmode kids who don't set entity proofs properly.
 											}
+											catch (...) { break; Log::Error("Crashed"); iCounter = -10; } //IDK why, but if you call these functions too many times per tick, it causes a crash. We can just toss the exception. Hopefully this fixes the crash...
 										}
 									}
 								}
-								catch (...) { break; Log::Error("Crashed"); iCounter = -10; } //IDK why, but if you call these functions too many times per tick, it causes a crash. We can just toss the exception. Hopefully this fixes the crash...
 							}
 							iCounter++;
 							if (iCounter > 5)
@@ -913,98 +979,117 @@ eThreadState new_Run(GtaThread* This) {
 			}
 			else //every function without selecting a player
 			{
+				//Hack modes for outside menu
+				draw_rect_sc(menuTop, menuLeft, menuWidth, 169.0);
+				draw_menu_line("F8		- Max ammo", menuWidth, 4.0f, menuTop + 13.0f * 3, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("F9		- Remove Junk", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad.	- Repair Vehicle", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad0	- Teleport to waypoint", menuWidth, 4.0f, menuTop + 13.0f * 6, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad2	- Spawn Kuruma2", menuWidth, 4.0f, menuTop + 13.0f * 7, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad3	- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad7	- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad9	- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
+				draw_menu_line("Numpad+	- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad*	- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
 				
 				//Spawn a test car.
 				static bool bNumpad2Pressed, bWaitingForModelCar = false;
 				if ((isKeyPressedOnce(bNumpad2Pressed, VK_NUMPAD2) || bWaitingForModelCar == true) && playerVeh == NULL)
 				{
-					Hash vehicleModelHash = VEHICLE_KURUMA2;
-					if (GetAsyncKeyState(VK_RCONTROL) & 0x8000)
-						vehicleModelHash = VEHICLE_BTYPE;
-					if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
-						vehicleModelHash = VEHICLE_ZENTORNO;
-					if (GetAsyncKeyState(VK_DOWN) & 0x8000)
-						vehicleModelHash = VEHICLE_INSURGENT;
-					STREAMING::REQUEST_MODEL(vehicleModelHash);
-					if (STREAMING::HAS_MODEL_LOADED(vehicleModelHash) == TRUE)
+					if (playerVeh == NULL || bWaitingForModelCar == true)
 					{
-						Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPed, FALSE);
-						playerVeh = VEHICLE::CREATE_VEHICLE(vehicleModelHash, playerPosition.x, playerPosition.y, playerPosition.z, ENTITY::GET_ENTITY_HEADING(playerPed), TRUE, TRUE);
-						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(playerVeh);
-						PED::SET_PED_INTO_VEHICLE(playerPed, playerVeh, SEAT_DRIVER);
-						BoostBaseVehicleStats(playerVeh);
-						if (vehicleModelHash == VEHICLE_KURUMA2) //Test that I can make a perfect 1:1 clone of my Kuruma with only calling natives.
+						Hash vehicleModelHash = VEHICLE_KURUMA2;
+						if (GetAsyncKeyState(VK_RCONTROL) & 0x8000)
+							vehicleModelHash = VEHICLE_BTYPE;
+						else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+							vehicleModelHash = VEHICLE_ZENTORNO;
+						else if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+							vehicleModelHash = VEHICLE_INSURGENT;
+						else if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+							vehicleModelHash = VEHICLE_RHINO;
+						STREAMING::REQUEST_MODEL(vehicleModelHash);
+						if (STREAMING::HAS_MODEL_LOADED(vehicleModelHash) == TRUE)
 						{
-							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SPOILER, MOD_INDEX_ONE, FALSE);
-							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTBUMPER, MOD_INDEX_TWO, FALSE);
-							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SIDESKIRT, MOD_INDEX_FIVE, FALSE);
-							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_EXHAUST, MOD_INDEX_ONE, FALSE);
-							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_SADTROMBONE, FALSE);
-							VEHICLE::SET_VEHICLE_WHEEL_TYPE(playerVeh, WHEEL_TYPE_HIGHEND);
-							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTWHEELS, WHEEL_HIGHEND_SUPAGEE, TRUE); //TRUE because we want the Custom Tires.
-							VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_XENONLIGHTS, TRUE);
-							VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(playerVeh, PLATE_YELLOWONBLACK);
-							VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_BLACK);
-							VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_BLACK);
-							//VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_TIRESMOKE, TRUE);
-							//VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVeh, TIRESMOKE_COLOR_BLACK);
-							VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_METALLIC_ULTRA_BLUE);
-							//for (int i = 0; i < NEON_BACK; i++) //This will turn on all the neon emitters except the back one. That shit's annoying when I'm trying to drive.
-							//{
-							//	VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, i, TRUE);
-							//}
-							//VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(playerVeh, NEON_COLOR_ELECTRICBLUE);
-							drawNotification("Spawned Kuruma");
-						}
-						else if (vehicleModelHash == VEHICLE_ZENTORNO)
-						{
-							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_CHASSIS, MOD_INDEX_TWO, FALSE);
-							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SPOILER, MOD_INDEX_SEVEN, FALSE);
-							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTBUMPER, MOD_INDEX_TWO, FALSE);
-							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SIDESKIRT, MOD_INDEX_TWO, FALSE);
-							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_EXHAUST, MOD_INDEX_FOUR, FALSE);
-							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_SADTROMBONE, FALSE);
-							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HOOD, MOD_INDEX_TWO, FALSE);
-							VEHICLE::SET_VEHICLE_WHEEL_TYPE(playerVeh, WHEEL_TYPE_HIGHEND);
-							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTWHEELS, WHEEL_HIGHEND_SUPAGEE, TRUE);
-							VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_XENONLIGHTS, TRUE);
-							VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_BLACK);
-							VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(playerVeh, PLATE_YELLOWONBLUE);
-							VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_METALLIC_ULTRA_BLUE, COLOR_MATTE_WHITE);
-							VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_TIRESMOKE, TRUE);
-							VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVeh, TIRESMOKE_COLOR_BLACK);
-							VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_METALLIC_ULTRA_BLUE);
-							for (int i = 0; i < NEON_BACK; i++) //This will turn on all the neon emitters except the back one. That shit's annoying when I'm trying to drive.
+							Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPed, FALSE);
+							playerVeh = VEHICLE::CREATE_VEHICLE(vehicleModelHash, playerPosition.x, playerPosition.y, playerPosition.z, ENTITY::GET_ENTITY_HEADING(playerPed), TRUE, TRUE);
+							NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(playerVeh);
+							PED::SET_PED_INTO_VEHICLE(playerPed, playerVeh, SEAT_DRIVER);
+							BoostBaseVehicleStats(playerVeh);
+							if (vehicleModelHash == VEHICLE_KURUMA2) //Test that I can make a perfect 1:1 clone of my Kuruma with only calling natives.
 							{
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SPOILER, MOD_INDEX_ONE, FALSE);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTBUMPER, MOD_INDEX_TWO, FALSE);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SIDESKIRT, MOD_INDEX_FIVE, FALSE);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_EXHAUST, MOD_INDEX_ONE, FALSE);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_SADTROMBONE, FALSE);
+								VEHICLE::SET_VEHICLE_WHEEL_TYPE(playerVeh, WHEEL_TYPE_HIGHEND);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTWHEELS, WHEEL_HIGHEND_SUPAGEE, TRUE); //TRUE because we want the Custom Tires.
+								VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_XENONLIGHTS, TRUE);
+								VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_BLACK);
+								VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_WHITE);
+								VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_TIRESMOKE, TRUE);
+								VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVeh, TIRESMOKE_COLOR_BLACK);
+								VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_MATTE_WHITE);
+								/*for (int i = 0; i < NEON_BACK; i++) //This will turn on all the neon emitters except the back one. That shit's annoying when I'm trying to drive.
+								{
 								VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, i, TRUE);
+								}
+								VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(playerVeh, NEON_COLOR_ELECTRICBLUE);
+								*/
+								drawNotification("Spawned Kuruma");
 							}
-							VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(playerVeh, NEON_COLOR_ELECTRICBLUE);
-							drawNotification("Spawned Zentorno");
-						}
-						else if (vehicleModelHash == VEHICLE_INSURGENT)
-						{
-							VEHICLE::SET_VEHICLE_WHEEL_TYPE(playerVeh, WHEEL_TYPE_SPORT);
-							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTWHEELS, WHEEL_SPORT_DEEPFIVE, TRUE);
-							VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_FOREST_GREEN);
-							VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_TIRESMOKE, TRUE);
-							VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVeh, TIRESMOKE_COLOR_BLACK);
-							VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_MATTE_FOREST_GREEN);
-							VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_GREEN);
-							VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(playerVeh, "GETFUCKD");
-							VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(playerVeh, PLATE_YELLOWONBLACK);
-							VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_TRUCK, FALSE);
+							else if (vehicleModelHash == VEHICLE_ZENTORNO)
+							{
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_CHASSIS, MOD_INDEX_TWO, FALSE);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SPOILER, MOD_INDEX_SEVEN, FALSE);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTBUMPER, MOD_INDEX_TWO, FALSE);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SIDESKIRT, MOD_INDEX_TWO, FALSE);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_EXHAUST, MOD_INDEX_FOUR, FALSE);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_SADTROMBONE, FALSE);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HOOD, MOD_INDEX_TWO, FALSE);
+								VEHICLE::SET_VEHICLE_WHEEL_TYPE(playerVeh, WHEEL_TYPE_HIGHEND);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTWHEELS, WHEEL_HIGHEND_SUPAGEE, TRUE);
+								VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_XENONLIGHTS, TRUE);
+								VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_BLACK);
+								VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(playerVeh, PLATE_YELLOWONBLUE);
+								VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_WHITE);
+								VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_TIRESMOKE, TRUE);
+								VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVeh, TIRESMOKE_COLOR_BLACK);
+								VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_MATTE_WHITE);
+								/*for (int i = 0; i < NEON_BACK; i++) //This will turn on all the neon emitters except the back one. That shit's annoying when I'm trying to drive.
+								{
+									VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, i, TRUE);
+								}
+								VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(playerVeh, NEON_COLOR_ELECTRICBLUE);
+								*/
+								drawNotification("Spawned Zentorno");
+
+							}
+							else if (vehicleModelHash == VEHICLE_INSURGENT)
+							{
+								VEHICLE::SET_VEHICLE_WHEEL_TYPE(playerVeh, WHEEL_TYPE_SPORT);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTWHEELS, WHEEL_SPORT_DEEPFIVE, TRUE);
+								VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_BLACK);
+								VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_TIRESMOKE, TRUE);
+								VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVeh, TIRESMOKE_COLOR_BLACK);
+								VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_MATTE_BLACK);
+								VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_GREEN);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_TRUCK, FALSE);
+							}
+							STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(vehicleModelHash);
+							bWaitingForModelCar = false;
 							drawNotification("Spawned Insurgent");
 						}
-						else 
-						{ 
-							drawNotification("Spawned Btype"); 
+						else
+						{
+							bWaitingForModelCar = true;							
+							drawNotification("Spawned Vehicle");
 						}
-						STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(vehicleModelHash);
-						bWaitingForModelCar = false;
 					}
-					else
+					else if (playerVeh != NULL)
 					{
-						bWaitingForModelCar = true;
+						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(playerVeh);
+						VEHICLE::SET_VEHICLE_FORWARD_SPEED(playerVeh, VEHICLE::_GET_VEHICLE_MAX_SPEED(ENTITY::GET_ENTITY_MODEL(playerVeh)));
 					}
 				}
 
@@ -1058,8 +1143,7 @@ eThreadState new_Run(GtaThread* This) {
 						Blip* blip = g_blipList->m_Blips[i].m_pBlip;
 						if (blip)
 						{
-							//if ( blip->dwColor != 0x3 && !(blip->bIcon == 150 && blip->dwColor == 1) ) //Cut out most of the random job blips.
-							DEBUGOUT("Blip%i ID: %i ID2: %i Scale: %f Icon: %i Color: 0x%X Message: %s", i, blip->iID, blip->iID2, blip->fScale, blip->bIcon, blip->dwColor, blip->szMessage == NULL ? "" : blip->szMessage);							if ((blip->dwColor == 0x42 && blip->bIcon == 1) /*Mission blip*/ ||
+							if ((blip->dwColor == 0x42 && blip->bIcon == 1) /*Mission blip*/ ||
 								(blip->dwColor == 0x5 && blip->bIcon == 1) /*Yellow blip*/ ||
 								(blip->dwColor == 0x0 && blip->bIcon == 38) /*Race flag*/ ||
 								(blip->dwColor == 0x2 && blip->bIcon == 1) /*Green blips*/)
@@ -1120,40 +1204,6 @@ eThreadState new_Run(GtaThread* This) {
 					drawNotification("Teleported to waypoint");
 				}
 			}
-
-			//Shoot all spaghettios (Fuck Deliver EMP)
-			static bool bNumpad9Pressed = false;
-			if (GetAsyncKeyState(VK_NUMPAD9) & 0x8000)
-				 {
-				for (int i = 0; i <= 1000; i++)
-					{
-					Blip* blip = g_blipList->m_Blips[i].m_pBlip;
-					if (blip)
-						{
-												//You can add more here if you want, like people during TDM. But they have to appear on your map first. It'd probably be easier to just use the SHOOT_SINGLE_BULLET_BETWEEN_COORDS function on all players in //the server. I tried iterating through every single possible entity in the server and checking if they are a ped or exists, but it crashed on random entities and I got mixed results. Getting the closest ped /to the /blip seems to be the safest.
-							if (blip->bIcon == 3 /*cop*/ || blip->bIcon == 14 /*spaghettio*/ || blip->bIcon == 71 /*red dot*/)
-							{
-								static bool bShoot = false;
-								bShoot = !bShoot;
-								if (bShoot)
-									{
-									if (blip->fScale == 1.0f && blip->bIcon != 71 /*red dot*/)
-										 FIRE::ADD_OWNED_EXPLOSION(playerPed, blip->x, blip->y, blip->z, 4, 10.0f, FALSE, TRUE, 0.0f);
-									else
-										 GAMEPLAY::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(blip->x + 0.1f, blip->y, blip->z - 0.1f, blip->x - 0.1f, blip->y, blip->z + 1, 10, TRUE, WEAPON_PISTOL, playerPed, TRUE, TRUE, 1.0f); //FWARRRRRRAING! ~benji Alasa 2277
-									}
-							}
-						if ((blip->dwColor == 0x0 && blip->bIcon == 97) /*helicopter*/ ||
-							(blip->dwColor == 0x0 && blip->bIcon == 15) /*helicopter*/ ||
-							(blip->dwColor == 0x36 && blip->bIcon == 167) /*helicopter*/)
-							{
-							FIRE::ADD_OWNED_EXPLOSION(playerPed, blip->x, blip->y, blip->z, 4, 10.0f, FALSE, TRUE, 0.0f);
-							}
-						}
-					}
-					drawNotification("Killed all targets");
-				}
-
 
 			//Increase wanted level.
 			static bool bAddPressed = false;
@@ -1228,14 +1278,60 @@ eThreadState new_Run(GtaThread* This) {
 				drawNotification("Player fixed");
 			}
 
+
+			
+			//Shoot all spaghettios (Fuck Deliver EMP)
+			if (isKeyPressedOnce(bNumpad9Pressed, VK_NUMPAD9))
+			{
+				if (bKillTargetsActive){
+					drawNotification("Stopping masacre");
+				}
+				else if (!bKillTargetsActive) {
+					drawNotification("Starting killing spree");
+				}
+				bKillTargetsActive = !bKillTargetsActive;
+			}
+			if (bKillTargetsActive)
+			{
+				for (int i = 0; i <= 1000; i++)
+				{
+					Blip* blip = g_blipList->m_Blips[i].m_pBlip;
+					if (blip)
+					{
+						if (blip->dwColor != 0x3) //Don't hit friendlies.
+						{
+							if (blip->bIcon == 3 /*cop*/ || blip->bIcon == 14 /*spaghettio*/)
+							{
+								static bool bShoot = false;
+								bShoot = !bShoot;
+								if (bShoot)
+								{
+									static Hash weaponList[] = { WEAPON_ADVANCEDRIFLE, WEAPON_APPISTOL, WEAPON_ASSAULTRIFLE, WEAPON_ASSAULTSMG, WEAPON_CARBINERIFLE, WEAPON_COMBATMG, WEAPON_COMBATPDW, WEAPON_COMBATPISTOL, WEAPON_HEAVYPISTOL, WEAPON_HEAVYSNIPER, WEAPON_MARKSMANRIFLE, WEAPON_MG, WEAPON_MICROSMG, WEAPON_PISTOL, WEAPON_PISTOL50, WEAPON_SMG, WEAPON_SNIPERRIFLE, WEAPON_SNSPISTOL, WEAPON_SPECIALCARBINE, WEAPON_MINIGUN };
+									if ((blip->fScale == 1.0f) && blip->bIcon != 71 /*red dot*/)
+										FIRE::ADD_OWNED_EXPLOSION(playerPed, blip->x, blip->y, blip->z, 4, 10.0f, FALSE, TRUE, 0.0f);
+									else
+										GAMEPLAY::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(blip->x + 0.1f, blip->y, blip->z - 0.15f, blip->x - 0.1f, blip->y, blip->z + 1, 1000, TRUE, weaponList[rand() % (sizeof(weaponList) / 4)], playerPed, TRUE, TRUE, 1.0f); //FWARRRRRRAING! ~benji Alaska 2277
+								}
+							}
+							if ((blip->dwColor == 0x0 && blip->bIcon == 97) /*helicopter*/ ||
+								(blip->dwColor == 0x0 && blip->bIcon == 15) /*helicopter*/ ||
+								(blip->dwColor == 0x36 && blip->bIcon == 167) /*helicopter*/)
+							{
+								FIRE::ADD_OWNED_EXPLOSION(playerPed, blip->x, blip->y, blip->z, 4, 10.0f, FALSE, TRUE, 0.0f);
+							}
+						}
+					}
+				}
+			}
+
 			//switch for godmode
-			if (isKeyPressedOnce(bF8Pressed, VK_F8))
+			if (isKeyPressedOnce(bF7Pressed, VK_F7))
 			{
 				bGodmodeActive = !bGodmodeActive;
 			}
 
-			static bool F10Pressed = false;
-			if (isKeyPressedOnce(F10Pressed, VK_F10))
+			static bool F8Pressed = false;
+			if (isKeyPressedOnce(F8Pressed, VK_F8))
 			{
 				//Infinite Ammo - Get max ammo
 				if (WEAPON::GET_CURRENT_PED_WEAPON(playerPed, &currentWeapon, 1))
