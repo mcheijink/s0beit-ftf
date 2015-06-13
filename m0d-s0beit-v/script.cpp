@@ -16,9 +16,9 @@ void SetActiveThread(rage::scrThread* thread)
 	*reinterpret_cast<rage::scrThread**>(moduleTls + 2096) = thread;
 }
 
-void draw_rect(float Top, float Left, float Height, float Width, int Red, int Green, int Bleu, int Alpha)
+void draw_rect(float Top, float Left, float Height, float Width, int Red, int Green, int Blue, int Alpha)
 {
-	GRAPHICS::DRAW_RECT((Top + (Height * 0.5f)), (Left + (Width * 0.5f)), Height, Width, Red, Green, Bleu, Alpha);
+	GRAPHICS::DRAW_RECT((Top + (Height * 0.5f)), (Left + (Width * 0.5f)), Height, Width, Red, Green, Blue, Alpha);
 }
 
 bool isKeyPressedOnce(bool& bIsPressed, DWORD vk)
@@ -322,21 +322,23 @@ void draw_menu_line(std::string caption, float lineWidth, float lineHeight, floa
 void draw_rect_sc(float lineTop, float lineLeft, float lineWidth, float lineHeight)
 {
 	// default values
-	int rect_col[4] = { 50, 50, 50, 100 };
+	int rect_col[4] = { 50, 50, 50, 125};
 	float text_scale = 0.30f;
 	int screen_w, screen_h;
 	GRAPHICS::GET_SCREEN_RESOLUTION(&screen_w, &screen_h);
+	float textLeft = 5.0;
 
+	textLeft += lineLeft;
 
 	float lineWidthScaled = lineWidth / (float)screen_w; // line width
 	float lineTopScaled = lineTop / (float)screen_h; // line top offset
+	float textLeftScaled = textLeft / (float)screen_w; // text left offset
 	float lineHeightScaled = lineHeight / (float)screen_h; // line height
 	float lineLeftScaled = lineLeft / (float)screen_w;
-	float textLeftScaled = 5.0f / (float)screen_w; // text left offset
 
-	int num25 = UI::_0x9040DFB09BE75706(textLeftScaled, (((lineTopScaled + 0.00278f) + lineHeightScaled) - 0.005f));
-	float num26 = UI::_0xDB88A37483346780(text_scale, 0);
-	draw_rect(lineLeftScaled, lineTopScaled + (0.007f), lineWidthScaled, ((((float)(num25)*num26) + (lineHeightScaled * 2.0f)) + 0.005f), rect_col[0], rect_col[1], rect_col[2], rect_col[3]);
+	//int num25 = UI::_0x9040DFB09BE75706(textLeftScaled, (((lineTopScaled + 0.00278f) + lineHeightScaled) - 0.005f));
+	//float num26 = UI::_0xDB88A37483346780(text_scale, 0);
+	draw_rect(lineLeftScaled, lineTopScaled + (0.007f), lineWidthScaled, lineHeightScaled, rect_col[0], rect_col[1], rect_col[2], rect_col[3]);
 }
 
 
@@ -534,7 +536,7 @@ eThreadState new_Run(GtaThread* This) {
 	static bool bGodmodeActive, bF7Pressed, bMoneyDropActive, bSubtractPressed, bHackActive, bF5Pressed, bMenuActive, bF6Pressed, bKillTargetsActive, bNumpad9Pressed = false;
 	static int iFreeze = -1;
 	static int modulesActive = 0;
-	static int mchbuildnr = 1008;
+	static int mchbuildnr = 1009;
 
 	float menuLeft = 1030.0;
 	float menuWidth = 250.0;
@@ -568,7 +570,7 @@ eThreadState new_Run(GtaThread* This) {
 
 	if (!bHackActive)
 		{	
-			draw_rect_sc(menuTop, menuLeft, 4.0, 100.0);
+			draw_rect_sc(menuTop, menuLeft, 110.0, 13.0f);
 			draw_menu_line("F5 - Hack inactive", 100.0f, 4.0f, menuTop, menuLeft, 5.0f, false, false, false, false);
 		}
 	else 
@@ -582,7 +584,7 @@ eThreadState new_Run(GtaThread* This) {
 				playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
 
 			//draw the UI for when hack is active
-			draw_menu_line("s0bietftf - build 1008", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
+			draw_menu_line("s0bietftf - build 1009", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
 			
 			draw_menu_line("F5			- Hack active", menuWidth, 4.0f, menuTop, menuLeft, 5.0f, bHackActive, false, bHackActive, false);
 			draw_menu_line("F6			- Player menu", menuWidth, 4.0f, menuTop + 13.0f * 1, menuLeft, 5.0f, bMenuActive, false, bMenuActive, false);
@@ -624,21 +626,21 @@ eThreadState new_Run(GtaThread* This) {
 			if (bMenuActive)
 			{
 				//Hack modes for Inside menu
-				draw_rect_sc(menuTop, menuLeft, menuWidth, 212.0);
+				draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 17);
 				draw_menu_line("Pageup		- Prev player in list", menuWidth, 4.0f, menuTop + 13.0f * 3, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("Pagedown	- Next player in list", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("Numpad/		- Give player all weapons", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("Numpad.		- Teleport to player vehicle", menuWidth, 4.0f, menuTop + 13.0f * 6, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("Numpad-		- Spawn money for player", menuWidth, 4.0f, menuTop + 13.0f * 7, menuLeft, 5.0f, bMoneyDropActive, false, bMoneyDropActive, false);
 				draw_menu_line("Numpad1		- Explode player", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("N1+Rcont	- Frame player", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad2		- Clone player vehicle", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad3		- Remove all weapons", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad4		- (alpha) set of alarm", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad5		- (alpha) change plate", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad6		- (alpha) destroy engine", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad7		- (alpha) destroy tires", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad8		- remove player from vehicle", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("N1+Rcont		- Frame player", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad2	- Clone player vehicle", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad3	- Remove all weapons", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad4	- (alpha) set of alarm", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad5	- (alpha) change plate", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad6	- (alpha) destroy engine", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad7	- (alpha) destroy tires", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad8	- remove player from vehicle", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
 
 
 				static int iSelectedPlayer = 0;
@@ -672,7 +674,8 @@ eThreadState new_Run(GtaThread* This) {
 						iLineNum++;
 					}					
 				}
-				draw_rect_sc(menuTop + 13.0f, menuLeft - 145, 145.0, 4 + iLineNum * 13.0f);
+				//draw player menu
+				draw_rect_sc(menuTop + 13.0f, menuLeft - 145, 145.0, iLineNum * 13.0f);
 
 				static bool bDividePressed = false;
 				if (isKeyPressedOnce(bDividePressed, VK_DIVIDE))
@@ -791,10 +794,7 @@ eThreadState new_Run(GtaThread* This) {
 						if (RequestNetworkControl(selectedVehicle)) {
 							NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(selectedVehicle);
 							VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(selectedVehicle, "Gut_Hakt");
-							//notify user of action
-							UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
-							UI::_ADD_TEXT_COMPONENT_STRING("Changed license plate to Gut_Hakt");
-							UI::_DRAW_NOTIFICATION(FALSE, TRUE);
+							drawNotification("Changed license plate to Gut_Hakt");
 						}
 					}
 				}
@@ -809,10 +809,7 @@ eThreadState new_Run(GtaThread* This) {
 						if (RequestNetworkControl(selectedVehicle)) {
 							VEHICLE::SET_VEHICLE_ENGINE_HEALTH(selectedVehicle, 0.0);
 							VEHICLE::SET_VEHICLE_PETROL_TANK_HEALTH(selectedVehicle, 0.0);
-							//notify user of action
-							UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
-							UI::_ADD_TEXT_COMPONENT_STRING("Ruined Engine and fuel tank");
-							UI::_DRAW_NOTIFICATION(FALSE, TRUE);
+							drawNotification("Ruined Engine and fuel tank");
 						}
 					}
 				}
@@ -831,10 +828,7 @@ eThreadState new_Run(GtaThread* This) {
 							for (tireID = 0; tireID < 8; tireID++) {
 								VEHICLE::SET_VEHICLE_TYRE_BURST(selectedVehicle, tireID, true, 1000.0);
 							}
-							//notify user of action
-							UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
-							UI::_ADD_TEXT_COMPONENT_STRING("Bursted tires");
-							UI::_DRAW_NOTIFICATION(FALSE, TRUE);
+							drawNotification("Bursted tires");
 						}
 					}
 				}
@@ -847,10 +841,7 @@ eThreadState new_Run(GtaThread* This) {
 					{
 						//Remove PED from vehicle
 						AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
-						//notify user of action
-						UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
-						UI::_ADD_TEXT_COMPONENT_STRING("Player Removed from vehicle");
-						UI::_DRAW_NOTIFICATION(FALSE, TRUE);
+						drawNotification("Player Removed from vehicle");
 					}
 				}
 
@@ -980,17 +971,17 @@ eThreadState new_Run(GtaThread* This) {
 			else //every function without selecting a player
 			{
 				//Hack modes for outside menu
-				draw_rect_sc(menuTop, menuLeft, menuWidth, 169.0);
-				draw_menu_line("F8		- Max ammo", menuWidth, 4.0f, menuTop + 13.0f * 3, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("F9		- Remove Junk", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad.	- Repair Vehicle", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, false, false, false, false);
+				draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 13);
+				draw_menu_line("F8			- Max ammo", menuWidth, 4.0f, menuTop + 13.0f * 3, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("F9			- Remove Junk", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad.		- Repair Vehicle", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("Numpad0	- Teleport to waypoint", menuWidth, 4.0f, menuTop + 13.0f * 6, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("Numpad2	- Spawn Kuruma2", menuWidth, 4.0f, menuTop + 13.0f * 7, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("Numpad3	- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("Numpad7	- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("Numpad9	- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
 				draw_menu_line("Numpad+	- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad*	- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
 				
 				//Spawn a test car.
 				static bool bNumpad2Pressed, bWaitingForModelCar = false;
