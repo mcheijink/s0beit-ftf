@@ -533,10 +533,11 @@ eThreadState new_Run(GtaThread* This) {
 	//if (bQuit) { return gGtaThreadOriginal.Run(This); }
 
 	//var init
-	static bool bGodmodeActive, bGodmodeSwitchset, bF7Pressed, bMoneyDropActive, bSubtractPressed, bHackActive, bF5Pressed, bMenuActive, bF6Pressed, bKillTargetsActive, bNumpad9Pressed = false;
+	static bool bGodmodeActive, bGodmodeSwitchset, bF7Pressed, bMoneyDropActive, bSubtractPressed, bHackActive, 
+				bF5Pressed, bMenuActive, bF6Pressed, bKillTargetsActive, bNumpad9Pressed, bPoliceIgnorePlayer = false;
 	static int iFreeze = -1;
 	static int modulesActive = 0;
-	static int mchbuildnr = 1011;
+	static int mchbuildnr = 1012;
 
 	float menuLeft = 1030.0;
 	float menuWidth = 250.0;
@@ -552,6 +553,8 @@ eThreadState new_Run(GtaThread* This) {
 				bGodmodeActive = false;
 				bMenuActive = false;
 				bKillTargetsActive = false;
+				bPoliceIgnorePlayer = false;
+				PLAYER::SET_POLICE_IGNORE_PLAYER(player, false);
 			}
 			else if (!bHackActive) {
 				drawNotification("Activating hack");
@@ -575,7 +578,7 @@ eThreadState new_Run(GtaThread* This) {
 				playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
 
 			//draw the UI for when hack is active
-			draw_menu_line("s0bietftf - build 1011", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
+			draw_menu_line("s0bietftf - build 1012", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
 			
 			draw_menu_line("F5			- Hack active", menuWidth, 4.0f, menuTop, menuLeft, 5.0f, bHackActive, false, bHackActive, false);
 			draw_menu_line("F6			- Player menu", menuWidth, 4.0f, menuTop + 13.0f * 1, menuLeft, 5.0f, bMenuActive, false, bMenuActive, false);
@@ -829,7 +832,7 @@ eThreadState new_Run(GtaThread* This) {
 						{
 							AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
 						}
-						ENTITY::ATTACH_ENTITY_TO_ENTITY(junkObject, selectedPed, PED::GET_PED_BONE_INDEX(selectedPed, 31086), 
+						ENTITY::ATTACH_ENTITY_TO_ENTITY(junkObject, selectedPed, PED::GET_PED_BONE_INDEX(selectedPed, 0), 
 							0.00,	//floatx
 							0.00,	//floaty
 							0.0,	//floatz
@@ -837,7 +840,7 @@ eThreadState new_Run(GtaThread* This) {
 							-90.0,	//yrot 
 							-90.0,	//zrot
 							false, false, false, false, 2, true);
-						STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(objectModel);
+						//STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(objectModel);
 						drawNotification("Attached junk to player");
 					}
 				}
@@ -996,17 +999,18 @@ eThreadState new_Run(GtaThread* This) {
 			else //every function without selecting a player
 			{
 				//Hack modes for outside menu
-				draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 13);
+				draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 14);
 				draw_menu_line("F8			- Max ammo", menuWidth, 4.0f, menuTop + 13.0f * 3, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("F9			- Remove Junk", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("Numpad.		- Repair Vehicle", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("Numpad0	- Teleport to waypoint", menuWidth, 4.0f, menuTop + 13.0f * 6, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("Numpad2	- Spawn Kuruma2", menuWidth, 4.0f, menuTop + 13.0f * 7, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("Numpad3	- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad7	- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad9	- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
-				draw_menu_line("Numpad+	- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad4	- Police disabled", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, bPoliceIgnorePlayer, false, bPoliceIgnorePlayer, false);
+				draw_menu_line("Numpad7	- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad9	- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
+				draw_menu_line("Numpad+	- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
 				
 				//Spawn a test car.
 				static bool bNumpad2Pressed, bWaitingForModelCar = false;
@@ -1152,6 +1156,21 @@ eThreadState new_Run(GtaThread* This) {
 						VEHICLE::SET_VEHICLE_FORWARD_SPEED(playerVeh, 500.0f);
 						BoostBaseVehicleStats(playerVeh);
 					}
+				}
+
+				//Police wont notice me
+				static bool bNumpad4Pressed = false;
+				if (isKeyPressedOnce(bNumpad4Pressed, VK_NUMPAD4))
+				{
+					if (bPoliceIgnorePlayer){
+						PLAYER::SET_POLICE_IGNORE_PLAYER(player, false);
+						drawNotification("Police started looking again");
+					}
+					else if (!bPoliceIgnorePlayer) {
+						PLAYER::SET_POLICE_IGNORE_PLAYER(player, true);
+						drawNotification("The Police wont notice me");
+					}
+					bPoliceIgnorePlayer = !bPoliceIgnorePlayer;
 				}
 
 				//TP to mission objective.
