@@ -551,21 +551,12 @@ eThreadState new_Run(GtaThread* This) {
 				bMoneyDropActive = false;
 				bGodmodeActive = false;
 				bMenuActive = false;
+				bKillTargetsActive = false;
 			}
 			else if (!bHackActive) {
 				drawNotification("Activating hack");
 			}
 			bHackActive = !bHackActive;
-		}
-
-	//menu switch
-	if (isKeyPressedOnce(bF6Pressed, VK_F6))
-		{
-			if (bMenuActive){
-				bMoneyDropActive = false;
-			}
-			iFreeze = -1;
-			bMenuActive = !bMenuActive;
 		}
 
 	if (!bHackActive)
@@ -590,7 +581,7 @@ eThreadState new_Run(GtaThread* This) {
 			draw_menu_line("F6			- Player menu", menuWidth, 4.0f, menuTop + 13.0f * 1, menuLeft, 5.0f, bMenuActive, false, bMenuActive, false);
 			draw_menu_line("F7			- Godmode active", menuWidth, 4.0f, menuTop + 13.0f * 2, menuLeft, 5.0f, bGodmodeActive, false, bGodmodeActive, false);
 
-			//godmode part
+			//godmodeswitch
 			if (bGodmodeActive)
 			{
 				//Godmode
@@ -603,13 +594,12 @@ eThreadState new_Run(GtaThread* This) {
 					PED::SET_PED_CAN_RAGDOLL(playerPed, FALSE);
 					PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, FALSE);
 					bGodmodeSwitchset = true;
+					//Max armor.
+					PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
 				}
-
-				//Max armor.
-				PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
 			} else {
 				//draw_menu_line("Godmode inactive", menuWidth, 4.0f, menuTop + 13.0f, menuLeft, 5.0f, false, false, false, false);
-				if (bGodmodeActive && bGodmodeSwitchset)
+				if (bGodmodeSwitchset)
 				{
 					DEBUGOUT("Deactivating godmode");
 					drawNotification("Deactivating godmode");
@@ -619,6 +609,21 @@ eThreadState new_Run(GtaThread* This) {
 					PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, TRUE);
 					bGodmodeSwitchset = false;
 				}
+			}
+			//menu switch
+			if (isKeyPressedOnce(bF6Pressed, VK_F6))
+			{
+				if (bMenuActive){
+					//leaving the menu, so we should stop dropping
+					bMoneyDropActive = false;
+				}
+				else if (!bMenuActive){
+					//switch of function that cant be accessed from the menu
+					bKillTargetsActive = false;
+				}
+
+				iFreeze = -1;
+				bMenuActive = !bMenuActive;
 			}
 
 
@@ -639,7 +644,7 @@ eThreadState new_Run(GtaThread* This) {
 				draw_menu_line("Numpad3	- Remove all weapons", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("Numpad4	- (alpha) set of alarm", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("Numpad5	- (alpha) change plate", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad6	- (alpha) destroy engine", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
+				draw_menu_line("Numpad6	- (alpha) attach tennisball", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("Numpad7	- (alpha) destroy tires", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
 				draw_menu_line("Numpad8	- remove player from vehicle", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
 
@@ -800,18 +805,40 @@ eThreadState new_Run(GtaThread* This) {
 					}
 				}
 
-				//Kill the engine of another players car
+				//Attach junk to player
 				static bool bNumpad6Pressed = false;
 				if (isKeyPressedOnce(bNumpad6Pressed, VK_NUMPAD6))
 				{
-					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
-					{						
-						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
-						if (RequestNetworkControl(selectedVehicle)) {
-							VEHICLE::SET_VEHICLE_ENGINE_HEALTH(selectedVehicle, 0.0);
-							VEHICLE::SET_VEHICLE_PETROL_TANK_HEALTH(selectedVehicle, 0.0);
-							drawNotification("Ruined Engine and fuel tank");
+					//load junk model
+					/* Sample objects:
+					prop_bskball_01=1840863642  		0xF77CB21C
+					prop_cs_bin_02=651101403			0x0F3F3CB0
+					prop_defilied_ragdoll_01=-332567508	0x7A2A3826
+					*/
+					Hash objectModel = 0xF77CB21C;
+					if (!STREAMING::HAS_MODEL_LOADED(objectModel))
+					{
+						STREAMING::REQUEST_MODEL(objectModel);
+					}
+					if (STREAMING::HAS_MODEL_LOADED(objectModel) == TRUE)
+					{ 
+						Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
+						Object junkObject = OBJECT::CREATE_OBJECT(objectModel, playerPosition.x, playerPosition.y, playerPosition.z, 1, 1, 0);
+						OBJECT::PLACE_OBJECT_ON_GROUND_PROPERLY(junkObject);
+						if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
+						{
+							AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
 						}
+						ENTITY::ATTACH_ENTITY_TO_ENTITY(junkObject, selectedPed, PED::GET_PED_BONE_INDEX(selectedPed, 31086), 
+							0.00,	//floatx
+							0.00,	//floaty
+							0.0,	//floatz
+							0.0,	//xrot
+							-90.0,	//yrot 
+							-90.0,	//zrot
+							false, false, false, false, 2, true);
+						STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(objectModel);
+						drawNotification("Attached junk to player");
 					}
 				}
 
@@ -895,25 +922,22 @@ eThreadState new_Run(GtaThread* This) {
 							for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
 							{
 								Ped playerPedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
-								if (ENTITY::DOES_ENTITY_EXIST(playerPedIterator) && playerPedIterator != playerPed) //If the iteration exists, and they're alive, and they're not me.
+								if (ENTITY::DOES_ENTITY_EXIST(playerPedIterator)) //If the iteration exists, and they're alive, and they're not me.
 								{
-									if (IsPlayerFriend(playerIterator) == FALSE && selectedPed != playerPedIterator)
+									if (iCounter == 5)
 									{
-										if (iCounter == 5)
+										try
 										{
-											try
-											{
-												AI::CLEAR_PED_TASKS_IMMEDIATELY(playerPedIterator); //If they're in a jet, or something. Toss them out.
-												Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPedIterator, FALSE);
-												static bool bExplode = false;
-												bExplode = !bExplode;
-												if (bExplode)
-													FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f); //We can blame anyone for the explosion. Whoever is selected in the menu will be blamed.
-												else
-													FIRE::START_SCRIPT_FIRE(playerPosition.x, playerPosition.y, playerPosition.z, 5, TRUE); //For LEXD Godmode kids who don't set entity proofs properly.
-											}
-											catch (...) { break; Log::Error("Crashed"); iCounter = -10; } //IDK why, but if you call these functions too many times per tick, it causes a crash. We can just toss the exception. Hopefully this fixes the crash...
+											AI::CLEAR_PED_TASKS_IMMEDIATELY(playerPedIterator); //If they're in a jet, or something. Toss them out.
+											Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPedIterator, FALSE);
+											static bool bExplode = false;
+											bExplode = !bExplode;
+											if (bExplode)
+												FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f); //We can blame anyone for the explosion. Whoever is selected in the menu will be blamed.
+											else
+												FIRE::START_SCRIPT_FIRE(playerPosition.x, playerPosition.y, playerPosition.z, 5, TRUE); //For LEXD Godmode kids who don't set entity proofs properly.
 										}
+										catch (...) { break; Log::Error("Crashed"); iCounter = -10; } //IDK why, but if you call these functions too many times per tick, it causes a crash. We can just toss the exception. Hopefully this fixes the crash...
 									}
 								}
 							}
@@ -926,7 +950,7 @@ eThreadState new_Run(GtaThread* This) {
 						{	
 							//and else, only himself
 							Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
-							if (selectedPed != playerPed)
+							if (selectedPed)
 							{
 								AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
 								FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, TRUE, TRUE, 0.0f);
@@ -1067,16 +1091,20 @@ eThreadState new_Run(GtaThread* This) {
 								VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_MATTE_BLACK);
 								VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_GREEN);
 								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_TRUCK, FALSE);
+								drawNotification("Spawned Insurgent");
+							} 
+							else 
+							{ 
+								//all other vehicles
+								drawNotification("Spawned Vehicle"); 
 							}
 							STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(vehicleModelHash);
 							bWaitingForModelCar = false;
-							drawNotification("Spawned Insurgent");
-						}
-						else
-						{
-							bWaitingForModelCar = true;							
-							drawNotification("Spawned Vehicle");
-						}
+							}
+							else
+							{
+								bWaitingForModelCar = true;							
+							}
 					}
 					else if (playerVeh != NULL)
 					{
@@ -1237,41 +1265,9 @@ eThreadState new_Run(GtaThread* This) {
 					if (ENTITY::IS_ENTITY_A_VEHICLE(attachedEnt) == FALSE)
 						ENTITY::DELETE_ENTITY(&attachedEnt);
 				}
-				//SetIntStatWithBothVarients("CHEAT_BITSET", 0, 0);
-				//SetIntStatWithBothVarients("BAD_SPORT_BITSET", 0, 0);
-				//STATS::STAT_SET_BOOL(GAMEPLAY::GET_HASH_KEY("MPPLY_IS_HIGH_EARNER"), FALSE, TRUE);
-				//STATS::STAT_SET_BOOL(GAMEPLAY::GET_HASH_KEY("MPPLY_IS_CHEATER"), FALSE, TRUE);
-				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_IS_CHEATER_TIME"), 0, TRUE);
-				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_WAS_I_BAD_SPORT"), 0, TRUE);
-				//STATS::STAT_SET_FLOAT(GAMEPLAY::GET_HASH_KEY("MPPLY_OVERALL_BADSPORT"), 0, TRUE);
-				//STATS::STAT_SET_FLOAT(GAMEPLAY::GET_HASH_KEY("MPPLY_OVERALL_CHEAT"), 0, TRUE);
-				//STATS::STAT_SET_BOOL(GAMEPLAY::GET_HASH_KEY("MPPLY_CHAR_IS_BADSPORT"), FALSE, TRUE);
-				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_BECAME_BADSPORT_NUM"), 0, TRUE);
-				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_BECAME_CHEATER_NUM"), 0, TRUE);
-				//Any date[12]; //Should be enough.
-				//memset(&date, 0, sizeof(date));
-				//STATS::STAT_SET_DATE(GAMEPLAY::GET_HASH_KEY("MPPLY_BECAME_CHEATER_DT"), &date[0], 7, TRUE);
-				//STATS::STAT_SET_DATE(GAMEPLAY::GET_HASH_KEY("MPPLY_BECAME_BADSPORT_DT"), &date[0], 7, TRUE);
-				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_DESTROYED_PVEHICLES"), 0, TRUE);
-				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_BADSPORT_MESSAGE"), 0, TRUE);
-				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_KILLS_PLAYERS_CHEATER"), 69, TRUE);
-				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_DEATHS_PLAYERS_CHEATER"), 420, TRUE);
-				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_LAST_REPORT_PENALTY"), 0, TRUE);
-				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_LAST_COMMEND_PENALTY"), 0, TRUE);
-				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_LAST_REPORT_RESTORE"), 0, TRUE);
-				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_LAST_COMMEND_RESTORE"), 0, TRUE);
-				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_REPORT_STRENGTH"), 32, TRUE);
-				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_COMMEND_STRENGTH"), 32, TRUE);
-				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_VOTED_OUT"), 0, TRUE);
-				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_VOTED_OUT_DELTA"), 0, TRUE);
-				//STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY("MPPLY_VOTED_OUT_QUIT"), 0, TRUE);
-				//STATS::STAT_SET_BOOL(GAMEPLAY::GET_HASH_KEY("MPPLY_WAS_I_BAD_SPORT"), FALSE, TRUE);
-				//STATS::STAT_SET_BOOL(GAMEPLAY::GET_HASH_KEY("MPPLY_WAS_I_CHEATER"), FALSE, TRUE);
 				drawNotification("Player fixed");
 			}
 
-
-			
 			//Shoot all spaghettios (Fuck Deliver EMP)
 			if (isKeyPressedOnce(bNumpad9Pressed, VK_NUMPAD9))
 			{
