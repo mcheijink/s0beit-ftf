@@ -392,11 +392,16 @@ void draw_text(float x, float y, char* chSampleText, color_t color)
 	UI::_DRAW_TEXT(x, y);
 }
 //custom notofication service
-void drawNotification(char* message)
+void drawNotification(std::string str, bool isGxtEntry = false)
 {
+	/* testing another method
 	UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
 	UI::_ADD_TEXT_COMPONENT_STRING(message);
 	UI::_DRAW_NOTIFICATION(FALSE, TRUE);
+	*/
+	UI::_SET_NOTIFICATION_TEXT_ENTRY((isGxtEntry ? &str[0u] : "STRING"));
+	UI::_ADD_TEXT_COMPONENT_STRING(&str[0u]);
+	UI::_DRAW_NOTIFICATION(FALSE, FALSE); // _DRAW_NOTIFICATION(BOOL blink, BOOL p1)
 }
 //Function to determine if a Player object is on your Rockstar Social Club friends list.
 BOOL IsPlayerFriend(Player player)
@@ -582,9 +587,10 @@ eThreadState new_Run(GtaThread* This) {
 	//var init
 	static bool bGodmodeActive, bGodmodeSwitchset, bF7Pressed, bMoneyDropActive, bSubtractPressed, bHackActive, 
 				bF5Pressed, bMenuActive, bF6Pressed, bKillTargetsActive, bNumpad9Pressed, bPoliceIgnorePlayer = false;
+	static bool featureRestrictedZones = true;
 	static int iFreeze = -1;
 	static int modulesActive = 0;
-	static int mchbuildnr = 1013;
+	static int mchbuildnr = 1014;
 
 	float menuLeft = 1030.0;
 	float menuWidth = 250.0;
@@ -598,13 +604,14 @@ eThreadState new_Run(GtaThread* This) {
 				drawNotification("Deactivating hack");
 				bMoneyDropActive = false;
 				bGodmodeActive = false;
+				bGodmodeSwitchset = false;
 				bMenuActive = false;
 				bKillTargetsActive = false;
 				bPoliceIgnorePlayer = false;
-				PLAYER::SET_POLICE_IGNORE_PLAYER(player, false);
+				featureRestrictedZones = true;
 			}
 			else if (!bHackActive) {
-				drawNotification("Activating hack");
+				drawNotification("Activating hack",true);
 			}
 			bHackActive = !bHackActive;
 		}
@@ -625,7 +632,7 @@ eThreadState new_Run(GtaThread* This) {
 				playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
 
 			//draw the UI for when hack is active
-			draw_menu_line("s0bietftf - build 1013", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
+			draw_menu_line("s0bietftf - build 1014", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
 			
 			draw_menu_line("F5			- Hack active", menuWidth, 4.0f, menuTop, menuLeft, 5.0f, bHackActive, false, bHackActive, false);
 			draw_menu_line("F6			- Player menu", menuWidth, 4.0f, menuTop + 13.0f * 1, menuLeft, 5.0f, bMenuActive, false, bMenuActive, false);
@@ -647,7 +654,8 @@ eThreadState new_Run(GtaThread* This) {
 					//Max armor.
 					PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
 				}
-			} else {
+			}
+			else if (!bGodmodeActive) {
 				//draw_menu_line("Godmode inactive", menuWidth, 4.0f, menuTop + 13.0f, menuLeft, 5.0f, false, false, false, false);
 				if (bGodmodeSwitchset)
 				{
@@ -659,7 +667,15 @@ eThreadState new_Run(GtaThread* This) {
 					PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, TRUE);
 					bGodmodeSwitchset = false;
 				}
+				else if (PLAYER::GET_PLAYER_INVINCIBLE(player))
+				{	// bugfix for random godmode active
+					PLAYER::SET_PLAYER_INVINCIBLE(player, false);
+					ENTITY::SET_ENTITY_PROOFS(playerPed, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
+					PED::SET_PED_CAN_RAGDOLL(playerPed, TRUE);
+					PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, TRUE);
+				}
 			}
+
 			//menu switch
 			if (isKeyPressedOnce(bF6Pressed, VK_F6))
 			{
@@ -914,6 +930,9 @@ eThreadState new_Run(GtaThread* This) {
 					{
 						//Remove PED from vehicle
 						AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
+						//need to remove the parachute: 0xFBAB5776
+						WEAPON::REMOVE_WEAPON_FROM_PED(selectedPed, 0xFBAB5776);
+
 						drawNotification("Player Removed from vehicle");
 					}
 				}
@@ -1233,14 +1252,34 @@ eThreadState new_Run(GtaThread* This) {
 				if (isKeyPressedOnce(bNumpad4Pressed, VK_NUMPAD4))
 				{
 					if (bPoliceIgnorePlayer){
-						PLAYER::SET_POLICE_IGNORE_PLAYER(playerPed, false);
-						PLAYER::SET_EVERYONE_IGNORE_PLAYER(playerPed, false);
+						//regain wantedlevel
+						PLAYER::SET_MAX_WANTED_LEVEL(5);
+
+						//stop ignoring me
+						PLAYER::SET_POLICE_IGNORE_PLAYER(player, false);
+						PLAYER::SET_EVERYONE_IGNORE_PLAYER(player, false);
+						PLAYER::SET_PLAYER_CAN_BE_HASSLED_BY_GANGS(player, true);
+						PLAYER::SET_IGNORE_LOW_PRIORITY_SHOCKING_EVENTS(player, false);
+						//enable army base:
+						featureRestrictedZones = true;
+
 						drawNotification("Police started looking again");
 					}
 					else if (!bPoliceIgnorePlayer) {
-						PLAYER::SET_POLICE_IGNORE_PLAYER(playerPed, true);
-						PLAYER::SET_EVERYONE_IGNORE_PLAYER(playerPed, true);
-						drawNotification("The Police wont notice me");
+						//police wont catch me
+						int frozenWantedLevel = 0;
+						PLAYER::CLEAR_PLAYER_WANTED_LEVEL(player);	
+						PLAYER::SET_MAX_WANTED_LEVEL(frozenWantedLevel);
+						
+						//people will ignore me
+						PLAYER::SET_POLICE_IGNORE_PLAYER(player, true);
+						PLAYER::SET_EVERYONE_IGNORE_PLAYER(player, true);
+						PLAYER::SET_PLAYER_CAN_BE_HASSLED_BY_GANGS(player, false);
+						PLAYER::SET_IGNORE_LOW_PRIORITY_SHOCKING_EVENTS(player, true);
+
+						//disable army base:
+						featureRestrictedZones = false;
+						drawNotification("Police disabled");
 					}
 					bPoliceIgnorePlayer = !bPoliceIgnorePlayer;
 				}
@@ -1349,7 +1388,7 @@ eThreadState new_Run(GtaThread* This) {
 				}
 				PED::CLEAR_PED_BLOOD_DAMAGE(playerPed);
 				//We can only change stats that are not ServerAuthoritative="true" in mpstatssetup.xml.
-				STATS::STAT_SET_FLOAT(GAMEPLAY::GET_HASH_KEY("MP0_PLAYER_MENTAL_STATE"), 0.0f, TRUE);
+				//STATS::STAT_SET_FLOAT(GAMEPLAY::GET_HASH_KEY("MP0_PLAYER_MENTAL_STATE"), 0.0f, TRUE);
 				drawNotification("Player fixed");
 			}
 
@@ -1507,7 +1546,15 @@ eThreadState new_Run(GtaThread* This) {
 		}
 
 	}
-
+	if (!featureRestrictedZones)
+	{
+		GAMEPLAY::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME("am_armybase");
+		GAMEPLAY::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME("restrictedareas");
+		GAMEPLAY::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME("re_armybase");
+		GAMEPLAY::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME("re_lossantosintl");
+		GAMEPLAY::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME("re_prison");
+		GAMEPLAY::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME("re_prisonvanbreak");
+	}
 	//Return control to the thread we stole it from.
 	SetActiveThread(runningThread);
 	return gGtaThreadOriginal.Run(This);
