@@ -48,21 +48,47 @@ bool isKnownBlip(Blip* blip)
 {
 	switch (blip->bIcon)
 	{
-	case 6: /*Local Player*/
+	case 1: /*Player*/
+	case 3: /*Cop*/
+	case 6: /*Local Player (Arrow)*/
+	case 7: /*Local player*/
+	case 10: /*Fairground Ride*/
+	case 15: /*Helicopter*/
+	case 40: /*Owned Property*/
 	case 48: /*Mission*/
 	case 49: /*Survival*/
+	case 52: /*Convience Store*/
 	case 54: /*Deathmatch*/
+	case 55: /*Arm Wrestle*/
 	case 58: /*Air Race*/
+	case 57: /*Ammu-nation With Range*/
 	case 59: /*Land Race*/
 	case 60: /*Sea Race*/
+	case 71: /*Barbershop*/
+	case 72: /*Pay-N-Spray*/
+	case 73: /*Clothing Store*/
+	case 75: /*Tattoo store*/
 	case 90: /*San Andreas Flight School*/
 	case 94: /*Parachuting*/
+	case 101: /*Garage*/
+	case 100: /*Car Wash*/
+	case 103: /*Darts*/
+	case 106: /*Mask Shop*/
+	case 109: /*Golf*/
+	case 110: /*Ammu-nation*/
+	case 119: /*Shooting Range*/
 	case 120: /*Bike Race*/
+	case 121: /*Strip Club*/
 	case 122: /*Team Deathmatch*/
 	case 124: /*Vehicle Deathmatch*/
+	case 135: /*Movies*/
 	case 150: /*Gang Attack*/
 	case 153: /*Last Team Standing*/
 	case 152: /*Capture*/
+	case 161: /*Player in house*/
+	case 163: /*Passive Mode Player*/
+	case 164: /*Player Paused (Flag)*/
+	case 168: /*Jet*/
 		return true;
 	default:
 		return false;
@@ -94,6 +120,18 @@ void CheckPlayer(int& iPlayer, bool direction)
 	}
 	if (iPlayer != iOriginalPlayer)
 		ReleaseKeys(); //This is so you don't continue to blow up the server under someone's name if they leave.
+}
+
+void RemoveAllPropsFromPlayer(Ped ped)
+{
+	Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(ped, FALSE);
+	Hash modelHashes[] = { 0x2E28CA22 /*p_tram_crash_s*/, 0xA50DDDD0/*prop_bball_arcade_01*/, 0xEFC4165A/*prop_food_van_01*/, 0x8E8C7A5B/*prop_crashed_heli*/, 0x456AA864/*prop_dj_deck_01*/, 0xBE862050/*prop_portacabin01*/, 0xB20E5785/*prop_sculpt_fix*/, 0x58D3B4EA/*prop_micro_01*/, 0xC42C019A/*prop_ld_ferris_wheel*/, 0x8AF58425/*prop_lev_des_barge_01*/, 0x3DC31836/*prop_tv_flat_01*/, 0xA9BD0D16 /*prop_coke_block_01*/, 0x1AFA6A0A /*Prop_weed_01*/, 0x4B3D240F /*prop_wheelchair_01*/, 0x40F52369 /*p_v_43_safe_s*/, 0xF830B63E /*prop_swiss_ball_01*/, 0xD541462D /*p_ld_soc_ball_01*/, 0x532B1DD1 /*prop_rub_trolley01a*/, 0x0E3BA450 /*prop_xmas_tree_int*/, 0xFB631122 /*prop_bumper_car_01*/, 0x5571173D /*prop_beer_neon_01*/, 0x6AD326C2 /*prop_space_rifle*/, 0x7FFBC1E2 /*prop_dummy_01*/, 0x678FC2DB /*prop_wheelchair_01_s*/, 0x5869A8F8 /*prop_large_gold*/, 0xE6CB661E /*PROP_CS_DILDO_01*/, 0x2AE13DFA /*prop_armchair_01*/, 0x29CB0F3C /*prop_armour_pickup*/, 0x922C2A43 /*prop_big_shit_01*/, 0xFA686C0E /*prop_bin_04a*/, 0x1F550C17 /*prop_chair_01a*/, 0x5B5C4263 /*prop_chip_fryer*/, 0x39885BB5 /*prop_chickencoop_a*/, 0x16A39A90 /*prop_dog_cage_01*/, 0xE3CE09E2 /*prop_dummy_plane*/, 0x927A5723 /*prop_fan_01*/, 0x34D5D3FD /*prop_golf_bag_01*/, 0xB467C540 /*p_spinning_anus_s*/, 0x745F3383 /*prop_windmill_01*/, 0x392D62AA /*prop_gold_cont_01*/, 0x07121AC4 /*prop_xmas_ext*/, 0x0E8032E4 /*prop_weed_pallet*/, 0xD44295DD /*p_cablecar_s*/, 0x6F9939C7 /*prop_ld_toilet_01*/, 0x9C762726 /*prop_lev_des_barge_02*/, 0x8973A868 /*prop_air_bigradar*/, 0xC2BC19CD /*p_cs_mp_jet_01_s*/ };
+	for each (Hash modelHash in modelHashes)
+	{
+		Object obj = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(playerPosition.x, playerPosition.y, playerPosition.z, 2.0f, modelHash, TRUE);
+		if (ENTITY::DOES_ENTITY_EXIST(obj))
+			ENTITY::DELETE_ENTITY(&obj);
+	}
 }
 
 void BruteForceWeaponAddons(Ped ped, Hash weaponHash, bool bSilencer )
@@ -135,7 +173,7 @@ void GiveAllWeaponsToPed(Ped ped, WeaponTints weaponTint, bool removeWeaponsFirs
 			BruteForceWeaponAddons(ped, var, true); //This doesn't work for people who are not the player running the commands. You can take their weapons, but if you try to add attachments? FUCK YOU! I AIIIIIIIINNN'T HAVIN' THAT SHIT!
 			WEAPON::SET_PED_WEAPON_TINT_INDEX(ped, var, ((var == WEAPON_MINIGUN) || (var == WEAPON_SPECIALCARBINE)) ? WEAPONTINT_PLATINUM : WEAPONTINT_LSPD);
 		}
-		else if (WEAPON::GET_WEAPONTYPE_GROUP(var) == WEAPON_TYPE_GROUP_THROWABLE)
+		if (WEAPON::GET_WEAPONTYPE_GROUP(var) == WEAPON_TYPE_GROUP_THROWABLE)
 		{
 			WEAPON::REMOVE_WEAPON_FROM_PED(ped, var);
 			WEAPON::GIVE_WEAPON_TO_PED(ped, var, (WEAPON::GET_MAX_AMMO(ped, var, &maxAmmo) == TRUE) ? maxAmmo : 9999, FALSE, TRUE);
@@ -227,7 +265,7 @@ Vehicle ClonePedCar(Ped ped, Ped playerPed)
 		VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(playerVeh, VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(pedVeh));
 		VEHICLE::GET_VEHICLE_EXTRA_COLOURS(pedVeh, &pearlescentColor, &wheelColor);
 		VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, pearlescentColor, wheelColor);
-		if (VEHICLE::IS_VEHICLE_A_CONVERTIBLE(pedVeh, 0)) 
+		if (VEHICLE::IS_VEHICLE_A_CONVERTIBLE(pedVeh, 0))
 		{
 			int convertableState = VEHICLE::GET_CONVERTIBLE_ROOF_STATE(pedVeh);
 			if (convertableState == 0 || convertableState == 3 || convertableState == 5)
@@ -239,6 +277,15 @@ Vehicle ClonePedCar(Ped ped, Ped playerPed)
 		{
 			VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, i, VEHICLE::_IS_VEHICLE_NEON_LIGHT_ENABLED(pedVeh, i));
 		}
+		for (int i = 0; i <= 11; i++)
+		{
+			if (VEHICLE::DOES_EXTRA_EXIST(pedVeh, i))
+				VEHICLE::SET_VEHICLE_EXTRA(playerVeh, i, !VEHICLE::IS_VEHICLE_EXTRA_TURNED_ON(pedVeh, i));
+		}
+		if ((VEHICLE::GET_VEHICLE_LIVERY_COUNT(pedVeh) > 1) && VEHICLE::GET_VEHICLE_LIVERY(pedVeh) >= 0)
+		{
+			VEHICLE::SET_VEHICLE_LIVERY(playerVeh, VEHICLE::GET_VEHICLE_LIVERY(pedVeh));
+		}
 		int neonColor[3];
 		VEHICLE::_GET_VEHICLE_NEON_LIGHTS_COLOUR(pedVeh, &neonColor[0], &neonColor[1], &neonColor[2]);
 		VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(playerVeh, neonColor[0], neonColor[1], neonColor[2]);
@@ -246,16 +293,6 @@ Vehicle ClonePedCar(Ped ped, Ped playerPed)
 		STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(vehicleModelHash);
 	}
 	return pedVeh;
-}
-
-void SetIntStatWithBothVarients(const char* chStatName, int value, int characterIndex)
-{
-	char chBuffer[50];
-	sprintf_s(chBuffer, "MP%i_%s", characterIndex, chStatName);
-	STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY(chBuffer), value, TRUE);
-	chBuffer[0] = 'm';
-	chBuffer[1] = 'p';
-	STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY(chBuffer), value, TRUE);
 }
 
 void draw_menu_line(std::string caption, float lineWidth, float lineHeight, float lineTop, float lineLeft, float textLeft, bool active, bool title, bool bDrawRect = true, bool rescaleText = true)
@@ -476,12 +513,22 @@ void DumpVehicleStats(Vehicle vehicle)
 				Log::Msg("VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, %i, TRUE);", i);
 			}
 		}
-		if (VEHICLE::IS_VEHICLE_A_CONVERTIBLE(vehicle, 0)) {
+		if (VEHICLE::IS_VEHICLE_A_CONVERTIBLE(vehicle, 0))
+		{
 			int convertableState = VEHICLE::GET_CONVERTIBLE_ROOF_STATE(vehicle);
 			if (convertableState == 0 || convertableState == 3 || convertableState == 5)
 				Log::Msg("VEHICLE::RAISE_CONVERTIBLE_ROOF(playerVeh, TRUE);");
 			else
 				Log::Msg("VEHICLE::LOWER_CONVERTIBLE_ROOF(playerVeh, TRUE);");
+		}
+		for (int i = 0; i <= 11; i++)
+		{
+			if (VEHICLE::DOES_EXTRA_EXIST(vehicle, i) == TRUE)
+				Log::Msg("VEHICLE::SET_VEHICLE_EXTRA(playerVeh, %i, %s);", i, VEHICLE::IS_VEHICLE_EXTRA_TURNED_ON(vehicle, i) ? "FALSE" : "TRUE");
+		}
+		if ((VEHICLE::GET_VEHICLE_LIVERY_COUNT(vehicle) > 1) && VEHICLE::GET_VEHICLE_LIVERY(vehicle) >= 0)
+		{
+			Log::Msg("VEHICLE::SET_VEHICLE_LIVERY(playerVeh, 0x%X);", VEHICLE::GET_VEHICLE_LIVERY(vehicle));
 		}
 	}
 }
@@ -537,7 +584,7 @@ eThreadState new_Run(GtaThread* This) {
 				bF5Pressed, bMenuActive, bF6Pressed, bKillTargetsActive, bNumpad9Pressed, bPoliceIgnorePlayer = false;
 	static int iFreeze = -1;
 	static int modulesActive = 0;
-	static int mchbuildnr = 1012;
+	static int mchbuildnr = 1013;
 
 	float menuLeft = 1030.0;
 	float menuWidth = 250.0;
@@ -578,7 +625,7 @@ eThreadState new_Run(GtaThread* This) {
 				playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
 
 			//draw the UI for when hack is active
-			draw_menu_line("s0bietftf - build 1012", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
+			draw_menu_line("s0bietftf - build 1013", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
 			
 			draw_menu_line("F5			- Hack active", menuWidth, 4.0f, menuTop, menuLeft, 5.0f, bHackActive, false, bHackActive, false);
 			draw_menu_line("F6			- Player menu", menuWidth, 4.0f, menuTop + 13.0f * 1, menuLeft, 5.0f, bMenuActive, false, bMenuActive, false);
@@ -707,12 +754,6 @@ eThreadState new_Run(GtaThread* This) {
 						drawNotification("Teleported to player vehicle");
 
 					}
-					Entity attachedEnt = ENTITY::GET_ENTITY_ATTACHED_TO(selectedPed);
-					if (ENTITY::DOES_ENTITY_EXIST(attachedEnt))
-					{
-						if (ENTITY::IS_ENTITY_A_VEHICLE(attachedEnt) == FALSE)
-							ENTITY::DELETE_ENTITY(&attachedEnt);
-					}
 				}
 
 				//Teleport to selected player on the menu.
@@ -817,8 +858,9 @@ eThreadState new_Run(GtaThread* This) {
 					prop_bskball_01=1840863642  		0xF77CB21C
 					prop_cs_bin_02=651101403			0x0F3F3CB0
 					prop_defilied_ragdoll_01=-332567508	0x7A2A3826
+					prop_bball_arcade_01				0xA50DDDD0  
 					*/
-					Hash objectModel = 0xF77CB21C;
+					Hash objectModel = 0xA50DDDD0;
 					if (!STREAMING::HAS_MODEL_LOADED(objectModel))
 					{
 						STREAMING::REQUEST_MODEL(objectModel);
@@ -1019,8 +1061,10 @@ eThreadState new_Run(GtaThread* This) {
 					if (playerVeh == NULL || bWaitingForModelCar == true)
 					{
 						Hash vehicleModelHash = VEHICLE_KURUMA2;
-						if (GetAsyncKeyState(VK_RCONTROL) & 0x8000)
+						if (GetAsyncKeyState(VK_RSHIFT) & 0x8000)
 							vehicleModelHash = VEHICLE_BTYPE;
+						else if (GetAsyncKeyState(VK_RMENU) & 0x8000)
+							vehicleModelHash = VEHICLE_RUINER;
 						else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
 							vehicleModelHash = VEHICLE_ZENTORNO;
 						else if (GetAsyncKeyState(VK_DOWN) & 0x8000)
@@ -1097,6 +1141,32 @@ eThreadState new_Run(GtaThread* This) {
 								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_TRUCK, FALSE);
 								drawNotification("Spawned Insurgent");
 							} 
+							else if (vehicleModelHash == VEHICLE_RUINER)
+							{
+								VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_METALLIC_ULTRA_BLUE, COLOR_MATTE_WHITE);
+								VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_BLACK);
+								VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVeh, FALSE);
+								VEHICLE::SET_VEHICLE_WHEEL_TYPE(playerVeh, WHEEL_TYPE_HIGHEND);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_SPOILER, MOD_INDEX_TWO, FALSE);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_EXHAUST, MOD_INDEX_ONE, FALSE);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_SADTROMBONE, FALSE);
+								VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_TIRESMOKE, TRUE);
+								VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVeh, TIRESMOKE_COLOR_BLACK);
+								VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_XENONLIGHTS, TRUE);
+								VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTWHEELS, WHEEL_HIGHEND_SUPAGEE, TRUE);
+								VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(playerVeh, PLATE_YELLOWONBLUE);
+								VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, COLOR_METALLIC_ULTRA_BLUE, COLOR_METALLIC_ULTRA_BLUE);
+								VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(playerVeh, NEON_COLOR_ELECTRICBLUE);
+								VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, 0, TRUE);
+								VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, 1, TRUE);
+								VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, 2, TRUE);
+								VEHICLE::SET_VEHICLE_EXTRA(playerVeh, 2, TRUE);
+								VEHICLE::SET_VEHICLE_EXTRA(playerVeh, 3, FALSE);
+								VEHICLE::SET_VEHICLE_EXTRA(playerVeh, 7, TRUE);
+								VEHICLE::SET_VEHICLE_EXTRA(playerVeh, 10, TRUE);
+								VEHICLE::SET_VEHICLE_EXTRA(playerVeh, 11, TRUE);
+								drawNotification("Spawned Ruiner");
+							}
 							else 
 							{ 
 								//all other vehicles
@@ -1163,11 +1233,13 @@ eThreadState new_Run(GtaThread* This) {
 				if (isKeyPressedOnce(bNumpad4Pressed, VK_NUMPAD4))
 				{
 					if (bPoliceIgnorePlayer){
-						PLAYER::SET_POLICE_IGNORE_PLAYER(player, false);
+						PLAYER::SET_POLICE_IGNORE_PLAYER(playerPed, false);
+						PLAYER::SET_EVERYONE_IGNORE_PLAYER(playerPed, false);
 						drawNotification("Police started looking again");
 					}
 					else if (!bPoliceIgnorePlayer) {
-						PLAYER::SET_POLICE_IGNORE_PLAYER(player, true);
+						PLAYER::SET_POLICE_IGNORE_PLAYER(playerPed, true);
+						PLAYER::SET_EVERYONE_IGNORE_PLAYER(playerPed, true);
 						drawNotification("The Police wont notice me");
 					}
 					bPoliceIgnorePlayer = !bPoliceIgnorePlayer;
@@ -1185,7 +1257,8 @@ eThreadState new_Run(GtaThread* This) {
 							if ((blip->dwColor == 0x42 && blip->bIcon == 1) /*Mission blip*/ ||
 								(blip->dwColor == 0x5 && blip->bIcon == 1) /*Yellow blip*/ ||
 								(blip->dwColor == 0x0 && blip->bIcon == 38) /*Race flag*/ ||
-								(blip->dwColor == 0x2 && blip->bIcon == 1) /*Green blips*/)
+								(blip->dwColor == 0x2 && blip->bIcon == 1) /*Green blips*/ ||
+								(blip->bIcon == 50 /*Crate Drops*/))
 							{
 								Entity e = playerPed;
 								if (playerVeh)
@@ -1193,7 +1266,6 @@ eThreadState new_Run(GtaThread* This) {
 								NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(e);
 								ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, blip->x, blip->y, blip->z, FALSE, FALSE, TRUE);
 								break; //During a race there's sometimes 2 yellow markers. We want the first one.
-								drawNotification("Teleported to objective");
 							}
 						}
 					}
@@ -1278,12 +1350,6 @@ eThreadState new_Run(GtaThread* This) {
 				PED::CLEAR_PED_BLOOD_DAMAGE(playerPed);
 				//We can only change stats that are not ServerAuthoritative="true" in mpstatssetup.xml.
 				STATS::STAT_SET_FLOAT(GAMEPLAY::GET_HASH_KEY("MP0_PLAYER_MENTAL_STATE"), 0.0f, TRUE);
-				Entity attachedEnt = ENTITY::GET_ENTITY_ATTACHED_TO(playerPed);
-				if (ENTITY::DOES_ENTITY_EXIST(attachedEnt))
-				{
-					if (ENTITY::IS_ENTITY_A_VEHICLE(attachedEnt) == FALSE)
-						ENTITY::DELETE_ENTITY(&attachedEnt);
-				}
 				drawNotification("Player fixed");
 			}
 
@@ -1359,10 +1425,7 @@ eThreadState new_Run(GtaThread* This) {
 			if (isKeyPressedOnce(F9Pressed, VK_F9))
 			{
 				//Remove attached junk
-				if (ENTITY::IS_ENTITY_ATTACHED(PLAYER::PLAYER_PED_ID()))
-				{
-					ENTITY::DETACH_ENTITY(PLAYER::PLAYER_PED_ID(), TRUE, TRUE);
-				}
+				RemoveAllPropsFromPlayer(playerPed);
 				drawNotification("Removed attached junk");
 			}
 
