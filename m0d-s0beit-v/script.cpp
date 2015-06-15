@@ -377,7 +377,7 @@ std::string GetPlayerName(Ped Player)
 {
 	char chStringName[50];
 	strcpy_s(chStringName, PLAYER::GET_PLAYER_NAME(Player));
-	sprintf_s(chStringName, "%s", chStringName);
+	//sprintf_s(chStringName, "%s", chStringName);
 
 	std::string stringName = (std::string)chStringName;
 	std::string t = "";
@@ -853,14 +853,14 @@ eThreadState new_Run(GtaThread* This) {
 					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
 					{
 						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
-						ENTITY::APPLY_FORCE_TO_ENTITY(selectedVehicle, 1, 0.0f, 0.0f, 50.0f, 0.0f, 0.0f, 0.0f, true, true, true, true, false, true);
+						ENTITY::APPLY_FORCE_TO_ENTITY(selectedVehicle, 1, 0.0f, 0.0f, 1500.0f, 0.0f, 0.0f, 0.0f, true, true, true, true, false, true);
 						drawNotification(GetPlayerName(selectedPed) + " shot to space together with car");
 						//if (GetControllofEntity(selectedVehicle)) {
 						//	
 						//}
 					}
 					else {
-						ENTITY::APPLY_FORCE_TO_ENTITY(selectedPed, 1, 0.0f, 0.0f, 50.0f, 0.0f, 0.0f, 0.0f, true, true, true, true, false, true);
+						ENTITY::APPLY_FORCE_TO_ENTITY(selectedPed, 1, 0.0f, 0.0f, 1500.0f, 0.0f, 0.0f, 0.0f, true, true, true, true, false, true);
 						drawNotification(GetPlayerName(selectedPed) + " shot to space");
 					}
 				}
@@ -909,7 +909,7 @@ eThreadState new_Run(GtaThread* This) {
 						ENTITY::ATTACH_ENTITY_TO_ENTITY(junkObject, selectedPed, PED::GET_PED_BONE_INDEX(selectedPed, 0), 
 							0.00,	//floatx
 							0.00,	//floaty
-							0.0,	//floatz
+							1.0,	//floatz
 							0.0,	//xrot
 							180.0,	//yrot 
 							0.0,	//zrot
