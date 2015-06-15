@@ -74,7 +74,7 @@ void CheckPlayer(int& iPlayer, bool direction)
 void RemoveAllPropsFromPlayer(Ped ped)
 {
 	Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(ped, FALSE);
-	Hash modelHashes[] = { 0x2E28CA22 /*p_tram_crash_s*/, 0xA50DDDD0/*prop_bball_arcade_01*/, 0xEFC4165A/*prop_food_van_01*/, 0x8E8C7A5B/*prop_crashed_heli*/, 0x456AA864/*prop_dj_deck_01*/, 0xBE862050/*prop_portacabin01*/, 0xB20E5785/*prop_sculpt_fix*/, 0x58D3B4EA/*prop_micro_01*/, 0xC42C019A/*prop_ld_ferris_wheel*/, 0x8AF58425/*prop_lev_des_barge_01*/, 0x3DC31836/*prop_tv_flat_01*/, 0xA9BD0D16 /*prop_coke_block_01*/, 0x1AFA6A0A /*Prop_weed_01*/, 0x4B3D240F /*prop_wheelchair_01*/, 0x40F52369 /*p_v_43_safe_s*/, 0xF830B63E /*prop_swiss_ball_01*/, 0xD541462D /*p_ld_soc_ball_01*/, 0x532B1DD1 /*prop_rub_trolley01a*/, 0x0E3BA450 /*prop_xmas_tree_int*/, 0xFB631122 /*prop_bumper_car_01*/, 0x5571173D /*prop_beer_neon_01*/, 0x6AD326C2 /*prop_space_rifle*/, 0x7FFBC1E2 /*prop_dummy_01*/, 0x678FC2DB /*prop_wheelchair_01_s*/, 0x5869A8F8 /*prop_large_gold*/, 0xE6CB661E /*PROP_CS_DILDO_01*/, 0x2AE13DFA /*prop_armchair_01*/, 0x29CB0F3C /*prop_armour_pickup*/, 0x922C2A43 /*prop_big_shit_01*/, 0xFA686C0E /*prop_bin_04a*/, 0x1F550C17 /*prop_chair_01a*/, 0x5B5C4263 /*prop_chip_fryer*/, 0x39885BB5 /*prop_chickencoop_a*/, 0x16A39A90 /*prop_dog_cage_01*/, 0xE3CE09E2 /*prop_dummy_plane*/, 0x927A5723 /*prop_fan_01*/, 0x34D5D3FD /*prop_golf_bag_01*/, 0xB467C540 /*p_spinning_anus_s*/, 0x745F3383 /*prop_windmill_01*/, 0x392D62AA /*prop_gold_cont_01*/, 0x07121AC4 /*prop_xmas_ext*/, 0x0E8032E4 /*prop_weed_pallet*/, 0xD44295DD /*p_cablecar_s*/, 0x6F9939C7 /*prop_ld_toilet_01*/, 0x9C762726 /*prop_lev_des_barge_02*/, 0x8973A868 /*prop_air_bigradar*/, 0xC2BC19CD /*p_cs_mp_jet_01_s*/ };
+	Hash modelHashes[] = { 0x2E28CA22 /*p_tram_crash_s*/, 0xA50DDDD0/*prop_bball_arcade_01*/, 0xEFC4165A/*prop_food_van_01*/, 0x8E8C7A5B/*prop_crashed_heli*/, 0x456AA864/*prop_dj_deck_01*/, 0xBE862050/*prop_portacabin01*/, 0xB20E5785/*prop_sculpt_fix*/, 0x58D3B4EA/*prop_micro_01*/, 0xC42C019A/*prop_ld_ferris_wheel*/, 0x8AF58425/*prop_lev_des_barge_01*/, 0x3DC31836/*prop_tv_flat_01*/, 0xA9BD0D16 /*prop_coke_block_01*/, 0x1AFA6A0A /*Prop_weed_01*/, 0x4B3D240F /*prop_wheelchair_01*/, 0x40F52369 /*p_v_43_safe_s*/, 0xF830B63E /*prop_swiss_ball_01*/, 0xD541462D /*p_ld_soc_ball_01*/, 0x532B1DD1 /*prop_rub_trolley01a*/, 0x0E3BA450 /*prop_xmas_tree_int*/, 0xFB631122 /*prop_bumper_car_01*/, 0x5571173D /*prop_beer_neon_01*/, 0x6AD326C2 /*prop_space_rifle*/, 0x7FFBC1E2 /*prop_dummy_01*/, 0x678FC2DB /*prop_wheelchair_01_s*/, 0x5869A8F8 /*prop_large_gold*/, 0xE6CB661E /*PROP_CS_DILDO_01*/, 0x2AE13DFA /*prop_armchair_01*/, 0x29CB0F3C /*prop_armour_pickup*/, 0x922C2A43 /*prop_big_shit_01*/, 0xFA686C0E /*prop_bin_04a*/, 0x1F550C17 /*prop_chair_01a*/, 0x5B5C4263 /*prop_chip_fryer*/, 0x39885BB5 /*prop_chickencoop_a*/, 0x16A39A90 /*prop_dog_cage_01*/, 0xE3CE09E2 /*prop_dummy_plane*/, 0x927A5723 /*prop_fan_01*/, 0x34D5D3FD /*prop_golf_bag_01*/, 0xB467C540 /*p_spinning_anus_s*/, 0x745F3383 /*prop_windmill_01*/, 0x392D62AA /*prop_gold_cont_01*/, 0x07121AC4 /*prop_xmas_ext*/, 0x0E8032E4 /*prop_weed_pallet*/, 0xD44295DD /*p_cablecar_s*/, 0x6F9939C7 /*prop_ld_toilet_01*/, 0x9C762726 /*prop_lev_des_barge_02*/, 0x8973A868 /*prop_air_bigradar*/, 0xC2BC19CD /*p_cs_mp_jet_01_s*/, 651101403 /*garbage bin*/ };
 	for each (Hash modelHash in modelHashes)
 	{
 		Object obj = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(playerPosition.x, playerPosition.y, playerPosition.z, 2.0f, modelHash, TRUE);
@@ -567,7 +567,7 @@ eThreadState new_Run(GtaThread* This) {
 	static bool featureRestrictedZones = true;
 	static int iFreeze = -1;
 	static int modulesActive = 0;
-	static int mchbuildnr = 1015;
+	static int mchbuildnr = 1016;
 
 	float menuLeft = 1030.0;
 	float menuWidth = 250.0;
@@ -610,7 +610,7 @@ eThreadState new_Run(GtaThread* This) {
 				playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
 
 			//draw the UI for when hack is active
-			draw_menu_line("s0bietftf - build 1015", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
+			draw_menu_line("s0bietftf - build 1016", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
 			
 			draw_menu_line("F5			- Hack active", menuWidth, 4.0f, menuTop, menuLeft, 5.0f, bHackActive, false, bHackActive, false);
 			if (!bHackHidden) {
@@ -688,7 +688,7 @@ eThreadState new_Run(GtaThread* This) {
 				if (!bHackHidden)
 				{
 					//Hack modes for Inside menu
-					draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 18);
+					draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 19);
 					draw_menu_line("F10			- Hack Hidden", menuWidth, 4.0f, menuTop + 13.0f * 3, menuLeft, 5.0f, bHackHidden, false, bHackHidden, false);
 					draw_menu_line("Pageup		- Prev player in list", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Pagedown	- Next player in list", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, false, false, false, false);
@@ -701,9 +701,10 @@ eThreadState new_Run(GtaThread* This) {
 					draw_menu_line("Numpad3	- Remove all weapons", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad4	- to space and beyond", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad5	- (alpha) change plate", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad6	- (alpha) attach tennisball", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad6	- attach garbage bin", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad7	- (alpha) destroy tires", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad8	- remove player from vehicle", menuWidth, 4.0f, menuTop + 13.0f * 17, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad9	- remove garbage bin", menuWidth, 4.0f, menuTop + 13.0f * 18, menuLeft, 5.0f, false, false, false, false);
 				}
 
 				static int iSelectedPlayer = 0;
@@ -891,7 +892,8 @@ eThreadState new_Run(GtaThread* This) {
 					prop_defilied_ragdoll_01=-332567508	0x7A2A3826
 					prop_bball_arcade_01				0xA50DDDD0  
 					*/
-					Hash objectModel = 0xD8F7692D;
+					Hash objectModel = 651101403
+						;
 					if (!STREAMING::HAS_MODEL_LOADED(objectModel))
 					{
 						STREAMING::REQUEST_MODEL(objectModel);
@@ -952,6 +954,14 @@ eThreadState new_Run(GtaThread* This) {
 						drawNotification(selectedPedName + "Removed from vehicle");
 					}
 				}
+
+				//Remove junk from player
+				static bool bNumpad9Pressed = false;
+				if (isKeyPressedOnce(bNumpad9Pressed, VK_NUMPAD9))
+				{
+					RemoveAllPropsFromPlayer(selectedPed);
+				}
+
 
 				//still work in progress
 				//Player will get attacked by random peds
