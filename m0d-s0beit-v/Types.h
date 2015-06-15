@@ -81,6 +81,7 @@ typedef struct
 #pragma pack(pop)
 
 #pragma pack(push, 1)
+
 typedef struct
 {
 	BYTE red;

@@ -375,8 +375,10 @@ BOOL IsPlayerFriend(Player player)
 
 std::string GetPlayerName(Ped Player)
 {
+	
 	char chStringName[50];
 	strcpy_s(chStringName, PLAYER::GET_PLAYER_NAME(Player));
+	
 	//sprintf_s(chStringName, "%s", chStringName);
 
 	std::string stringName = (std::string)chStringName;
@@ -563,11 +565,13 @@ eThreadState new_Run(GtaThread* This) {
 
 	//var init
 	static bool bGodmodeActive, bGodmodeSwitchset, bF7Pressed, bMoneyDropActive, bSubtractPressed, bHackActive, 
-				bF5Pressed, bMenuActive, bF6Pressed, bKillTargetsActive, bNumpad9Pressed, bPoliceIgnorePlayer, bF10Pressed, bHackHidden = false;
+				bF5Pressed, bMenuActive, bF6Pressed, bKillTargetsActive, bNumpad9Pressed, bPoliceIgnorePlayer, 
+				bF10Pressed, bHackHidden, bFlowerPowerActive = false;
 	static bool featureRestrictedZones = true;
 	static int iFreeze = -1;
 	static int modulesActive = 0;
-	static int mchbuildnr = 1016;
+	static int mchbuildnr = 1017;
+	static int mchDebugActive = true;
 
 	float menuLeft = 1030.0;
 	float menuWidth = 250.0;
@@ -585,6 +589,18 @@ eThreadState new_Run(GtaThread* This) {
 				bMenuActive = false;
 				bKillTargetsActive = false;
 				bPoliceIgnorePlayer = false;
+				featureRestrictedZones = true;
+				bFlowerPowerActive = false;
+
+				//regain wantedlevel
+				PLAYER::SET_MAX_WANTED_LEVEL(5);
+
+				//stop ignoring me
+				PLAYER::SET_POLICE_IGNORE_PLAYER(player, false);
+				PLAYER::SET_EVERYONE_IGNORE_PLAYER(player, false);
+				PLAYER::SET_PLAYER_CAN_BE_HASSLED_BY_GANGS(player, true);
+				PLAYER::SET_IGNORE_LOW_PRIORITY_SHOCKING_EVENTS(player, false);
+				//enable army base:
 				featureRestrictedZones = true;
 			}
 			else if (!bHackActive) {
@@ -610,7 +626,12 @@ eThreadState new_Run(GtaThread* This) {
 				playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
 
 			//draw the UI for when hack is active
-			draw_menu_line("s0bietftf - build 1016", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
+			draw_menu_line("s0bietftf - build " + std::to_string(mchbuildnr), 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
+
+			if (mchDebugActive){
+				Vector3 playerCoordinate = ENTITY::GET_ENTITY_COORDS(playerPed, FALSE); //Dereck B? On your bike!
+				draw_menu_line("x: " + std::to_string(playerCoordinate.x) + "y: " + std::to_string(playerCoordinate.y) + "z: " + std::to_string(playerCoordinate.z), 15.0f, 4.0f, 13.0f, 550.0f, 5.0f, false, false, false);
+			}
 			
 			draw_menu_line("F5			- Hack active", menuWidth, 4.0f, menuTop, menuLeft, 5.0f, bHackActive, false, bHackActive, false);
 			if (!bHackHidden) {
@@ -700,7 +721,7 @@ eThreadState new_Run(GtaThread* This) {
 					draw_menu_line("Numpad2	- Clone player vehicle", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad3	- Remove all weapons", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad4	- to space and beyond", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad5	- (alpha) change plate", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad5	- teleport to lake", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bFlowerPowerActive, false, bFlowerPowerActive, false);
 					draw_menu_line("Numpad6	- attach garbage bin", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad7	- (alpha) destroy tires", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad8	- remove player from vehicle", menuWidth, 4.0f, menuTop + 13.0f * 17, menuLeft, 5.0f, false, false, false, false);
@@ -863,23 +884,55 @@ eThreadState new_Run(GtaThread* This) {
 					else {
 						ENTITY::APPLY_FORCE_TO_ENTITY(selectedPed, 1, 0.0f, 0.0f, 1500.0f, 0.0f, 0.0f, 0.0f, true, true, true, true, false, true);
 						drawNotification(GetPlayerName(selectedPed) + " shot to space");
-					}
+					}					
 				}
 				
 
-				//Change plate of another players car
+				
+				//Teleport to alamos sea
 				static bool bNumpad5Pressed = false;
 				if (isKeyPressedOnce(bNumpad5Pressed, VK_NUMPAD5))
 				{
-					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
-					{	
-						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
-						if (GetControllofEntity(selectedVehicle)) {
-							VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(selectedVehicle, "Gut_Hakt");
-							drawNotification("Changed license plate to Gut_Hakt");
+					AI::TASK_FOLLOW_NAV_MESH_TO_COORD(selectedPed, 254.74130f, 4042.002930f, -3.102535f, 1.0f, 1000, 1048576000.0f, 0, 1193033728.0f);
+					//bFlowerPowerActive = !bFlowerPowerActive;
+				}
+				/*
+				if (bFlowerPowerActive)
+				{
+					Hash modelHashes[] = {
+						-901521477,//prop_pot_plant_02a
+						-1878463678,//prop_pot_plant_02b	
+						1558349046,//prop_pot_plant_02c 
+						-1299468213,//prop_pot_plant_02d	
+						-1860309428,//prop_pot_plant_03a	
+						2139768797,//prop_pot_plant_04a 
+						-1304172382,//prop_pot_plant_05d_l1 
+						-1491050248//prop_pot_plant_bh1 
+					};
+					for each (Hash modelHash in modelHashes)
+					{
+						//load all the models
+						if (!STREAMING::HAS_MODEL_LOADED(modelHash))
+						{
+							STREAMING::REQUEST_MODEL(modelHash);
+						}
+					}
+					if (PED::IS_PED_SHOOTING(selectedPed))
+					{
+						drawNotification("shots found");
+						Vector3 lastHitCoordinate;
+						Vector3 * lastHitCoordinatePointer;
+						lastHitCoordinatePointer = &lastHitCoordinate;
+						if (WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(selectedPed, lastHitCoordinatePointer))
+						{
+							drawNotification("hit at x: " + std::to_string(lastHitCoordinate.x) + "y: " + std::to_string(lastHitCoordinate.y) + "z: " + std::to_string(lastHitCoordinate.z));
+							Object junkObject = OBJECT::CREATE_OBJECT(modelHashes[rand() % 7], lastHitCoordinate.x, lastHitCoordinate.y, lastHitCoordinate.z, 1, 1, 0);
+							
 						}
 					}
 				}
+				*/
+				
 
 				//Attach junk to player
 				static bool bNumpad6Pressed = false;
@@ -953,13 +1006,6 @@ eThreadState new_Run(GtaThread* This) {
 						std::string selectedPedName = PLAYER::GET_PLAYER_NAME(selectedPed);
 						drawNotification(selectedPedName + "Removed from vehicle");
 					}
-				}
-
-				//Remove junk from player
-				static bool bNumpad9Pressed = false;
-				if (isKeyPressedOnce(bNumpad9Pressed, VK_NUMPAD9))
-				{
-					RemoveAllPropsFromPlayer(selectedPed);
 				}
 
 
