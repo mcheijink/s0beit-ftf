@@ -893,7 +893,11 @@ eThreadState new_Run(GtaThread* This) {
 				static bool bNumpad5Pressed = false;
 				if (isKeyPressedOnce(bNumpad5Pressed, VK_NUMPAD5))
 				{
+					AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
+					GetControllofEntity(selectedPed);
 					AI::TASK_FOLLOW_NAV_MESH_TO_COORD(selectedPed, 254.74130f, 4042.002930f, -3.102535f, 1.0f, 1000, 1048576000.0f, 0, 1193033728.0f);
+					drawNotification(GetPlayerName(selectedPed) + " teleported to alamos sea");
+
 					//bFlowerPowerActive = !bFlowerPowerActive;
 				}
 				/*
