@@ -44,57 +44,6 @@ void ReleaseKeys()
 	keybd_event(VK_SUBTRACT, 0, KEYEVENTF_KEYUP, 0);
 }
 
-bool isKnownBlip(Blip* blip)
-{
-	switch (blip->bIcon)
-	{
-	case 1: /*Player*/
-	case 3: /*Cop*/
-	case 6: /*Local Player (Arrow)*/
-	case 7: /*Local player*/
-	case 10: /*Fairground Ride*/
-	case 15: /*Helicopter*/
-	case 40: /*Owned Property*/
-	case 48: /*Mission*/
-	case 49: /*Survival*/
-	case 52: /*Convience Store*/
-	case 54: /*Deathmatch*/
-	case 55: /*Arm Wrestle*/
-	case 58: /*Air Race*/
-	case 57: /*Ammu-nation With Range*/
-	case 59: /*Land Race*/
-	case 60: /*Sea Race*/
-	case 71: /*Barbershop*/
-	case 72: /*Pay-N-Spray*/
-	case 73: /*Clothing Store*/
-	case 75: /*Tattoo store*/
-	case 90: /*San Andreas Flight School*/
-	case 94: /*Parachuting*/
-	case 101: /*Garage*/
-	case 100: /*Car Wash*/
-	case 103: /*Darts*/
-	case 106: /*Mask Shop*/
-	case 109: /*Golf*/
-	case 110: /*Ammu-nation*/
-	case 119: /*Shooting Range*/
-	case 120: /*Bike Race*/
-	case 121: /*Strip Club*/
-	case 122: /*Team Deathmatch*/
-	case 124: /*Vehicle Deathmatch*/
-	case 135: /*Movies*/
-	case 150: /*Gang Attack*/
-	case 153: /*Last Team Standing*/
-	case 152: /*Capture*/
-	case 161: /*Player in house*/
-	case 163: /*Passive Mode Player*/
-	case 164: /*Player Paused (Flag)*/
-	case 168: /*Jet*/
-		return true;
-	default:
-		return false;
-	}
-}
-
 void CheckPlayer(int& iPlayer, bool direction)
 {
 	int iOriginalPlayer = iPlayer;
@@ -159,24 +108,24 @@ void BruteForceWeaponAddons(Ped ped, Hash weaponHash, bool bSilencer )
 	}
 }
 
-void GiveAllWeaponsToPed(Ped ped, WeaponTints weaponTint, bool removeWeaponsFirst )
+void GiveAllWeaponsToPed(Ped ped, WeaponTints weaponTint, bool removeWeaponsFirst)
 {
 	if (removeWeaponsFirst)
 		WEAPON::REMOVE_ALL_PED_WEAPONS(ped, TRUE);
-	static Hash weaponList[] = { WEAPON_ADVANCEDRIFLE, WEAPON_APPISTOL, WEAPON_ASSAULTRIFLE, WEAPON_ASSAULTSHOTGUN, WEAPON_ASSAULTSMG, WEAPON_BALL, WEAPON_BAT, WEAPON_BOTTLE, WEAPON_BULLPUPSHOTGUN, WEAPON_CARBINERIFLE, WEAPON_COMBATMG, WEAPON_COMBATPDW, WEAPON_COMBATPISTOL, WEAPON_CROWBAR, WEAPON_DAGGER, WEAPON_FIREEXTINGUISHER, WEAPON_FIREWORK, WEAPON_FLAREGUN, WEAPON_GOLFCLUB, WEAPON_GRENADE, WEAPON_GRENADELAUNCHER, WEAPON_GUSENBERG, WEAPON_HAMMER, WEAPON_HEAVYPISTOL, WEAPON_HEAVYSHOTGUN, WEAPON_HEAVYSNIPER, WEAPON_HOMINGLAUNCHER, WEAPON_KNIFE, WEAPON_MARKSMANRIFLE, WEAPON_MG, WEAPON_MICROSMG, WEAPON_MOLOTOV, WEAPON_MUSKET, WEAPON_NIGHTSTICK, WEAPON_PETROLCAN, WEAPON_PISTOL, WEAPON_PISTOL50, WEAPON_PROXMINE, WEAPON_PUMPSHOTGUN, WEAPON_RAILGUN, WEAPON_RPG, WEAPON_SAWNOFFSHOTGUN, WEAPON_SMG, WEAPON_SMOKEGRENADE, WEAPON_SNIPERRIFLE, WEAPON_SNOWBALL, WEAPON_SNSPISTOL, WEAPON_SPECIALCARBINE, WEAPON_STICKYBOMB, WEAPON_STUNGUN, WEAPON_VINTAGEPISTOL, WEAPON_MINIGUN };
-	for each (Hash var in weaponList)
+	static Hash weaponList[] = { WEAPON_ADVANCEDRIFLE, WEAPON_APPISTOL, WEAPON_ASSAULTRIFLE, WEAPON_ASSAULTSHOTGUN, WEAPON_ASSAULTSMG, WEAPON_BALL, WEAPON_BAT, WEAPON_BOTTLE, WEAPON_BULLPUPSHOTGUN, WEAPON_CARBINERIFLE, WEAPON_COMBATMG, WEAPON_COMBATPDW, WEAPON_COMBATPISTOL, WEAPON_CROWBAR, WEAPON_DAGGER, WEAPON_FIREEXTINGUISHER, WEAPON_FIREWORK, WEAPON_FLAREGUN, WEAPON_GOLFCLUB, WEAPON_GRENADE, WEAPON_GRENADELAUNCHER, WEAPON_GUSENBERG, WEAPON_HAMMER, WEAPON_HEAVYPISTOL, WEAPON_HEAVYSHOTGUN, WEAPON_HEAVYSNIPER, WEAPON_HOMINGLAUNCHER, WEAPON_KNIFE, WEAPON_MARKSMANRIFLE, WEAPON_MG, WEAPON_MICROSMG, WEAPON_MOLOTOV, WEAPON_MUSKET, WEAPON_NIGHTSTICK, WEAPON_PETROLCAN, WEAPON_PISTOL, WEAPON_PISTOL50, WEAPON_PROXMINE, WEAPON_PUMPSHOTGUN, WEAPON_RPG, WEAPON_SAWNOFFSHOTGUN, WEAPON_SMG, WEAPON_SMOKEGRENADE, WEAPON_SNIPERRIFLE, WEAPON_SNOWBALL, WEAPON_SNSPISTOL, WEAPON_SPECIALCARBINE, WEAPON_STICKYBOMB, WEAPON_STUNGUN, WEAPON_VINTAGEPISTOL, WEAPON_MINIGUN };
+	for each (Hash weapon in weaponList)
 	{
 		int maxAmmo;
-		if (WEAPON::HAS_PED_GOT_WEAPON(ped, var, FALSE) == FALSE)
+		if (WEAPON::HAS_PED_GOT_WEAPON(ped, weapon, FALSE) == FALSE)
 		{
-			WEAPON::GIVE_WEAPON_TO_PED(ped, var, (WEAPON::GET_MAX_AMMO(ped, var, &maxAmmo) == TRUE) ? maxAmmo : 9999, FALSE, TRUE);
-			BruteForceWeaponAddons(ped, var, true); //This doesn't work for people who are not the player running the commands. You can take their weapons, but if you try to add attachments? FUCK YOU! I AIIIIIIIINNN'T HAVIN' THAT SHIT!
-			WEAPON::SET_PED_WEAPON_TINT_INDEX(ped, var, ((var == WEAPON_MINIGUN) || (var == WEAPON_SPECIALCARBINE)) ? WEAPONTINT_PLATINUM : WEAPONTINT_LSPD);
+			WEAPON::GIVE_WEAPON_TO_PED(ped, weapon, (WEAPON::GET_MAX_AMMO(ped, weapon, &maxAmmo) == TRUE) ? maxAmmo : 9999, FALSE, TRUE);
+			BruteForceWeaponAddons(ped, weapon, true); //This doesn't work for people who are not the player running the commands. You can take their weapons, but if you try to add attachments? FUCK YOU! I AIIIIIIIINNN'T HAVIN' THAT SHIT!
+			WEAPON::SET_PED_WEAPON_TINT_INDEX(ped, weapon, ((weapon == WEAPON_MINIGUN) || (weapon == WEAPON_SPECIALCARBINE)) ? WEAPONTINT_PLATINUM : WEAPONTINT_LSPD);
 		}
-		if (WEAPON::GET_WEAPONTYPE_GROUP(var) == WEAPON_TYPE_GROUP_THROWABLE)
+		if (WEAPON::GET_WEAPONTYPE_GROUP(weapon) == WEAPON_TYPE_GROUP_THROWABLE)
 		{
-			WEAPON::REMOVE_WEAPON_FROM_PED(ped, var);
-			WEAPON::GIVE_WEAPON_TO_PED(ped, var, (WEAPON::GET_MAX_AMMO(ped, var, &maxAmmo) == TRUE) ? maxAmmo : 9999, FALSE, TRUE);
+			WEAPON::REMOVE_WEAPON_FROM_PED(ped, weapon);
+			WEAPON::GIVE_WEAPON_TO_PED(ped, weapon, (WEAPON::GET_MAX_AMMO(ped, weapon, &maxAmmo) == TRUE) ? maxAmmo : 9999, FALSE, TRUE);
 		}
 	}
 }
@@ -218,18 +167,6 @@ void BoostBaseVehicleStats(Vehicle vehicle)
 		VEHICLE::TOGGLE_VEHICLE_MOD(vehicle, MOD_TURBO, TRUE); //Forced induction huehuehue
 	}
 	VEHICLE::SET_VEHICLE_BODY_HEALTH(vehicle, 1000.0f); //This is what the game does
-}
-
-bool RequestNetworkControl(Entity vehicle)
-{
-	if (NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(vehicle)) //requesting permission to fuck up another player
-	{
-		if (NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(vehicle))
-		{
-			return true;
-		}
-	}
-	return false;
 }
 
 Vehicle ClonePedCar(Ped ped, Ped playerPed)
@@ -293,6 +230,27 @@ Vehicle ClonePedCar(Ped ped, Ped playerPed)
 		STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(vehicleModelHash);
 	}
 	return pedVeh;
+}
+
+bool GetControllofEntity(Entity entity)
+{
+	if (ENTITY::DOES_ENTITY_EXIST(entity))
+	{
+		if (NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(entity)){
+			if (NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(entity)){
+				return true;
+			}
+		}
+	}
+	return false;
+		/*
+		int networkID = NETWORK::NETWORK_GET_NETWORK_ID_FROM_ENTITY(entity);
+		if (NETWORK::NETWORK_REQUEST_CONTROL_OF_NETWORK_ID(networkID)){
+			if (NETWORK::NETWORK_HAS_CONTROL_OF_NETWORK_ID(networkID)){
+				if (NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(entity)){
+					if (NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(entity)){
+						return true;
+						*/
 }
 
 void draw_menu_line(std::string caption, float lineWidth, float lineHeight, float lineTop, float lineLeft, float textLeft, bool active, bool title, bool bDrawRect = true, bool rescaleText = true)
@@ -412,8 +370,27 @@ BOOL IsPlayerFriend(Player player)
 	{
 		return NETWORK::NETWORK_IS_FRIEND(&handle[0]);
 	}
-	Log::Error("Bad handle on %i", player);
 	return FALSE;
+}
+
+std::string GetPlayerName(Ped Player)
+{
+	char chStringName[50];
+	strcpy_s(chStringName, PLAYER::GET_PLAYER_NAME(Player));
+	sprintf_s(chStringName, "%s", chStringName);
+
+	std::string stringName = (std::string)chStringName;
+	std::string t = "";
+	unsigned int i1;
+	
+	for (i1 = 0; i1 < stringName.length(); i1++)
+	{
+		if (!isspace(stringName[i1]))
+			t += stringName[i1];
+	}
+	stringName = t;
+	
+	return stringName;
 }
 
 DWORD64 g_dwRegistrationTablePtr = 0;
@@ -586,11 +563,11 @@ eThreadState new_Run(GtaThread* This) {
 
 	//var init
 	static bool bGodmodeActive, bGodmodeSwitchset, bF7Pressed, bMoneyDropActive, bSubtractPressed, bHackActive, 
-				bF5Pressed, bMenuActive, bF6Pressed, bKillTargetsActive, bNumpad9Pressed, bPoliceIgnorePlayer = false;
+				bF5Pressed, bMenuActive, bF6Pressed, bKillTargetsActive, bNumpad9Pressed, bPoliceIgnorePlayer, bF10Pressed, bHackHidden = false;
 	static bool featureRestrictedZones = true;
 	static int iFreeze = -1;
 	static int modulesActive = 0;
-	static int mchbuildnr = 1014;
+	static int mchbuildnr = 1015;
 
 	float menuLeft = 1030.0;
 	float menuWidth = 250.0;
@@ -612,6 +589,7 @@ eThreadState new_Run(GtaThread* This) {
 			}
 			else if (!bHackActive) {
 				drawNotification("Activating hack",true);
+				bHackHidden = false;
 			}
 			bHackActive = !bHackActive;
 		}
@@ -632,12 +610,17 @@ eThreadState new_Run(GtaThread* This) {
 				playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
 
 			//draw the UI for when hack is active
-			draw_menu_line("s0bietftf - build 1014", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
+			draw_menu_line("s0bietftf - build 1015", 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
 			
 			draw_menu_line("F5			- Hack active", menuWidth, 4.0f, menuTop, menuLeft, 5.0f, bHackActive, false, bHackActive, false);
-			draw_menu_line("F6			- Player menu", menuWidth, 4.0f, menuTop + 13.0f * 1, menuLeft, 5.0f, bMenuActive, false, bMenuActive, false);
-			draw_menu_line("F7			- Godmode active", menuWidth, 4.0f, menuTop + 13.0f * 2, menuLeft, 5.0f, bGodmodeActive, false, bGodmodeActive, false);
-
+			if (!bHackHidden) {
+				draw_menu_line("F6			- Player menu", menuWidth, 4.0f, menuTop + 13.0f * 1, menuLeft, 5.0f, bMenuActive, false, bMenuActive, false);
+				draw_menu_line("F7			- Godmode active", menuWidth, 4.0f, menuTop + 13.0f * 2, menuLeft, 5.0f, bGodmodeActive, false, bGodmodeActive, false);
+			}
+			else if (bHackHidden) {
+				draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 2);
+				draw_menu_line("F10			- Hack Hidden", menuWidth, 4.0f, menuTop + 13.0f * 1, menuLeft, 5.0f, bHackHidden, false, bHackHidden, false);
+			}
 			//godmodeswitch
 			if (bGodmodeActive)
 			{
@@ -692,28 +675,36 @@ eThreadState new_Run(GtaThread* This) {
 				bMenuActive = !bMenuActive;
 			}
 
+			//switch to hide the hack
+			if (isKeyPressedOnce(bF10Pressed, VK_F10))
+			{
+				bHackHidden = !bHackHidden;
+			}
 
 			//menu subsystem
 			bool bReset = false;
 			if (bMenuActive)
 			{
-				//Hack modes for Inside menu
-				draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 17);
-				draw_menu_line("Pageup		- Prev player in list", menuWidth, 4.0f, menuTop + 13.0f * 3, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Pagedown	- Next player in list", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad/		- Give player all weapons", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad.		- Teleport to player vehicle", menuWidth, 4.0f, menuTop + 13.0f * 6, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad-		- Spawn money for player", menuWidth, 4.0f, menuTop + 13.0f * 7, menuLeft, 5.0f, bMoneyDropActive, false, bMoneyDropActive, false);
-				draw_menu_line("Numpad1		- Explode player", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("N1+Rcont		- Frame player", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad2	- Clone player vehicle", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad3	- Remove all weapons", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad4	- (alpha) set of alarm", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad5	- (alpha) change plate", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad6	- (alpha) attach tennisball", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad7	- (alpha) destroy tires", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad8	- remove player from vehicle", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
-
+				if (!bHackHidden)
+				{
+					//Hack modes for Inside menu
+					draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 18);
+					draw_menu_line("F10			- Hack Hidden", menuWidth, 4.0f, menuTop + 13.0f * 3, menuLeft, 5.0f, bHackHidden, false, bHackHidden, false);
+					draw_menu_line("Pageup		- Prev player in list", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Pagedown	- Next player in list", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad/		- Give player all weapons", menuWidth, 4.0f, menuTop + 13.0f * 6, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad.		- Teleport to player vehicle", menuWidth, 4.0f, menuTop + 13.0f * 7, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad-		- Spawn money for player", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, bMoneyDropActive, false, bMoneyDropActive, false);
+					draw_menu_line("Numpad1		- Explode player", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("N1+Rcont		- Frame player", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad2	- Clone player vehicle", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad3	- Remove all weapons", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad4	- to space and beyond", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad5	- (alpha) change plate", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad6	- (alpha) attach tennisball", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad7	- (alpha) destroy tires", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad8	- remove player from vehicle", menuWidth, 4.0f, menuTop + 13.0f * 17, menuLeft, 5.0f, false, false, false, false);
+				}
 
 				static int iSelectedPlayer = 0;
 				static bool bPgUpPressed, bPgDwnPressed = false;
@@ -738,12 +729,15 @@ eThreadState new_Run(GtaThread* This) {
 					Ped pedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
 					if (ENTITY::DOES_ENTITY_EXIST(pedIterator))
 					{
-						char chStringToDraw[50];
-						strcpy_s(chStringToDraw, PLAYER::GET_PLAYER_NAME(playerIterator));
-						if (bSelectedPed)
-							sprintf_s(chStringToDraw, "%s F:%i", chStringToDraw, iFreeze == selectedPed);
-						draw_menu_line(chStringToDraw, 145.0f, 4.0f, menuTop + 13.0f + iLineNum * 13.0f, menuLeft - 145.0f, 0.0f, false, false, bSelectedPed, false);
-						iLineNum++;
+						if (!bHackHidden)
+						{
+							char chStringToDraw[50];
+							strcpy_s(chStringToDraw, PLAYER::GET_PLAYER_NAME(playerIterator));
+							if (bSelectedPed)
+								sprintf_s(chStringToDraw, "%s F:%i", chStringToDraw, iFreeze == selectedPed);
+							draw_menu_line(chStringToDraw, 145.0f, 4.0f, menuTop + 13.0f + iLineNum * 13.0f, menuLeft - 145.0f, 0.0f, false, false, bSelectedPed, false);
+							iLineNum++;
+						}
 					}					
 				}
 				//draw player menu
@@ -754,7 +748,7 @@ eThreadState new_Run(GtaThread* This) {
 				{
 					GiveAllWeaponsToPed(selectedPed, WEAPONTINT_LSPD, selectedPed == playerPed);
 					//notify user of action
-					drawNotification("Gave all weapons to player");
+					drawNotification("Gave all weapons to " + GetPlayerName(selectedPed));
 				}
 
 				static bool bDecimalPressed = false;
@@ -767,7 +761,7 @@ eThreadState new_Run(GtaThread* This) {
 						{
 							PED::SET_PED_INTO_VEHICLE(playerPed, selectedVehicle, i);
 						}
-						drawNotification("Teleported to player vehicle");
+						drawNotification("Teleported to " + GetPlayerName(selectedPed) + "'s vehicle");
 
 					}
 				}
@@ -782,7 +776,7 @@ eThreadState new_Run(GtaThread* This) {
 
 					Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
 					ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, playerPosition.x, playerPosition.y, playerPosition.z + 1, FALSE, FALSE, TRUE);
-					drawNotification("Teleported to player");
+					drawNotification("Teleported to " + GetPlayerName(selectedPed));
 				}
 
 
@@ -796,7 +790,7 @@ eThreadState new_Run(GtaThread* This) {
 						drawNotification("Stopping moneydrop");
 					}
 					else if (bMoneyDropActive) {
-						drawNotification("And the rain of the moneyzbagz started!");
+						drawNotification("And the rain of the moneyzbagz started!" + GetPlayerName(selectedPed) + " be rich and happy");
 					}
 					bMoneyDropActive = !bMoneyDropActive;
 				}
@@ -835,6 +829,7 @@ eThreadState new_Run(GtaThread* This) {
 					drawNotification("Vehicle cloned");
 				}
 
+				/*
 				//set off alarm of another players car
 				static bool bNumpad4Pressed = false;
 				if (isKeyPressedOnce(bNumpad4Pressed, VK_NUMPAD4))
@@ -842,13 +837,34 @@ eThreadState new_Run(GtaThread* This) {
 					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
 					{						
 						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
-						if (RequestNetworkControl(selectedVehicle)) {
+						if (GetControllofEntity(selectedVehicle)) {
 							VEHICLE::SET_VEHICLE_ALARM(selectedVehicle, true);
 							VEHICLE::START_VEHICLE_ALARM(selectedVehicle);
 							drawNotification("Set off alarm of vehicle");
 						}
 					}
 				}
+				*/
+
+				//set off alarm of another players car
+				static bool bNumpad4Pressed = false;
+				if (isKeyPressedOnce(bNumpad4Pressed, VK_NUMPAD4))
+				{
+					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
+					{
+						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
+						ENTITY::APPLY_FORCE_TO_ENTITY(selectedVehicle, 1, 0.0f, 0.0f, 50.0f, 0.0f, 0.0f, 0.0f, true, true, true, true, false, true);
+						drawNotification(GetPlayerName(selectedPed) + " shot to space together with car");
+						//if (GetControllofEntity(selectedVehicle)) {
+						//	
+						//}
+					}
+					else {
+						ENTITY::APPLY_FORCE_TO_ENTITY(selectedPed, 1, 0.0f, 0.0f, 50.0f, 0.0f, 0.0f, 0.0f, true, true, true, true, false, true);
+						drawNotification(GetPlayerName(selectedPed) + " shot to space");
+					}
+				}
+				
 
 				//Change plate of another players car
 				static bool bNumpad5Pressed = false;
@@ -857,8 +873,7 @@ eThreadState new_Run(GtaThread* This) {
 					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
 					{	
 						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
-						if (RequestNetworkControl(selectedVehicle)) {
-							NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(selectedVehicle);
+						if (GetControllofEntity(selectedVehicle)) {
 							VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(selectedVehicle, "Gut_Hakt");
 							drawNotification("Changed license plate to Gut_Hakt");
 						}
@@ -876,7 +891,7 @@ eThreadState new_Run(GtaThread* This) {
 					prop_defilied_ragdoll_01=-332567508	0x7A2A3826
 					prop_bball_arcade_01				0xA50DDDD0  
 					*/
-					Hash objectModel = 0xA50DDDD0;
+					Hash objectModel = 0xD8F7692D;
 					if (!STREAMING::HAS_MODEL_LOADED(objectModel))
 					{
 						STREAMING::REQUEST_MODEL(objectModel);
@@ -890,16 +905,17 @@ eThreadState new_Run(GtaThread* This) {
 						{
 							AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
 						}
+						GetControllofEntity(junkObject);
 						ENTITY::ATTACH_ENTITY_TO_ENTITY(junkObject, selectedPed, PED::GET_PED_BONE_INDEX(selectedPed, 0), 
 							0.00,	//floatx
 							0.00,	//floaty
 							0.0,	//floatz
 							0.0,	//xrot
-							-90.0,	//yrot 
-							-90.0,	//zrot
+							180.0,	//yrot 
+							0.0,	//zrot
 							false, false, false, false, 2, true);
 						//STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(objectModel);
-						drawNotification("Attached junk to player");
+						drawNotification("Attached junk to " + GetPlayerName(selectedPed));
 					}
 				}
 
@@ -911,7 +927,7 @@ eThreadState new_Run(GtaThread* This) {
 					{
 						//fuck up the tires
 						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
-						if (RequestNetworkControl(selectedVehicle)) {
+						if (GetControllofEntity(selectedVehicle)) {
 							VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(selectedVehicle, TRUE);
 							static int tireID = 0;
 							for (tireID = 0; tireID < 8; tireID++) {
@@ -932,8 +948,8 @@ eThreadState new_Run(GtaThread* This) {
 						AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
 						//need to remove the parachute: 0xFBAB5776
 						WEAPON::REMOVE_WEAPON_FROM_PED(selectedPed, 0xFBAB5776);
-
-						drawNotification("Player Removed from vehicle");
+						std::string selectedPedName = PLAYER::GET_PLAYER_NAME(selectedPed);
+						drawNotification(selectedPedName + "Removed from vehicle");
 					}
 				}
 
@@ -1008,7 +1024,7 @@ eThreadState new_Run(GtaThread* This) {
 							iCounter++;
 							if (iCounter > 5)
 								iCounter = 0;
-							drawNotification("Player framed!");
+							drawNotification(GetPlayerName(selectedPed) + " framed!");
 						}
 						else
 						{	
@@ -1023,7 +1039,7 @@ eThreadState new_Run(GtaThread* This) {
 							{
 								FIRE::ADD_EXPLOSION(playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, TRUE, TRUE, 0.0f);
 							}
-							drawNotification("Player killed");
+							drawNotification(GetPlayerName(selectedPed) + " killed");
 						}
 					
 						//how does this freezing stuf work?
@@ -1049,7 +1065,7 @@ eThreadState new_Run(GtaThread* This) {
 									{
 									WEAPON::REMOVE_ALL_PED_WEAPONS(selectedPed, TRUE);
 									AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
-									drawNotification("Took away all the players guns");
+									drawNotification("Took away all " + GetPlayerName(selectedPed) + " guns");
 									}
 								}
 						}
@@ -1059,19 +1075,22 @@ eThreadState new_Run(GtaThread* This) {
 			}
 			else //every function without selecting a player
 			{
-				//Hack modes for outside menu
-				draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 14);
-				draw_menu_line("F8			- Max ammo", menuWidth, 4.0f, menuTop + 13.0f * 3, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("F9			- Remove Junk", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad.		- Repair Vehicle", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad0	- Teleport to waypoint", menuWidth, 4.0f, menuTop + 13.0f * 6, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad2	- Spawn Kuruma2", menuWidth, 4.0f, menuTop + 13.0f * 7, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad3	- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad4	- Police disabled", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, bPoliceIgnorePlayer, false, bPoliceIgnorePlayer, false);
-				draw_menu_line("Numpad7	- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad9	- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
-				draw_menu_line("Numpad+	- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
-				draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
+				if (!bHackHidden){
+					//Hack modes for outside menu
+					draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 15);
+					draw_menu_line("F8			- Max ammo", menuWidth, 4.0f, menuTop + 13.0f * 3, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("F9			- Remove Junk", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("F10			- Hack Hidden", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, bHackHidden, false, bHackHidden, false);
+					draw_menu_line("Numpad.		- Repair Vehicle", menuWidth, 4.0f, menuTop + 13.0f * 6, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad0	- Teleport to waypoint", menuWidth, 4.0f, menuTop + 13.0f * 7, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad2	- Spawn Kuruma2", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad3	- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad4	- Police disabled", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, bPoliceIgnorePlayer, false, bPoliceIgnorePlayer, false);
+					draw_menu_line("Numpad7	- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad9	- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
+					draw_menu_line("Numpad+	- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
+				}
 				
 				//Spawn a test car.
 				static bool bNumpad2Pressed, bWaitingForModelCar = false;
@@ -1080,7 +1099,7 @@ eThreadState new_Run(GtaThread* This) {
 					if (playerVeh == NULL || bWaitingForModelCar == true)
 					{
 						Hash vehicleModelHash = VEHICLE_KURUMA2;
-						if (GetAsyncKeyState(VK_RSHIFT) & 0x8000)
+						if (GetAsyncKeyState(VK_UP) & 0x8000)
 							vehicleModelHash = VEHICLE_BTYPE;
 						else if (GetAsyncKeyState(VK_RMENU) & 0x8000)
 							vehicleModelHash = VEHICLE_RUINER;
@@ -1095,7 +1114,7 @@ eThreadState new_Run(GtaThread* This) {
 						{
 							Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPed, FALSE);
 							playerVeh = VEHICLE::CREATE_VEHICLE(vehicleModelHash, playerPosition.x, playerPosition.y, playerPosition.z, ENTITY::GET_ENTITY_HEADING(playerPed), TRUE, TRUE);
-							NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(playerVeh);
+							GetControllofEntity(playerVeh);
 							PED::SET_PED_INTO_VEHICLE(playerPed, playerVeh, SEAT_DRIVER);
 							BoostBaseVehicleStats(playerVeh);
 							if (vehicleModelHash == VEHICLE_KURUMA2) //Test that I can make a perfect 1:1 clone of my Kuruma with only calling natives.
@@ -1201,7 +1220,7 @@ eThreadState new_Run(GtaThread* This) {
 					}
 					else if (playerVeh != NULL)
 					{
-						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(playerVeh);
+						GetControllofEntity(playerVeh);
 						VEHICLE::SET_VEHICLE_FORWARD_SPEED(playerVeh, VEHICLE::_GET_VEHICLE_MAX_SPEED(ENTITY::GET_ENTITY_MODEL(playerVeh)));
 					}
 				}
@@ -1238,7 +1257,7 @@ eThreadState new_Run(GtaThread* This) {
 					if (playerVeh != NULL && (VEHICLE::IS_THIS_MODEL_A_PLANE(ENTITY::GET_ENTITY_MODEL(playerVeh)) == TRUE || VEHICLE::IS_THIS_MODEL_A_HELI(ENTITY::GET_ENTITY_MODEL(playerVeh)) ||
 						ENTITY::GET_ENTITY_MODEL(playerVeh) == VEHICLE_BLIMP || ENTITY::GET_ENTITY_MODEL(playerVeh) == VEHICLE_BLIMP2) == TRUE)
 					{
-						NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(playerVeh);
+						GetControllofEntity(playerVeh);
 						Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerVeh, FALSE);
 						if (playerPosition.z < 350.0f)
 							ENTITY::SET_ENTITY_COORDS_NO_OFFSET(playerVeh, playerPosition.x, playerPosition.y, playerPosition.z + 800, FALSE, FALSE, TRUE);
@@ -1293,11 +1312,11 @@ eThreadState new_Run(GtaThread* This) {
 						Blip* blip = g_blipList->m_Blips[i].m_pBlip;
 						if (blip)
 						{
-							if ((blip->dwColor == 0x42 && blip->bIcon == 1) /*Mission blip*/ ||
-								(blip->dwColor == 0x5 && blip->bIcon == 1) /*Yellow blip*/ ||
-								(blip->dwColor == 0x0 && blip->bIcon == 38) /*Race flag*/ ||
-								(blip->dwColor == 0x2 && blip->bIcon == 1) /*Green blips*/ ||
-								(blip->bIcon == 50 /*Crate Drops*/))
+							if ((blip->dwColor == BLIPCOLOR_MISSION && blip->iIcon == BLIP_CIRCLE) ||
+								(blip->dwColor == BLIPCOLOR_YELLOWMISSION && blip->iIcon == BLIP_CIRCLE) ||
+								(blip->dwColor == BLIPCOLOR_NONE && blip->iIcon == BLIP_RACEFLAG) ||
+								(blip->dwColor == BLIPCOLOR_GREEN && blip->iIcon == BLIP_CIRCLE) ||
+								(blip->iIcon == BLIP_SPECIALCRATE))
 							{
 								Entity e = playerPed;
 								if (playerVeh)
@@ -1381,7 +1400,7 @@ eThreadState new_Run(GtaThread* This) {
 			{
 				if (ENTITY::DOES_ENTITY_EXIST(playerVeh) && !ENTITY::IS_ENTITY_DEAD(playerVeh))
 				{
-					NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(playerVeh); //Can't hurt to try.
+					GetControllofEntity(playerVeh); //Can't hurt to try.
 					VEHICLE::SET_VEHICLE_FIXED(playerVeh);
 					VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(playerVeh);
 					BoostBaseVehicleStats(playerVeh);
@@ -1410,24 +1429,23 @@ eThreadState new_Run(GtaThread* This) {
 					Blip* blip = g_blipList->m_Blips[i].m_pBlip;
 					if (blip)
 					{
-						if (blip->dwColor != 0x3) //Don't hit friendlies.
+						if (blip->dwColor != BLIPCOLOR_BLUE) //Don't hit friendlies.
 						{
-							if (blip->bIcon == 3 /*cop*/ || blip->bIcon == 14 /*spaghettio*/)
+							if (blip->iIcon == BLIP_COP /*cop*/ || blip->iIcon == BLIP_SPAGHETTIO || (blip->iIcon == BLIP_CIRCLE && blip->dwColor == BLIPCOLOR_RED))
 							{
 								static bool bShoot = false;
 								bShoot = !bShoot;
 								if (bShoot)
 								{
 									static Hash weaponList[] = { WEAPON_ADVANCEDRIFLE, WEAPON_APPISTOL, WEAPON_ASSAULTRIFLE, WEAPON_ASSAULTSMG, WEAPON_CARBINERIFLE, WEAPON_COMBATMG, WEAPON_COMBATPDW, WEAPON_COMBATPISTOL, WEAPON_HEAVYPISTOL, WEAPON_HEAVYSNIPER, WEAPON_MARKSMANRIFLE, WEAPON_MG, WEAPON_MICROSMG, WEAPON_PISTOL, WEAPON_PISTOL50, WEAPON_SMG, WEAPON_SNIPERRIFLE, WEAPON_SNSPISTOL, WEAPON_SPECIALCARBINE, WEAPON_MINIGUN };
-									if ((blip->fScale == 1.0f) && blip->bIcon != 71 /*red dot*/)
+									if (blip->fScale == 1.0f)
 										FIRE::ADD_OWNED_EXPLOSION(playerPed, blip->x, blip->y, blip->z, 4, 10.0f, FALSE, TRUE, 0.0f);
 									else
 										GAMEPLAY::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(blip->x + 0.1f, blip->y, blip->z - 0.15f, blip->x - 0.1f, blip->y, blip->z + 1, 1000, TRUE, weaponList[rand() % (sizeof(weaponList) / 4)], playerPed, TRUE, TRUE, 1.0f); //FWARRRRRRAING! ~benji Alaska 2277
 								}
 							}
-							if ((blip->dwColor == 0x0 && blip->bIcon == 97) /*helicopter*/ ||
-								(blip->dwColor == 0x0 && blip->bIcon == 15) /*helicopter*/ ||
-								(blip->dwColor == 0x36 && blip->bIcon == 167) /*helicopter*/)
+							if ((blip->dwColor == BLIPCOLOR_NONE && (blip->iIcon == BLIP_HELIBLADES || blip->iIcon == BLIP_COPHELICOPTER)) ||
+								(blip->dwColor == BLIPCOLOR_RED && (blip->iIcon == BLIP_PLANE || blip->iIcon == BLIP_MOTORCYCLE || blip->iIcon == BLIP_CAR || blip->iIcon == BLIP_HELICOPTER)))
 							{
 								FIRE::ADD_OWNED_EXPLOSION(playerPed, blip->x, blip->y, blip->z, 4, 10.0f, FALSE, TRUE, 0.0f);
 							}
