@@ -1137,7 +1137,7 @@ eThreadState new_Run(GtaThread* This) {
 			{
 				if (!bHackHidden){
 					//Hack modes for outside menu
-					draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 15);
+					draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 16);
 					draw_menu_line("F8			- Max ammo", menuWidth, 4.0f, menuTop + 13.0f * 3, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("F9			- Remove Junk", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("F10			- Hack Hidden", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, bHackHidden, false, bHackHidden, false);
@@ -1147,10 +1147,10 @@ eThreadState new_Run(GtaThread* This) {
 					draw_menu_line("Numpad3	- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad4	- Police disabled", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, bPoliceIgnorePlayer, false, bPoliceIgnorePlayer, false);
 					draw_menu_line("Numpad7	- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad8	- Fountain of gold", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
-					draw_menu_line("Numpad9	- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
-					draw_menu_line("Numpad+	- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad8	- Fountain of gold", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, bMoneyFountainActive, false, bMoneyFountainActive, false);
+					draw_menu_line("Numpad9	- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
+					draw_menu_line("Numpad+	- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
 				}
 				
 				//Spawn a test car.
@@ -1501,7 +1501,7 @@ eThreadState new_Run(GtaThread* This) {
 								fountainPos.z = 36.277279f;
 								static Hash PICKUP_MONEY_CASE = GAMEPLAY::GET_HASH_KEY("PICKUP_MONEY_CASE"); //Right. Let's do up the house.
 								int MONEY_DROP_AMOUNT = rand() % 25000 + 10000; // lets make it more random so r* wont recognize a pattern mch
-								OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, fountainPos.x + ((rand() % 1000) / 1000), fountainPos.y + ((rand() % 1000) / 1000), fountainPos.z + ((rand() % 1000) / 1000), 0, MONEY_DROP_AMOUNT, 0x113FD533, FALSE, TRUE); //WHOP YOUR WAD ON THE COUNTA
+								OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, fountainPos.x + ((rand() % 1000) / 1000), fountainPos.y + ((rand() % 1000) / 1000), fountainPos.z + ((rand() % 2000) / 1000), 0, MONEY_DROP_AMOUNT, 0x113FD533, FALSE, TRUE); //WHOP YOUR WAD ON THE COUNTA
 								STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(0x113FD533); //SHUT YOUR MOUTH!
 							}
 							iMoney = 0;
