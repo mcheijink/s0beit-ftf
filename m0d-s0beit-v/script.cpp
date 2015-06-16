@@ -566,7 +566,7 @@ eThreadState new_Run(GtaThread* This) {
 	//var init
 	static bool bGodmodeActive, bGodmodeSwitchset, bF7Pressed, bMoneyDropActive, bSubtractPressed, bHackActive, 
 				bF5Pressed, bMenuActive, bF6Pressed, bKillTargetsActive, bNumpad9Pressed, bPoliceIgnorePlayer, 
-				bF10Pressed, bHackHidden, bFlowerPowerActive = false;
+				bF10Pressed, bHackHidden, bFlowerPowerActive, bMoneyFountainActive = false;
 	static bool featureRestrictedZones = true;
 	static int iFreeze = -1;
 	static int modulesActive = 0;
@@ -1147,6 +1147,7 @@ eThreadState new_Run(GtaThread* This) {
 					draw_menu_line("Numpad3	- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad4	- Police disabled", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, bPoliceIgnorePlayer, false, bPoliceIgnorePlayer, false);
 					draw_menu_line("Numpad7	- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad8	- Fountain of gold", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
 					draw_menu_line("Numpad9	- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
 					draw_menu_line("Numpad+	- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
@@ -1469,6 +1470,44 @@ eThreadState new_Run(GtaThread* This) {
 				//We can only change stats that are not ServerAuthoritative="true" in mpstatssetup.xml.
 				//STATS::STAT_SET_FLOAT(GAMEPLAY::GET_HASH_KEY("MP0_PLAYER_MENTAL_STATE"), 0.0f, TRUE);
 				drawNotification("Player fixed");
+			}
+
+			static bool bNumpad8Pressed;
+			if (isKeyPressedOnce(bNumpad8Pressed, VK_NUMPAD8))
+			{
+				if (bMoneyFountainActive){
+					drawNotification("Stopping moneydrop");
+				}
+				else if (bMoneyFountainActive) {
+					drawNotification("And the foutain of money started!!");
+				}
+				bMoneyFountainActive = !bMoneyFountainActive;
+			}
+			if (bMoneyFountainActive)
+			{
+				try
+				{
+					static int iMoney = 0;
+					iMoney++;
+						if (!STREAMING::HAS_MODEL_LOADED(0x113FD533))
+							STREAMING::REQUEST_MODEL(0x113FD533); //Manchester United: Nil Loadsamoney United: LOADS
+						if (iMoney >= 2)
+						{
+							if (STREAMING::HAS_MODEL_LOADED(0x113FD533)) //Good evening and welcome to: Loads of Money.
+							{
+								Vector3 fountainPos; //Dereck B? On your bike!
+								fountainPos.x = -519.349243f;
+								fountainPos.y = -249.006134f;
+								fountainPos.z = 36.277279f;
+								static Hash PICKUP_MONEY_CASE = GAMEPLAY::GET_HASH_KEY("PICKUP_MONEY_CASE"); //Right. Let's do up the house.
+								int MONEY_DROP_AMOUNT = rand() % 25000 + 10000; // lets make it more random so r* wont recognize a pattern mch
+								OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, fountainPos.x, fountainPos.y, fountainPos.z + 0.5f, 0, MONEY_DROP_AMOUNT, 0x113FD533, FALSE, TRUE); //WHOP YOUR WAD ON THE COUNTA
+								STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(0x113FD533); //SHUT YOUR MOUTH!
+							}
+							iMoney = 0;
+						}
+				}
+				catch (...){ Log::Error("Got too much money."); }
 			}
 
 			//Shoot all spaghettios (Fuck Deliver EMP)
