@@ -467,6 +467,22 @@ NativeHandler GetNativeHandler(UINT64 hash) {
 	return nullptr;
 }
 
+void DumpPlayerFromVehicle(Ped PlayerID,bool Notification)
+{
+	if (PED::IS_PED_IN_ANY_VEHICLE(PlayerID, FALSE))
+	{
+		//Remove PED from vehicle
+		AI::CLEAR_PED_TASKS_IMMEDIATELY(PlayerID);
+		//need to remove the parachute: 0xFBAB5776
+		WEAPON::REMOVE_WEAPON_FROM_PED(PlayerID, 0xFBAB5776);
+		
+		if (Notification){
+			std::string selectedPedName = PLAYER::GET_PLAYER_NAME(PlayerID);
+			drawNotification(selectedPedName + "Removed from vehicle");
+		}
+	}
+}
+
 void DumpVehicleStats(Vehicle vehicle)
 {
 	if (ENTITY::DOES_ENTITY_EXIST(vehicle) == FALSE || ENTITY::IS_ENTITY_A_VEHICLE(vehicle) == FALSE)
@@ -595,7 +611,7 @@ eThreadState new_Run(GtaThread* This) {
 	static bool featureRestrictedZones = true;
 	static int iFreeze = -1;
 	static int modulesActive = 0;
-	static int mchbuildnr = 1018;
+	static int mchbuildnr = 1019;
 	static int mchDebugActive = true;
 
 	float menuLeft = 1030.0;
@@ -991,15 +1007,7 @@ eThreadState new_Run(GtaThread* This) {
 				static bool bNumpad8Pressed = false;
 				if (isKeyPressedOnce(bNumpad8Pressed, VK_NUMPAD8))
 				{
-					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
-					{
-						//Remove PED from vehicle
-						AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
-						//need to remove the parachute: 0xFBAB5776
-						WEAPON::REMOVE_WEAPON_FROM_PED(selectedPed, 0xFBAB5776);
-						std::string selectedPedName = PLAYER::GET_PLAYER_NAME(selectedPed);
-						drawNotification(selectedPedName + "Removed from vehicle");
-					}
+					DumpPlayerFromVehicle(selectedPed, true);
 				}
 
 
@@ -1126,21 +1134,22 @@ eThreadState new_Run(GtaThread* This) {
 			{
 				if (!bHackHidden){
 					//Hack modes for outside menu
-					draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 17);
+					draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 18);
 					draw_menu_line("F8			- Max ammo", menuWidth, 4.0f, menuTop + 13.0f * 3, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("F9			- Remove Junk", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("F10			- Hack Hidden", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, bHackHidden, false, bHackHidden, false);
-					draw_menu_line("Numpad.		- Repair Vehicle", menuWidth, 4.0f, menuTop + 13.0f * 6, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad0		- Teleport to waypoint", menuWidth, 4.0f, menuTop + 13.0f * 7, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad2		- Spawn Kuruma2", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad3		- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad4		- Police disabled", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, bPoliceIgnorePlayer, false, bPoliceIgnorePlayer, false);
-					draw_menu_line("Numpad4		- Spectate mode", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, bSpectateMode, false, bSpectateMode, false);
-					draw_menu_line("Numpad7		- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad8		- Fountain of gold", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, bMoneyFountainActive, false, bMoneyFountainActive, false);
-					draw_menu_line("Numpad9		- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
-					draw_menu_line("Numpad+		- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad.	- Repair Vehicle", menuWidth, 4.0f, menuTop + 13.0f * 6, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad0	- Teleport to waypoint", menuWidth, 4.0f, menuTop + 13.0f * 7, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad2	- Spawn Kuruma2", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad3	- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad4	- Police disabled", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, bPoliceIgnorePlayer, false, bPoliceIgnorePlayer, false);
+					draw_menu_line("Numpad5	- Spectate mode", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, bSpectateMode, false, bSpectateMode, false);
+					draw_menu_line("Numpad5	- Enforce No-Flyzone", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad7	- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad8	- Fountain of gold", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bMoneyFountainActive, false, bMoneyFountainActive, false);
+					draw_menu_line("Numpad9	- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
+					draw_menu_line("Numpad+	- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad*	- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 17, menuLeft, 5.0f, false, false, false, false);
 				}
 				
 				//Spawn a test car.
@@ -1354,7 +1363,7 @@ eThreadState new_Run(GtaThread* This) {
 					bPoliceIgnorePlayer = !bPoliceIgnorePlayer;
 				}
 				
-					//Police wont notice me
+					//spectate mode
 				static bool bNumpad5Pressed = false;
 				if (isKeyPressedOnce(bNumpad5Pressed, VK_NUMPAD5))
 				{
@@ -1367,6 +1376,27 @@ eThreadState new_Run(GtaThread* This) {
 						drawNotification("Spectating off");
 					}
 					bSpectateMode = !bSpectateMode;
+				}
+
+				// no fly zone
+				static bool bNumpad6Pressed = false;
+				if (isKeyPressedOnce(bNumpad6Pressed, VK_NUMPAD6))
+				{
+					int iFlyingcount = 0;
+					Ped selectedPed = NULL;
+					for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
+					{
+						Ped pedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
+						if (ENTITY::DOES_ENTITY_EXIST(pedIterator))
+						{
+							if (PED::IS_PED_IN_FLYING_VEHICLE(pedIterator))
+							{
+								DumpPlayerFromVehicle(selectedPed, false);
+								iFlyingcount++;
+							}
+						}
+					}
+					drawNotification("Cleared Airspace of off " + std::to_string(iFlyingcount) + " pilots");
 				}
 
 				//TP to mission objective.
