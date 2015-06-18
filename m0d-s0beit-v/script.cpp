@@ -74,10 +74,33 @@ void CheckPlayer(int& iPlayer, bool direction)
 void RemoveAllPropsFromPlayer(Ped ped)
 {
 	Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(ped, FALSE);
-	Hash modelHashes[] = { 0x2E28CA22 /*p_tram_crash_s*/, 0xA50DDDD0/*prop_bball_arcade_01*/, 0xEFC4165A/*prop_food_van_01*/, 0x8E8C7A5B/*prop_crashed_heli*/, 0x456AA864/*prop_dj_deck_01*/, 0xBE862050/*prop_portacabin01*/, 0xB20E5785/*prop_sculpt_fix*/, 0x58D3B4EA/*prop_micro_01*/, 0xC42C019A/*prop_ld_ferris_wheel*/, 0x8AF58425/*prop_lev_des_barge_01*/, 0x3DC31836/*prop_tv_flat_01*/, 0xA9BD0D16 /*prop_coke_block_01*/, 0x1AFA6A0A /*Prop_weed_01*/, 0x4B3D240F /*prop_wheelchair_01*/, 0x40F52369 /*p_v_43_safe_s*/, 0xF830B63E /*prop_swiss_ball_01*/, 0xD541462D /*p_ld_soc_ball_01*/, 0x532B1DD1 /*prop_rub_trolley01a*/, 0x0E3BA450 /*prop_xmas_tree_int*/, 0xFB631122 /*prop_bumper_car_01*/, 0x5571173D /*prop_beer_neon_01*/, 0x6AD326C2 /*prop_space_rifle*/, 0x7FFBC1E2 /*prop_dummy_01*/, 0x678FC2DB /*prop_wheelchair_01_s*/, 0x5869A8F8 /*prop_large_gold*/, 0xE6CB661E /*PROP_CS_DILDO_01*/, 0x2AE13DFA /*prop_armchair_01*/, 0x29CB0F3C /*prop_armour_pickup*/, 0x922C2A43 /*prop_big_shit_01*/, 0xFA686C0E /*prop_bin_04a*/, 0x1F550C17 /*prop_chair_01a*/, 0x5B5C4263 /*prop_chip_fryer*/, 0x39885BB5 /*prop_chickencoop_a*/, 0x16A39A90 /*prop_dog_cage_01*/, 0xE3CE09E2 /*prop_dummy_plane*/, 0x927A5723 /*prop_fan_01*/, 0x34D5D3FD /*prop_golf_bag_01*/, 0xB467C540 /*p_spinning_anus_s*/, 0x745F3383 /*prop_windmill_01*/, 0x392D62AA /*prop_gold_cont_01*/, 0x07121AC4 /*prop_xmas_ext*/, 0x0E8032E4 /*prop_weed_pallet*/, 0xD44295DD /*p_cablecar_s*/, 0x6F9939C7 /*prop_ld_toilet_01*/, 0x9C762726 /*prop_lev_des_barge_02*/, 0x8973A868 /*prop_air_bigradar*/, 0xC2BC19CD /*p_cs_mp_jet_01_s*/, 651101403 /*garbage bin*/ };
+	Hash modelHashes[] = {	0x2E28CA22 /*p_tram_crash_s*/, 0xA50DDDD0/*prop_bball_arcade_01*/, 
+							0xEFC4165A/*prop_food_van_01*/, 0x8E8C7A5B/*prop_crashed_heli*/, 
+							0x456AA864/*prop_dj_deck_01*/, 0xBE862050/*prop_portacabin01*/, 
+							0xB20E5785/*prop_sculpt_fix*/, 0x58D3B4EA/*prop_micro_01*/, 
+							0xC42C019A/*prop_ld_ferris_wheel*/, 0x8AF58425/*prop_lev_des_barge_01*/, 
+							0x3DC31836/*prop_tv_flat_01*/, 0xA9BD0D16 /*prop_coke_block_01*/, 
+							0x1AFA6A0A /*Prop_weed_01*/, 0x4B3D240F /*prop_wheelchair_01*/, 
+							0x40F52369 /*p_v_43_safe_s*/, 0xF830B63E /*prop_swiss_ball_01*/, 
+							0xD541462D /*p_ld_soc_ball_01*/, 0x532B1DD1 /*prop_rub_trolley01a*/, 
+							0x0E3BA450 /*prop_xmas_tree_int*/, 0xFB631122 /*prop_bumper_car_01*/, 
+							0x5571173D /*prop_beer_neon_01*/, 0x6AD326C2 /*prop_space_rifle*/, 
+							0x7FFBC1E2 /*prop_dummy_01*/, 0x678FC2DB /*prop_wheelchair_01_s*/, 
+							0x5869A8F8 /*prop_large_gold*/, 0xE6CB661E /*PROP_CS_DILDO_01*/, 
+							0x2AE13DFA /*prop_armchair_01*/, 0x29CB0F3C /*prop_armour_pickup*/, 
+							0x922C2A43 /*prop_big_shit_01*/, 0xFA686C0E /*prop_bin_04a*/, 
+							0x1F550C17 /*prop_chair_01a*/, 0x5B5C4263 /*prop_chip_fryer*/, 
+							0x39885BB5 /*prop_chickencoop_a*/, 0x16A39A90 /*prop_dog_cage_01*/, 
+							0xE3CE09E2 /*prop_dummy_plane*/, 0x927A5723 /*prop_fan_01*/, 
+							0x34D5D3FD /*prop_golf_bag_01*/, 0xB467C540 /*p_spinning_anus_s*/, 
+							0x745F3383 /*prop_windmill_01*/, 0x392D62AA /*prop_gold_cont_01*/, 
+							0x07121AC4 /*prop_xmas_ext*/, 0x0E8032E4 /*prop_weed_pallet*/, 
+							0xD44295DD /*p_cablecar_s*/, 0x6F9939C7 /*prop_ld_toilet_01*/, 
+							0x9C762726 /*prop_lev_des_barge_02*/, 0x8973A868 /*prop_air_bigradar*/, 
+							0xC2BC19CD /*p_cs_mp_jet_01_s*/, 651101403 /*garbage bin*/ };
 	for each (Hash modelHash in modelHashes)
 	{
-		Object obj = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(playerPosition.x, playerPosition.y, playerPosition.z, 2.0f, modelHash, TRUE);
+		Object obj = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(playerPosition.x, playerPosition.y, playerPosition.z, 3.0f, modelHash, TRUE, 0, 0);
 		if (ENTITY::DOES_ENTITY_EXIST(obj))
 			ENTITY::DELETE_ENTITY(&obj);
 	}
@@ -376,11 +399,12 @@ BOOL IsPlayerFriend(Player player)
 std::string GetPlayerName(Ped Player)
 {
 	
-	char chStringName[50];
-	strcpy_s(chStringName, PLAYER::GET_PLAYER_NAME(Player));
+	//char chStringName[50];
+	//strcpy_s(chStringName, PLAYER::GET_PLAYER_NAME(Player));
 	
+	char* chStringName = PLAYER::GET_PLAYER_NAME(Player);
 	//sprintf_s(chStringName, "%s", chStringName);
-
+	
 	std::string stringName = (std::string)chStringName;
 	std::string t = "";
 	unsigned int i1;
@@ -390,6 +414,7 @@ std::string GetPlayerName(Ped Player)
 		if (!isspace(stringName[i1]))
 			t += stringName[i1];
 	}
+
 	stringName = t;
 	
 	return stringName;
@@ -566,11 +591,11 @@ eThreadState new_Run(GtaThread* This) {
 	//var init
 	static bool bGodmodeActive, bGodmodeSwitchset, bF7Pressed, bMoneyDropActive, bSubtractPressed, bHackActive, 
 				bF5Pressed, bMenuActive, bF6Pressed, bKillTargetsActive, bNumpad9Pressed, bPoliceIgnorePlayer, 
-				bF10Pressed, bHackHidden, bFlowerPowerActive, bMoneyFountainActive = false;
+				bF10Pressed, bHackHidden, bFlowerPowerActive, bMoneyFountainActive, bSpectateMode = false;
 	static bool featureRestrictedZones = true;
 	static int iFreeze = -1;
 	static int modulesActive = 0;
-	static int mchbuildnr = 1017;
+	static int mchbuildnr = 1018;
 	static int mchDebugActive = true;
 
 	float menuLeft = 1030.0;
@@ -591,6 +616,7 @@ eThreadState new_Run(GtaThread* This) {
 				bPoliceIgnorePlayer = false;
 				featureRestrictedZones = true;
 				bFlowerPowerActive = false;
+				bSpectateMode = false;
 
 				//regain wantedlevel
 				PLAYER::SET_MAX_WANTED_LEVEL(5);
@@ -604,7 +630,7 @@ eThreadState new_Run(GtaThread* This) {
 				featureRestrictedZones = true;
 			}
 			else if (!bHackActive) {
-				drawNotification("Activating hack",true);
+				drawNotification("Activating hack");
 				bHackHidden = false;
 			}
 			bHackActive = !bHackActive;
@@ -641,43 +667,6 @@ eThreadState new_Run(GtaThread* This) {
 			else if (bHackHidden) {
 				draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 2);
 				draw_menu_line("F10			- Hack Hidden", menuWidth, 4.0f, menuTop + 13.0f * 1, menuLeft, 5.0f, bHackHidden, false, bHackHidden, false);
-			}
-			//godmodeswitch
-			if (bGodmodeActive)
-			{
-				//Godmode
-				if (!bGodmodeSwitchset)
-				{
-					DEBUGOUT("Setting godmode");
-					drawNotification("Activating godmode");
-					PLAYER::SET_PLAYER_INVINCIBLE(player, true);
-					ENTITY::SET_ENTITY_PROOFS(playerPed, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-					PED::SET_PED_CAN_RAGDOLL(playerPed, FALSE);
-					PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, FALSE);
-					bGodmodeSwitchset = true;
-					//Max armor.
-					PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
-				}
-			}
-			else if (!bGodmodeActive) {
-				//draw_menu_line("Godmode inactive", menuWidth, 4.0f, menuTop + 13.0f, menuLeft, 5.0f, false, false, false, false);
-				if (bGodmodeSwitchset)
-				{
-					DEBUGOUT("Deactivating godmode");
-					drawNotification("Deactivating godmode");
-					PLAYER::SET_PLAYER_INVINCIBLE(player, false);
-					ENTITY::SET_ENTITY_PROOFS(playerPed, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
-					PED::SET_PED_CAN_RAGDOLL(playerPed, TRUE);
-					PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, TRUE);
-					bGodmodeSwitchset = false;
-				}
-				else if (PLAYER::GET_PLAYER_INVINCIBLE(player))
-				{	// bugfix for random godmode active
-					PLAYER::SET_PLAYER_INVINCIBLE(player, false);
-					ENTITY::SET_ENTITY_PROOFS(playerPed, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
-					PED::SET_PED_CAN_RAGDOLL(playerPed, TRUE);
-					PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, TRUE);
-				}
 			}
 
 			//menu switch
@@ -721,7 +710,7 @@ eThreadState new_Run(GtaThread* This) {
 					draw_menu_line("Numpad2	- Clone player vehicle", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad3	- Remove all weapons", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad4	- to space and beyond", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad5	- teleport to lake", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bFlowerPowerActive, false, bFlowerPowerActive, false);
+					draw_menu_line("Numpad5	- flowerpower", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bFlowerPowerActive, false, bFlowerPowerActive, false);
 					draw_menu_line("Numpad6	- attach garbage bin", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad7	- (alpha) destroy tires", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad8	- remove player from vehicle", menuWidth, 4.0f, menuTop + 13.0f * 17, menuLeft, 5.0f, false, false, false, false);
@@ -868,7 +857,7 @@ eThreadState new_Run(GtaThread* This) {
 				}
 				*/
 
-				//set off alarm of another players car
+				//send player to space
 				static bool bNumpad4Pressed = false;
 				if (isKeyPressedOnce(bNumpad4Pressed, VK_NUMPAD4))
 				{
@@ -893,14 +882,14 @@ eThreadState new_Run(GtaThread* This) {
 				static bool bNumpad5Pressed = false;
 				if (isKeyPressedOnce(bNumpad5Pressed, VK_NUMPAD5))
 				{
-					AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
+					/*AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
 					GetControllofEntity(selectedPed);
 					AI::TASK_FOLLOW_NAV_MESH_TO_COORD(selectedPed, 254.74130f, 4042.002930f, -3.102535f, 1.0f, 1000, 1048576000.0f, 0, 1193033728.0f);
 					drawNotification(GetPlayerName(selectedPed) + " teleported to alamos sea");
-
-					//bFlowerPowerActive = !bFlowerPowerActive;
+					*/
+					bFlowerPowerActive = !bFlowerPowerActive;
 				}
-				/*
+				///*
 				if (bFlowerPowerActive)
 				{
 					Hash modelHashes[] = {
@@ -919,23 +908,23 @@ eThreadState new_Run(GtaThread* This) {
 						if (!STREAMING::HAS_MODEL_LOADED(modelHash))
 						{
 							STREAMING::REQUEST_MODEL(modelHash);
+							drawNotification(std::to_string(modelHash) + " loaded");
 						}
 					}
 					if (PED::IS_PED_SHOOTING(selectedPed))
 					{
 						drawNotification("shots found");
 						Vector3 lastHitCoordinate;
-						Vector3 * lastHitCoordinatePointer;
-						lastHitCoordinatePointer = &lastHitCoordinate;
-						if (WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(selectedPed, lastHitCoordinatePointer))
+						lastHitCoordinate.x, lastHitCoordinate.y, lastHitCoordinate.z = 0.0;
+						if (WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(selectedPed, &lastHitCoordinate))
 						{
 							drawNotification("hit at x: " + std::to_string(lastHitCoordinate.x) + "y: " + std::to_string(lastHitCoordinate.y) + "z: " + std::to_string(lastHitCoordinate.z));
-							Object junkObject = OBJECT::CREATE_OBJECT(modelHashes[rand() % 7], lastHitCoordinate.x, lastHitCoordinate.y, lastHitCoordinate.z, 1, 1, 0);
+							//Object junkObject = OBJECT::CREATE_OBJECT(modelHashes[rand() % 7], lastHitCoordinate.x, lastHitCoordinate.y, lastHitCoordinate.z, 1, 1, 0);
 							
 						}
 					}
 				}
-				*/
+				//*/
 				
 
 				//Attach junk to player
@@ -947,7 +936,8 @@ eThreadState new_Run(GtaThread* This) {
 					prop_bskball_01=1840863642  		0xF77CB21C
 					prop_cs_bin_02=651101403			0x0F3F3CB0
 					prop_defilied_ragdoll_01=-332567508	0x7A2A3826
-					prop_bball_arcade_01				0xA50DDDD0  
+					prop_bball_arcade_01				0xA50DDDD0 
+					Garbage can							651101403
 					*/
 					Hash objectModel = 651101403
 						;
@@ -979,6 +969,7 @@ eThreadState new_Run(GtaThread* This) {
 				}
 
 				//Burst all the tires of another players car
+				
 				static bool bNumpad7Pressed = false;
 				if (isKeyPressedOnce(bNumpad7Pressed, VK_NUMPAD7))
 				{
@@ -1072,10 +1063,9 @@ eThreadState new_Run(GtaThread* This) {
 											Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPedIterator, FALSE);
 											static bool bExplode = false;
 											bExplode = !bExplode;
-											if (bExplode)
-												FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, FALSE, TRUE, 0.0f); //We can blame anyone for the explosion. Whoever is selected in the menu will be blamed.
-											else
-												FIRE::START_SCRIPT_FIRE(playerPosition.x, playerPosition.y, playerPosition.z, 5, TRUE); //For LEXD Godmode kids who don't set entity proofs properly.
+											if (bExplode) {
+												FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f); //We can blame anyone for the explosion. Whoever is selected in the menu will be blamed.
+											}
 										}
 										catch (...) { break; Log::Error("Crashed"); iCounter = -10; } //IDK why, but if you call these functions too many times per tick, it causes a crash. We can just toss the exception. Hopefully this fixes the crash...
 									}
@@ -1090,14 +1080,14 @@ eThreadState new_Run(GtaThread* This) {
 						{	
 							//and else, only himself
 							Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
-							if (selectedPed)
+							if (selectedPed != playerPed)
 							{
 								AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
-								FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, TRUE, TRUE, 0.0f);
+								FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f);
 							}
 							else
 							{
-								FIRE::ADD_EXPLOSION(playerPosition.x, playerPosition.y, playerPosition.z, 4, 400.0f, TRUE, TRUE, 0.0f);
+								FIRE::ADD_EXPLOSION(playerPosition.x, playerPosition.y, playerPosition.z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f);
 							}
 							drawNotification(GetPlayerName(selectedPed) + " killed");
 						}
@@ -1142,14 +1132,15 @@ eThreadState new_Run(GtaThread* This) {
 					draw_menu_line("F9			- Remove Junk", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("F10			- Hack Hidden", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, bHackHidden, false, bHackHidden, false);
 					draw_menu_line("Numpad.		- Repair Vehicle", menuWidth, 4.0f, menuTop + 13.0f * 6, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad0	- Teleport to waypoint", menuWidth, 4.0f, menuTop + 13.0f * 7, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad2	- Spawn Kuruma2", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad3	- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad4	- Police disabled", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, bPoliceIgnorePlayer, false, bPoliceIgnorePlayer, false);
-					draw_menu_line("Numpad7	- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad8	- Fountain of gold", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, bMoneyFountainActive, false, bMoneyFountainActive, false);
-					draw_menu_line("Numpad9	- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
-					draw_menu_line("Numpad+	- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad0		- Teleport to waypoint", menuWidth, 4.0f, menuTop + 13.0f * 7, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad2		- Spawn Kuruma2", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad3		- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad4		- Police disabled", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, bPoliceIgnorePlayer, false, bPoliceIgnorePlayer, false);
+					draw_menu_line("Numpad4		- Spectate mode", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, bSpectateMode, false, bSpectateMode, false);
+					draw_menu_line("Numpad7		- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad8		- Fountain of gold", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, bMoneyFountainActive, false, bMoneyFountainActive, false);
+					draw_menu_line("Numpad9		- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
+					draw_menu_line("Numpad+		- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
 				}
 				
@@ -1363,6 +1354,21 @@ eThreadState new_Run(GtaThread* This) {
 					}
 					bPoliceIgnorePlayer = !bPoliceIgnorePlayer;
 				}
+				
+					//Police wont notice me
+				static bool bNumpad5Pressed = false;
+				if (isKeyPressedOnce(bNumpad5Pressed, VK_NUMPAD5))
+				{
+					if (bSpectateMode){
+						NETWORK::NETWORK_SET_ACTIVITY_SPECTATOR(true);
+						drawNotification("Spectating on");
+					}
+					else if (!bSpectateMode) {
+						NETWORK::NETWORK_SET_ACTIVITY_SPECTATOR(false);
+						drawNotification("Spectating off");
+					}
+					bSpectateMode = !bSpectateMode;
+				}
 
 				//TP to mission objective.
 				static bool bNumpad7Pressed = false;
@@ -1433,6 +1439,148 @@ eThreadState new_Run(GtaThread* This) {
 					}
 					drawNotification("Teleported to waypoint");
 				}
+
+				//Fix player.
+				static bool bDecimalPressed = false;
+				if (isKeyPressedOnce(bDecimalPressed, VK_DECIMAL))
+				{
+					if (ENTITY::DOES_ENTITY_EXIST(playerVeh) && !ENTITY::IS_ENTITY_DEAD(playerVeh))
+					{
+						GetControllofEntity(playerVeh); //Can't hurt to try.
+						VEHICLE::SET_VEHICLE_FIXED(playerVeh);
+						VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(playerVeh);
+						BoostBaseVehicleStats(playerVeh);
+					}
+					PED::CLEAR_PED_BLOOD_DAMAGE(playerPed);
+					//We can only change stats that are not ServerAuthoritative="true" in mpstatssetup.xml.
+					//STATS::STAT_SET_FLOAT(GAMEPLAY::GET_HASH_KEY("MP0_PLAYER_MENTAL_STATE"), 0.0f, TRUE);
+					drawNotification("Player fixed");
+				}
+
+				static bool bNumpad8Pressed;
+				if (isKeyPressedOnce(bNumpad8Pressed, VK_NUMPAD8))
+				{
+					if (bMoneyFountainActive){
+						drawNotification("Stopping moneydrop");
+					}
+					else if (bMoneyFountainActive) {
+						drawNotification("And the foutain of money started!!");
+					}
+					bMoneyFountainActive = !bMoneyFountainActive;
+				}
+				
+
+				//Shoot all spaghettios (Fuck Deliver EMP)
+				if (isKeyPressedOnce(bNumpad9Pressed, VK_NUMPAD9))
+				{
+					if (bKillTargetsActive){
+						drawNotification("Stopping masacre");
+					}
+					else if (!bKillTargetsActive) {
+						drawNotification("Starting killing spree");
+					}
+					bKillTargetsActive = !bKillTargetsActive;
+				}
+
+			}// end of menu
+
+			//moneyfountain action
+			if (bMoneyFountainActive)
+			{
+				try
+				{
+					static int iMoney = 0;
+					iMoney++;
+					if (!STREAMING::HAS_MODEL_LOADED(0x113FD533))
+						STREAMING::REQUEST_MODEL(0x113FD533); //Manchester United: Nil Loadsamoney United: LOADS
+					if (iMoney >= 2)
+					{
+						if (STREAMING::HAS_MODEL_LOADED(0x113FD533)) //Good evening and welcome to: Loads of Money.
+						{
+							Vector3 fountainPos; //Dereck B? On your bike!
+							fountainPos.x = -519.349243f;
+							fountainPos.y = -249.006134f;
+							fountainPos.z = 36.277279f;
+							static Hash PICKUP_MONEY_CASE = GAMEPLAY::GET_HASH_KEY("PICKUP_MONEY_CASE"); //Right. Let's do up the house.
+							int MONEY_DROP_AMOUNT = rand() % 25000 + 10000; // lets make it more random so r* wont recognize a pattern mch
+							OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, fountainPos.x + (((rand() % 3000) - 1500)/ 1000), fountainPos.y + (((rand() % 3000) - 1500) / 1000), fountainPos.z + (((rand() % 2000)-1000) / 1000), 0, MONEY_DROP_AMOUNT, 0x113FD533, FALSE, TRUE); //WHOP YOUR WAD ON THE COUNTA
+							STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(0x113FD533); //SHUT YOUR MOUTH!
+						}
+						iMoney = 0;
+					}
+				}
+				catch (...){ Log::Error("Got too much money."); }
+			}
+
+			//kill all targets active
+			if (bKillTargetsActive)
+			{
+				for (int i = 0; i <= 1000; i++)
+				{
+					Blip* blip = g_blipList->m_Blips[i].m_pBlip;
+					if (blip)
+					{
+						if (blip->dwColor != BLIPCOLOR_BLUE) //Don't hit friendlies.
+						{
+							if (blip->iIcon == BLIP_COP /*cop*/ || blip->iIcon == BLIP_SPAGHETTIO || (blip->iIcon == BLIP_CIRCLE && blip->dwColor == BLIPCOLOR_RED))
+							{
+								static bool bShoot = false;
+								bShoot = !bShoot;
+								if (bShoot)
+								{
+									static Hash weaponList[] = { WEAPON_ADVANCEDRIFLE, WEAPON_APPISTOL, WEAPON_ASSAULTRIFLE, WEAPON_ASSAULTSMG, WEAPON_CARBINERIFLE, WEAPON_COMBATMG, WEAPON_COMBATPDW, WEAPON_COMBATPISTOL, WEAPON_HEAVYPISTOL, WEAPON_HEAVYSNIPER, WEAPON_MARKSMANRIFLE, WEAPON_MG, WEAPON_MICROSMG, WEAPON_PISTOL, WEAPON_PISTOL50, WEAPON_SMG, WEAPON_SNIPERRIFLE, WEAPON_SNSPISTOL, WEAPON_SPECIALCARBINE, WEAPON_MINIGUN };
+									if (blip->fScale == 1.0f)
+										FIRE::ADD_OWNED_EXPLOSION(playerPed, blip->x, blip->y, blip->z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f);
+									else
+										GAMEPLAY::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(blip->x + 0.1f, blip->y, blip->z - 0.15f, blip->x - 0.1f, blip->y, blip->z + 1, 1000, TRUE, weaponList[rand() % (sizeof(weaponList) / 4)], playerPed, TRUE, TRUE, 1.0f); //FWARRRRRRAING! ~benji Alaska 2277
+								}
+							}
+							if ((blip->dwColor == BLIPCOLOR_NONE && (blip->iIcon == BLIP_HELIBLADESENEMY || blip->iIcon == BLIP_COPHELICOPTER)) ||
+								(blip->dwColor == BLIPCOLOR_RED && (blip->iIcon == BLIP_PLANE || blip->iIcon == BLIP_MOTORCYCLE || blip->iIcon == BLIP_CAR || blip->iIcon == BLIP_HELICOPTER || blip->iIcon == BLIP_JET2 || blip->iIcon == BLIP_HELICOPTERBLADES || blip->iIcon == BLIP_PLANEVEHICLE)))
+							{
+								FIRE::ADD_OWNED_EXPLOSION(playerPed, blip->x, blip->y, blip->z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f);
+							}
+						}
+					}
+				}
+			}
+
+			//godmodeswitch
+			if (bGodmodeActive)
+			{
+				//Godmode
+				if (!bGodmodeSwitchset)
+				{
+					DEBUGOUT("Setting godmode");
+					drawNotification("Activating godmode");
+					PLAYER::SET_PLAYER_INVINCIBLE(player, true);
+					ENTITY::SET_ENTITY_PROOFS(playerPed, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+					PED::SET_PED_CAN_RAGDOLL(playerPed, FALSE);
+					PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, FALSE);
+					bGodmodeSwitchset = true;
+					//Max armor.
+					PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
+				}
+			}
+			else if (!bGodmodeActive) {
+				//draw_menu_line("Godmode inactive", menuWidth, 4.0f, menuTop + 13.0f, menuLeft, 5.0f, false, false, false, false);
+				if (bGodmodeSwitchset)
+				{
+					DEBUGOUT("Deactivating godmode");
+					drawNotification("Deactivating godmode");
+					PLAYER::SET_PLAYER_INVINCIBLE(player, false);
+					ENTITY::SET_ENTITY_PROOFS(playerPed, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
+					PED::SET_PED_CAN_RAGDOLL(playerPed, TRUE);
+					PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, TRUE);
+					bGodmodeSwitchset = false;
+				}
+				else if (PLAYER::GET_PLAYER_INVINCIBLE(player))
+				{	// bugfix for random godmode active
+					PLAYER::SET_PLAYER_INVINCIBLE(player, false);
+					ENTITY::SET_ENTITY_PROOFS(playerPed, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
+					PED::SET_PED_CAN_RAGDOLL(playerPed, TRUE);
+					PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, TRUE);
+				}
 			}
 
 			//Increase wanted level.
@@ -1453,104 +1601,6 @@ eThreadState new_Run(GtaThread* This) {
 				PLAYER::SET_PLAYER_WANTED_LEVEL(player, 0, FALSE);
 				PLAYER::SET_PLAYER_WANTED_LEVEL_NOW(player, FALSE);
 				drawNotification("Wanted cleared");
-			}
-
-			//Fix player.
-			static bool bDecimalPressed = false;
-			if (isKeyPressedOnce(bDecimalPressed, VK_DECIMAL))
-			{
-				if (ENTITY::DOES_ENTITY_EXIST(playerVeh) && !ENTITY::IS_ENTITY_DEAD(playerVeh))
-				{
-					GetControllofEntity(playerVeh); //Can't hurt to try.
-					VEHICLE::SET_VEHICLE_FIXED(playerVeh);
-					VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(playerVeh);
-					BoostBaseVehicleStats(playerVeh);
-				}
-				PED::CLEAR_PED_BLOOD_DAMAGE(playerPed);
-				//We can only change stats that are not ServerAuthoritative="true" in mpstatssetup.xml.
-				//STATS::STAT_SET_FLOAT(GAMEPLAY::GET_HASH_KEY("MP0_PLAYER_MENTAL_STATE"), 0.0f, TRUE);
-				drawNotification("Player fixed");
-			}
-
-			static bool bNumpad8Pressed;
-			if (isKeyPressedOnce(bNumpad8Pressed, VK_NUMPAD8))
-			{
-				if (bMoneyFountainActive){
-					drawNotification("Stopping moneydrop");
-				}
-				else if (bMoneyFountainActive) {
-					drawNotification("And the foutain of money started!!");
-				}
-				bMoneyFountainActive = !bMoneyFountainActive;
-			}
-			if (bMoneyFountainActive)
-			{
-				try
-				{
-					static int iMoney = 0;
-					iMoney++;
-						if (!STREAMING::HAS_MODEL_LOADED(0x113FD533))
-							STREAMING::REQUEST_MODEL(0x113FD533); //Manchester United: Nil Loadsamoney United: LOADS
-						if (iMoney >= 2)
-						{
-							if (STREAMING::HAS_MODEL_LOADED(0x113FD533)) //Good evening and welcome to: Loads of Money.
-							{
-								Vector3 fountainPos; //Dereck B? On your bike!
-								fountainPos.x = -519.349243f;
-								fountainPos.y = -249.006134f;
-								fountainPos.z = 36.277279f;
-								static Hash PICKUP_MONEY_CASE = GAMEPLAY::GET_HASH_KEY("PICKUP_MONEY_CASE"); //Right. Let's do up the house.
-								int MONEY_DROP_AMOUNT = rand() % 25000 + 10000; // lets make it more random so r* wont recognize a pattern mch
-								OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, fountainPos.x + ((rand() % 1000) / 1000), fountainPos.y + ((rand() % 1000) / 1000), fountainPos.z + ((rand() % 2000) / 1000), 0, MONEY_DROP_AMOUNT, 0x113FD533, FALSE, TRUE); //WHOP YOUR WAD ON THE COUNTA
-								STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(0x113FD533); //SHUT YOUR MOUTH!
-							}
-							iMoney = 0;
-						}
-				}
-				catch (...){ Log::Error("Got too much money."); }
-			}
-
-			//Shoot all spaghettios (Fuck Deliver EMP)
-			if (isKeyPressedOnce(bNumpad9Pressed, VK_NUMPAD9))
-			{
-				if (bKillTargetsActive){
-					drawNotification("Stopping masacre");
-				}
-				else if (!bKillTargetsActive) {
-					drawNotification("Starting killing spree");
-				}
-				bKillTargetsActive = !bKillTargetsActive;
-			}
-			if (bKillTargetsActive)
-			{
-				for (int i = 0; i <= 1000; i++)
-				{
-					Blip* blip = g_blipList->m_Blips[i].m_pBlip;
-					if (blip)
-					{
-						if (blip->dwColor != BLIPCOLOR_BLUE) //Don't hit friendlies.
-						{
-							if (blip->iIcon == BLIP_COP /*cop*/ || blip->iIcon == BLIP_SPAGHETTIO || (blip->iIcon == BLIP_CIRCLE && blip->dwColor == BLIPCOLOR_RED))
-							{
-								static bool bShoot = false;
-								bShoot = !bShoot;
-								if (bShoot)
-								{
-									static Hash weaponList[] = { WEAPON_ADVANCEDRIFLE, WEAPON_APPISTOL, WEAPON_ASSAULTRIFLE, WEAPON_ASSAULTSMG, WEAPON_CARBINERIFLE, WEAPON_COMBATMG, WEAPON_COMBATPDW, WEAPON_COMBATPISTOL, WEAPON_HEAVYPISTOL, WEAPON_HEAVYSNIPER, WEAPON_MARKSMANRIFLE, WEAPON_MG, WEAPON_MICROSMG, WEAPON_PISTOL, WEAPON_PISTOL50, WEAPON_SMG, WEAPON_SNIPERRIFLE, WEAPON_SNSPISTOL, WEAPON_SPECIALCARBINE, WEAPON_MINIGUN };
-									if (blip->fScale == 1.0f)
-										FIRE::ADD_OWNED_EXPLOSION(playerPed, blip->x, blip->y, blip->z, 4, 10.0f, FALSE, TRUE, 0.0f);
-									else
-										GAMEPLAY::SHOOT_SINGLE_BULLET_BETWEEN_COORDS(blip->x + 0.1f, blip->y, blip->z - 0.15f, blip->x - 0.1f, blip->y, blip->z + 1, 1000, TRUE, weaponList[rand() % (sizeof(weaponList) / 4)], playerPed, TRUE, TRUE, 1.0f); //FWARRRRRRAING! ~benji Alaska 2277
-								}
-							}
-							if ((blip->dwColor == BLIPCOLOR_NONE && (blip->iIcon == BLIP_HELIBLADES || blip->iIcon == BLIP_COPHELICOPTER)) ||
-								(blip->dwColor == BLIPCOLOR_RED && (blip->iIcon == BLIP_PLANE || blip->iIcon == BLIP_MOTORCYCLE || blip->iIcon == BLIP_CAR || blip->iIcon == BLIP_HELICOPTER)))
-							{
-								FIRE::ADD_OWNED_EXPLOSION(playerPed, blip->x, blip->y, blip->z, 4, 10.0f, FALSE, TRUE, 0.0f);
-							}
-						}
-					}
-				}
 			}
 
 			//switch for godmode
