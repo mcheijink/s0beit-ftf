@@ -878,7 +878,7 @@ eThreadState new_Run(GtaThread* This) {
 				
 
 				
-				//Teleport to alamos sea
+				//get some plants in LS
 				static bool bNumpad5Pressed = false;
 				if (isKeyPressedOnce(bNumpad5Pressed, VK_NUMPAD5))
 				{
@@ -914,13 +914,12 @@ eThreadState new_Run(GtaThread* This) {
 					if (PED::IS_PED_SHOOTING(selectedPed))
 					{
 						drawNotification("shots found");
-						Vector3 lastHitCoordinate;
-						lastHitCoordinate.x, lastHitCoordinate.y, lastHitCoordinate.z = 0.0;
-						if (WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(selectedPed, &lastHitCoordinate))
+						float lastHitCoordinate[6];
+						
+						if (WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(selectedPed, lastHitCoordinate))
 						{
-							drawNotification("hit at x: " + std::to_string(lastHitCoordinate.x) + "y: " + std::to_string(lastHitCoordinate.y) + "z: " + std::to_string(lastHitCoordinate.z));
-							//Object junkObject = OBJECT::CREATE_OBJECT(modelHashes[rand() % 7], lastHitCoordinate.x, lastHitCoordinate.y, lastHitCoordinate.z, 1, 1, 0);
-							
+							drawNotification("hit at x: " + std::to_string(lastHitCoordinate[0]) + "y: " + std::to_string(lastHitCoordinate[2]) + "z: " + std::to_string(lastHitCoordinate[4]));
+							Object junkObject = OBJECT::CREATE_OBJECT(modelHashes[rand() % 7], lastHitCoordinate[0], lastHitCoordinate[2], lastHitCoordinate[4], 1, 1, 0);
 						}
 					}
 				}
@@ -1127,7 +1126,7 @@ eThreadState new_Run(GtaThread* This) {
 			{
 				if (!bHackHidden){
 					//Hack modes for outside menu
-					draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 16);
+					draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 17);
 					draw_menu_line("F8			- Max ammo", menuWidth, 4.0f, menuTop + 13.0f * 3, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("F9			- Remove Junk", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("F10			- Hack Hidden", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, bHackHidden, false, bHackHidden, false);
@@ -1136,12 +1135,12 @@ eThreadState new_Run(GtaThread* This) {
 					draw_menu_line("Numpad2		- Spawn Kuruma2", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad3		- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad4		- Police disabled", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, bPoliceIgnorePlayer, false, bPoliceIgnorePlayer, false);
-					draw_menu_line("Numpad4		- Spectate mode", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, bSpectateMode, false, bSpectateMode, false);
-					draw_menu_line("Numpad7		- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad8		- Fountain of gold", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, bMoneyFountainActive, false, bMoneyFountainActive, false);
-					draw_menu_line("Numpad9		- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
-					draw_menu_line("Numpad+		- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad4		- Spectate mode", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, bSpectateMode, false, bSpectateMode, false);
+					draw_menu_line("Numpad7		- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad8		- Fountain of gold", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, bMoneyFountainActive, false, bMoneyFountainActive, false);
+					draw_menu_line("Numpad9		- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
+					draw_menu_line("Numpad+		- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
 				}
 				
 				//Spawn a test car.

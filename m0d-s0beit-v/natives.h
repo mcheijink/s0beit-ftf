@@ -2765,8 +2765,8 @@ namespace WEAPON
 	static Void SET_PED_AMMO_TO_DROP(Any p0, Any p1) { return NativeInvoke::Invoke<Void, Any, Any>(0x5E02CAD2E2F02723, p0, p1); } // A4EFEF9440A5B0EF 2386A307
 	static Void _0xE620FD3512A04F18(float p0) { return NativeInvoke::Invoke<Void, float>(0xA4F4B21C17205F15, p0); } // E620FD3512A04F18 D6460EA2
 	static Any _GET_PED_AMMO_TYPE(Ped ped, Hash weaponHash) { return NativeInvoke::Invoke<Any, Ped, Hash>(0x8C63D284478C4CC1, ped, weaponHash); } // 7FEAD38B326B9F74 09337863
-	static BOOL GET_PED_LAST_WEAPON_IMPACT_COORD(Ped ped, Vector3* coord) { return NativeInvoke::Invoke<BOOL, Ped, Vector3*>(0xE7A67DAAF42D2229, ped, coord); } // 6C4D0409BA1A2BC2 9B266079
-	//static Any GET_PED_LAST_WEAPON_IMPACT_COORD(Ped Handle, float* Coords) { return NativeInvoke::Invoke<Any>(0x6C4D0409BA1A2BC2, Handle, Coords); } //original method doesnt work.
+	//static BOOL GET_PED_LAST_WEAPON_IMPACT_COORD(Ped ped, Vector3* coord) { return NativeInvoke::Invoke<BOOL, Ped, Vector3*>(0xE7A67DAAF42D2229, ped, coord); } // 6C4D0409BA1A2BC2 9B266079
+	static Any GET_PED_LAST_WEAPON_IMPACT_COORD(Ped Handle, float* Coords) { return NativeInvoke::Invoke<Any>(0x6C4D0409BA1A2BC2, Handle, Coords); } //original method doesnt work.
 	static Void SET_PED_GADGET(Any p0, Any p1, BOOL p2) { return NativeInvoke::Invoke<Void, Any, Any, BOOL>(0x48DC4923F6184AE8, p0, p1, p2); } // D0D7B1E680ED4A1A 8A256D0A
 	static BOOL _IS_PED_USING_GADGET(Ped ped, Hash gadgetHash) { return NativeInvoke::Invoke<BOOL, Ped, Hash>(0x391393371909C23E, ped, gadgetHash); } // F731332072F5156C 8DDD0B5B
 	static Hash GET_SELECTED_PED_WEAPON(Ped ped) { return NativeInvoke::Invoke<Hash, Ped>(0x4A48517684791A46, ped); } // 0A6DB4965674D243 D240123E
