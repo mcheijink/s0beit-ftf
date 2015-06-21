@@ -611,8 +611,8 @@ eThreadState new_Run(GtaThread* This) {
 	static bool featureRestrictedZones = true;
 	static int iFreeze = -1;
 	static int modulesActive = 0;
-	static int mchbuildnr = 1019;
-	static int mchDebugActive = true;
+	static int mchbuildnr = 1020;
+	static int mchDebugActive = false;
 
 	float menuLeft = 1030.0;
 	float menuWidth = 250.0;
@@ -726,7 +726,7 @@ eThreadState new_Run(GtaThread* This) {
 					draw_menu_line("Numpad2	- Clone player vehicle", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad3	- Remove all weapons", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad4	- to space and beyond", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad5	- flowerpower", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bFlowerPowerActive, false, bFlowerPowerActive, false);
+					draw_menu_line("Numpad5	- (alpha) flowerpower", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bFlowerPowerActive, false, bFlowerPowerActive, false);
 					draw_menu_line("Numpad6	- attach garbage bin", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad7	- (alpha) destroy tires", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad8	- remove player from vehicle", menuWidth, 4.0f, menuTop + 13.0f * 17, menuLeft, 5.0f, false, false, false, false);
@@ -1138,7 +1138,7 @@ eThreadState new_Run(GtaThread* This) {
 					draw_menu_line("F8			- Max ammo", menuWidth, 4.0f, menuTop + 13.0f * 3, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("F9			- Remove Junk", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("F10			- Hack Hidden", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, bHackHidden, false, bHackHidden, false);
-					draw_menu_line("Numpad.	- Repair Vehicle", menuWidth, 4.0f, menuTop + 13.0f * 6, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad.		- Repair Vehicle", menuWidth, 4.0f, menuTop + 13.0f * 6, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad0	- Teleport to waypoint", menuWidth, 4.0f, menuTop + 13.0f * 7, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad2	- Spawn Kuruma2", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad3	- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
@@ -1149,7 +1149,7 @@ eThreadState new_Run(GtaThread* This) {
 					draw_menu_line("Numpad8	- Fountain of gold", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bMoneyFountainActive, false, bMoneyFountainActive, false);
 					draw_menu_line("Numpad9	- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
 					draw_menu_line("Numpad+	- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad*	- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 17, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 17, menuLeft, 5.0f, false, false, false, false);
 				}
 				
 				//Spawn a test car.
@@ -1383,7 +1383,7 @@ eThreadState new_Run(GtaThread* This) {
 				if (isKeyPressedOnce(bNumpad6Pressed, VK_NUMPAD6))
 				{
 					int iFlyingcount = 0;
-					Ped selectedPed = NULL;
+					
 					for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
 					{
 						Ped pedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
@@ -1391,7 +1391,7 @@ eThreadState new_Run(GtaThread* This) {
 						{
 							if (PED::IS_PED_IN_FLYING_VEHICLE(pedIterator))
 							{
-								DumpPlayerFromVehicle(selectedPed, false);
+								DumpPlayerFromVehicle(pedIterator, false);
 								iFlyingcount++;
 							}
 						}
