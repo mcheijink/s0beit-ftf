@@ -611,8 +611,8 @@ eThreadState new_Run(GtaThread* This) {
 	static bool featureRestrictedZones = true;
 	static int iFreeze = -1;
 	static int modulesActive = 0;
-	static int mchbuildnr = 1020;
-	static int mchDebugActive = false;
+	static int mchbuildnr = 1021;
+	static int mchDebugActive = true;
 
 	float menuLeft = 1030.0;
 	float menuWidth = 250.0;
@@ -671,8 +671,21 @@ eThreadState new_Run(GtaThread* This) {
 			draw_menu_line("s0bietftf - build " + std::to_string(mchbuildnr), 15.0f, 4.0f, 0.0f, 550.0f, 5.0f, false, false, false);
 
 			if (mchDebugActive){
-				Vector3 playerCoordinate = ENTITY::GET_ENTITY_COORDS(playerPed, FALSE); //Dereck B? On your bike!
-				draw_menu_line("x: " + std::to_string(playerCoordinate.x) + "y: " + std::to_string(playerCoordinate.y) + "z: " + std::to_string(playerCoordinate.z), 15.0f, 4.0f, 13.0f, 550.0f, 5.0f, false, false, false);
+				Ped debugPed;
+				if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, FALSE)){
+					debugPed = PED::GET_VEHICLE_PED_IS_USING(playerPed);
+				}
+				else {
+					debugPed = playerPed;
+				}
+				Vector3 playerCoordinate = ENTITY::GET_ENTITY_COORDS(debugPed, FALSE); //Dereck B? On your bike!
+				float playerHeading = ENTITY::GET_ENTITY_HEADING(debugPed);
+				draw_menu_line(" x: " + std::to_string(playerCoordinate.x) + " y: " + std::to_string(playerCoordinate.y) + " z: " + std::to_string(playerCoordinate.z) + " heading: " + std::to_string(playerHeading), 15.0f, 4.0f, 13.0f, 550.0f, 5.0f, false, false, false);
+				static bool bF11Pressed;
+				if (isKeyPressedOnce(bF11Pressed, VK_F11))
+				{
+					Log::Msg((" x: " + std::to_string(playerCoordinate.x) + " y: " + std::to_string(playerCoordinate.y) + " z: " + std::to_string(playerCoordinate.z) + " heading: " + std::to_string(playerHeading)).c_str());
+				}
 			}
 			
 			draw_menu_line("F5			- Hack active", menuWidth, 4.0f, menuTop, menuLeft, 5.0f, bHackActive, false, bHackActive, false);
@@ -725,7 +738,7 @@ eThreadState new_Run(GtaThread* This) {
 					draw_menu_line("N1+Rcont		- Frame player", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad2	- Clone player vehicle", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad3	- Remove all weapons", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad4	- to space and beyond", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad4	- Pay and sprayclone", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad5	- (alpha) flowerpower", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bFlowerPowerActive, false, bFlowerPowerActive, false);
 					draw_menu_line("Numpad6	- attach garbage bin", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad7	- (alpha) destroy tires", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
@@ -873,23 +886,93 @@ eThreadState new_Run(GtaThread* This) {
 				}
 				*/
 
-				//send player to space
+				//park and clone
 				static bool bNumpad4Pressed = false;
 				if (isKeyPressedOnce(bNumpad4Pressed, VK_NUMPAD4))
 				{
-					if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
-					{
-						Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
-						ENTITY::APPLY_FORCE_TO_ENTITY(selectedVehicle, 1, 0.0f, 0.0f, 1500.0f, 0.0f, 0.0f, 0.0f, true, true, true, true, false, true);
-						drawNotification(GetPlayerName(selectedPed) + " shot to space together with car");
-						//if (GetControllofEntity(selectedVehicle)) {
-						//	
-						//}
-					}
-					else {
-						ENTITY::APPLY_FORCE_TO_ENTITY(selectedPed, 1, 0.0f, 0.0f, 1500.0f, 0.0f, 0.0f, 0.0f, true, true, true, true, false, true);
-						drawNotification(GetPlayerName(selectedPed) + " shot to space");
-					}					
+						Vector3 carpark[10];
+						float carparkheading = 298.0f;
+						carpark[0].x = -377.052338f; carpark[0].y = -146.578171f; carpark[0].z = 38.136883f;
+						carpark[1].x = -378.185455f; carpark[1].y = -143.062912f; carpark[1].z = 38.637417f;
+						carpark[2].x = -379.831360f; carpark[2].y = -139.990662f; carpark[2].z = 38.637928f;
+						carpark[3].x = -381.609650f; carpark[3].y = -137.015427f; carpark[3].z = 38.638058f;
+						carpark[4].x = -383.640381f; carpark[4].y = -134.032303f; carpark[4].z = 38.638317f;
+						carpark[5].x = -385.417297f; carpark[5].y = -131.086594f; carpark[5].z = 38.637768f;
+						carpark[6].x = -386.984100f; carpark[6].y = -127.842491f; carpark[6].z = 38.656815f;
+						carpark[7].x = -388.355316f; carpark[7].y = -124.618080f; carpark[7].z = 38.638138f;
+						carpark[8].x = -389.692169f; carpark[8].y = -121.593727f; carpark[8].z = 38.629921f;
+						carpark[9].x = -392.876312f; carpark[9].y = -118.994896f; carpark[9].z = 38.053879f;
+						
+						Vehicle pedVeh = NULL;
+						pedVeh = PED::GET_VEHICLE_PED_IS_IN(selectedPed, TRUE);
+						if (ENTITY::DOES_ENTITY_EXIST(pedVeh))
+						{
+							Hash vehicleModelHash = ENTITY::GET_ENTITY_MODEL(pedVeh);
+							if (VEHICLE::IS_THIS_MODEL_A_CAR(vehicleModelHash) && !VEHICLE::IS_BIG_VEHICLE(vehicleModelHash))
+							{
+								STREAMING::REQUEST_MODEL(vehicleModelHash); //This should already be loaded since we're stealing it from someone in memory.
+								for each (Vector3 carparkcoordinate in carpark) 
+								{
+									Vehicle clonedVeh = VEHICLE::CREATE_VEHICLE(vehicleModelHash, carparkcoordinate.x, carparkcoordinate.y, carparkcoordinate.z, carparkheading, TRUE, TRUE);
+									VEHICLE::SET_VEHICLE_MOD_KIT(clonedVeh, 0);
+									int primaryColor, secondaryColor;
+									VEHICLE::GET_VEHICLE_COLOURS(pedVeh, &primaryColor, &secondaryColor);
+									VEHICLE::SET_VEHICLE_COLOURS(clonedVeh, primaryColor, secondaryColor);
+									VEHICLE::SET_VEHICLE_WHEEL_TYPE(clonedVeh, VEHICLE::GET_VEHICLE_WHEEL_TYPE(pedVeh));
+									for (int i = 0; i <= MOD_BACKWHEELS; i++)
+									{
+										if (i > MOD_ARMOR && i < MOD_FRONTWHEELS)
+											VEHICLE::TOGGLE_VEHICLE_MOD(clonedVeh, i, VEHICLE::IS_TOGGLE_MOD_ON(pedVeh, i));
+										else
+											VEHICLE::SET_VEHICLE_MOD(clonedVeh, i, VEHICLE::GET_VEHICLE_MOD(pedVeh, i), VEHICLE::GET_VEHICLE_MOD_VARIATION(pedVeh, i));
+									}
+									int tireSmokeColor[3], pearlescentColor, wheelColor;
+									VEHICLE::GET_VEHICLE_TYRE_SMOKE_COLOR(pedVeh, &tireSmokeColor[0], &tireSmokeColor[1], &tireSmokeColor[2]);
+									VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(clonedVeh, tireSmokeColor[0], tireSmokeColor[1], tireSmokeColor[2]);
+									VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(clonedVeh, VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(pedVeh));
+									VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT(clonedVeh, VEHICLE::GET_VEHICLE_NUMBER_PLATE_TEXT(pedVeh));
+									VEHICLE::GET_VEHICLE_EXTRA_COLOURS(pedVeh, &pearlescentColor, &wheelColor);
+									VEHICLE::SET_VEHICLE_EXTRA_COLOURS(clonedVeh, pearlescentColor, wheelColor);
+									if (VEHICLE::IS_VEHICLE_A_CONVERTIBLE(pedVeh, 0))
+									{
+										int convertableState = VEHICLE::GET_CONVERTIBLE_ROOF_STATE(pedVeh);
+										if (convertableState == 0 || convertableState == 3 || convertableState == 5)
+											VEHICLE::RAISE_CONVERTIBLE_ROOF(clonedVeh, 1);
+										else
+											VEHICLE::LOWER_CONVERTIBLE_ROOF(clonedVeh, 1);
+									}
+									for (int i = 0; i <= NEON_BACK; i++)
+									{
+										VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(clonedVeh, i, VEHICLE::_IS_VEHICLE_NEON_LIGHT_ENABLED(pedVeh, i));
+									}
+									for (int i = 0; i <= 11; i++)
+									{
+										if (VEHICLE::DOES_EXTRA_EXIST(pedVeh, i))
+											VEHICLE::SET_VEHICLE_EXTRA(clonedVeh, i, !VEHICLE::IS_VEHICLE_EXTRA_TURNED_ON(pedVeh, i));
+									}
+									if ((VEHICLE::GET_VEHICLE_LIVERY_COUNT(pedVeh) > 1) && VEHICLE::GET_VEHICLE_LIVERY(pedVeh) >= 0)
+									{
+										VEHICLE::SET_VEHICLE_LIVERY(clonedVeh, VEHICLE::GET_VEHICLE_LIVERY(pedVeh));
+									}
+									int neonColor[3];
+									VEHICLE::_GET_VEHICLE_NEON_LIGHTS_COLOUR(pedVeh, &neonColor[0], &neonColor[1], &neonColor[2]);
+									VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(clonedVeh, neonColor[0], neonColor[1], neonColor[2]);
+									VEHICLE::SET_VEHICLE_WINDOW_TINT(clonedVeh, VEHICLE::GET_VEHICLE_WINDOW_TINT(pedVeh));
+									VEHICLE::SET_VEHICLE_LIGHTS(clonedVeh, true);
+									VEHICLE::SET_VEHICLE_ALARM(clonedVeh, true);
+									STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(vehicleModelHash);
+									BoostBaseVehicleStats(clonedVeh);
+								}
+								drawNotification("Cloned and parked that shit");
+							} else 
+							{ 
+								drawNotification("Vehicle not a car or to big");
+							}
+						}
+						else 
+						{
+							drawNotification("Playervehicle not found");
+						}						
 				}
 				
 
@@ -1144,7 +1227,7 @@ eThreadState new_Run(GtaThread* This) {
 					draw_menu_line("Numpad3	- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad4	- Police disabled", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, bPoliceIgnorePlayer, false, bPoliceIgnorePlayer, false);
 					draw_menu_line("Numpad5	- Spectate mode", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, bSpectateMode, false, bSpectateMode, false);
-					draw_menu_line("Numpad5	- Enforce No-Flyzone", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad6	- Enforce No-Flyzone", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad7	- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad8	- Fountain of gold", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bMoneyFountainActive, false, bMoneyFountainActive, false);
 					draw_menu_line("Numpad9	- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
