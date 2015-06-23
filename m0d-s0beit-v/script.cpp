@@ -97,7 +97,8 @@ void RemoveAllPropsFromPlayer(Ped ped)
 							0x07121AC4 /*prop_xmas_ext*/, 0x0E8032E4 /*prop_weed_pallet*/, 
 							0xD44295DD /*p_cablecar_s*/, 0x6F9939C7 /*prop_ld_toilet_01*/, 
 							0x9C762726 /*prop_lev_des_barge_02*/, 0x8973A868 /*prop_air_bigradar*/, 
-							0xC2BC19CD /*p_cs_mp_jet_01_s*/, 651101403 /*garbage bin*/ };
+							0xC2BC19CD /*p_cs_mp_jet_01_s*/, 651101403 /*garbage bin*/,
+							1840863642 /*baskedball */};
 	for each (Hash modelHash in modelHashes)
 	{
 		Object obj = OBJECT::GET_CLOSEST_OBJECT_OF_TYPE(playerPosition.x, playerPosition.y, playerPosition.z, 3.0f, modelHash, TRUE, 0, 0);
@@ -402,7 +403,8 @@ std::string GetPlayerName(Ped Player)
 	//char chStringName[50];
 	//strcpy_s(chStringName, PLAYER::GET_PLAYER_NAME(Player));
 	
-	char* chStringName = PLAYER::GET_PLAYER_NAME(Player);
+	char chStringName[32];
+	sprintf_s(chStringName, "%s", PLAYER::GET_PLAYER_NAME(Player));
 	//sprintf_s(chStringName, "%s", chStringName);
 	
 	std::string stringName = (std::string)chStringName;
@@ -607,11 +609,11 @@ eThreadState new_Run(GtaThread* This) {
 	//var init
 	static bool bGodmodeActive, bGodmodeSwitchset, bF7Pressed, bMoneyDropActive, bSubtractPressed, bHackActive, 
 				bF5Pressed, bMenuActive, bF6Pressed, bKillTargetsActive, bNumpad9Pressed, bPoliceIgnorePlayer, 
-				bF10Pressed, bHackHidden, bFlowerPowerActive, bMoneyFountainActive, bSpectateMode = false;
+				bF10Pressed, bHackHidden, bFlowerPowerActive, bMoneyFountainActive, bSpectateMode, bKillSpeakers = false;
 	static bool featureRestrictedZones = true;
 	static int iFreeze = -1;
 	static int modulesActive = 0;
-	static int mchbuildnr = 1021;
+	static int mchbuildnr = 1022;
 	static int mchDebugActive = true;
 
 	float menuLeft = 1030.0;
@@ -1037,7 +1039,7 @@ eThreadState new_Run(GtaThread* This) {
 					prop_bball_arcade_01				0xA50DDDD0 
 					Garbage can							651101403
 					*/
-					Hash objectModel = 651101403
+					Hash objectModel = 1840863642
 						;
 					if (!STREAMING::HAS_MODEL_LOADED(objectModel))
 					{
@@ -1053,10 +1055,10 @@ eThreadState new_Run(GtaThread* This) {
 							AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
 						}
 						GetControllofEntity(junkObject);
-						ENTITY::ATTACH_ENTITY_TO_ENTITY(junkObject, selectedPed, PED::GET_PED_BONE_INDEX(selectedPed, 0), 
+						ENTITY::ATTACH_ENTITY_TO_ENTITY(junkObject, selectedPed, PED::GET_PED_BONE_INDEX(selectedPed, SKEL_Head),
 							0.00,	//floatx
 							0.00,	//floaty
-							1.0,	//floatz
+							0.0,	//floatz
 							0.0,	//xrot
 							180.0,	//yrot 
 							0.0,	//zrot
@@ -1226,7 +1228,7 @@ eThreadState new_Run(GtaThread* This) {
 					draw_menu_line("Numpad2	- Spawn Kuruma2", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad3	- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad4	- Police disabled", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, bPoliceIgnorePlayer, false, bPoliceIgnorePlayer, false);
-					draw_menu_line("Numpad5	- Spectate mode", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, bSpectateMode, false, bSpectateMode, false);
+					draw_menu_line("Numpad5	- Kill speaking peasants", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, bKillSpeakers, false, bKillSpeakers, false);
 					draw_menu_line("Numpad6	- Enforce No-Flyzone", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad7	- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad8	- Fountain of gold", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bMoneyFountainActive, false, bMoneyFountainActive, false);
@@ -1446,19 +1448,43 @@ eThreadState new_Run(GtaThread* This) {
 					bPoliceIgnorePlayer = !bPoliceIgnorePlayer;
 				}
 				
-					//spectate mode
+					//kill all the speaking players
 				static bool bNumpad5Pressed = false;
 				if (isKeyPressedOnce(bNumpad5Pressed, VK_NUMPAD5))
 				{
-					if (bSpectateMode){
+					if (bKillSpeakers){
 						NETWORK::NETWORK_SET_ACTIVITY_SPECTATOR(true);
-						drawNotification("Spectating on");
+						drawNotification("Killing those peasants");
 					}
-					else if (!bSpectateMode) {
+					else if (!bKillSpeakers) {
 						NETWORK::NETWORK_SET_ACTIVITY_SPECTATOR(false);
-						drawNotification("Spectating off");
+						drawNotification("Keep'n the talking peasants alive...");
 					}
-					bSpectateMode = !bSpectateMode;
+					bKillSpeakers = !bKillSpeakers;
+				}
+				if (bKillSpeakers) {
+					for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
+					{
+						Ped pedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
+						if (ENTITY::DOES_ENTITY_EXIST(pedIterator))
+						{
+							if (NETWORK::NETWORK_IS_PLAYER_TALKING(pedIterator))
+							{
+								Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(pedIterator, FALSE);
+								if (pedIterator)
+								{
+									AI::CLEAR_PED_TASKS_IMMEDIATELY(pedIterator);
+									FIRE::ADD_OWNED_EXPLOSION(pedIterator, playerPosition.x, playerPosition.y, playerPosition.z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f);
+								}
+								else
+								{
+									FIRE::ADD_EXPLOSION(playerPosition.x, playerPosition.y, playerPosition.z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f);
+								}
+								drawNotification(GetPlayerName(pedIterator) + " killed for speaking out loud");
+								
+							}
+						}
+					}
 				}
 
 				// no fly zone
@@ -1466,7 +1492,6 @@ eThreadState new_Run(GtaThread* This) {
 				if (isKeyPressedOnce(bNumpad6Pressed, VK_NUMPAD6))
 				{
 					int iFlyingcount = 0;
-					
 					for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
 					{
 						Ped pedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
