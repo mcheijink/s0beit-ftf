@@ -30,7 +30,7 @@
     <ProjectGuid>{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>m0ds0beitv</RootNamespace>
-    <ProjectName>m0d-s0beitftf-build 1021</ProjectName>
+    <ProjectName>m0d-s0beitftf-build 1022</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

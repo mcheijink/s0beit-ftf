@@ -397,7 +397,7 @@ BOOL IsPlayerFriend(Player player)
 	return FALSE;
 }
 
-std::string GetPlayerName(Ped Player)
+std::string GetPlayerName(Player Player)
 {
 	
 	//char chStringName[50];
@@ -615,6 +615,7 @@ eThreadState new_Run(GtaThread* This) {
 	static int modulesActive = 0;
 	static int mchbuildnr = 1022;
 	static int mchDebugActive = true;
+	Vehicle LSCCarParkVehicles[10];
 
 	float menuLeft = 1030.0;
 	float menuWidth = 250.0;
@@ -635,7 +636,7 @@ eThreadState new_Run(GtaThread* This) {
 				featureRestrictedZones = true;
 				bFlowerPowerActive = false;
 				bSpectateMode = false;
-
+				bKillSpeakers = false;
 				//regain wantedlevel
 				PLAYER::SET_MAX_WANTED_LEVEL(5);
 
@@ -763,11 +764,13 @@ eThreadState new_Run(GtaThread* This) {
 				CheckPlayer(iSelectedPlayer, !bPgUpPressed);
 				int iLineNum = 0;
 				Ped selectedPed = NULL;
+				Player selectedPlayer = NULL;
 				for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
 				{
 					bool bSelectedPed = (playerIterator == iSelectedPlayer);
 					if (bSelectedPed)
 						selectedPed = PLAYER::GET_PLAYER_PED(playerIterator);
+						selectedPlayer = playerIterator;
 					Ped pedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
 					if (ENTITY::DOES_ENTITY_EXIST(pedIterator))
 					{
@@ -790,7 +793,7 @@ eThreadState new_Run(GtaThread* This) {
 				{
 					GiveAllWeaponsToPed(selectedPed, WEAPONTINT_LSPD, selectedPed == playerPed);
 					//notify user of action
-					drawNotification("Gave all weapons to " + GetPlayerName(selectedPed));
+					drawNotification("Gave all weapons to " + GetPlayerName(selectedPlayer));
 				}
 
 				static bool bDecimalPressed = false;
@@ -803,7 +806,7 @@ eThreadState new_Run(GtaThread* This) {
 						{
 							PED::SET_PED_INTO_VEHICLE(playerPed, selectedVehicle, i);
 						}
-						drawNotification("Teleported to " + GetPlayerName(selectedPed) + "'s vehicle");
+						drawNotification("Teleported to " + GetPlayerName(selectedPlayer) + "'s vehicle");
 
 					}
 				}
@@ -818,7 +821,7 @@ eThreadState new_Run(GtaThread* This) {
 
 					Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
 					ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, playerPosition.x, playerPosition.y, playerPosition.z + 1, FALSE, FALSE, TRUE);
-					drawNotification("Teleported to " + GetPlayerName(selectedPed));
+					drawNotification("Teleported to " + GetPlayerName(selectedPlayer));
 				}
 
 
@@ -832,7 +835,7 @@ eThreadState new_Run(GtaThread* This) {
 						drawNotification("Stopping moneydrop");
 					}
 					else if (bMoneyDropActive) {
-						drawNotification("And the rain of the moneyzbagz started!" + GetPlayerName(selectedPed) + " be rich and happy");
+						drawNotification("And the rain of the moneyzbagz started!" + GetPlayerName(selectedPlayer) + " be rich and happy");
 					}
 					bMoneyDropActive = !bMoneyDropActive;
 				}
@@ -907,12 +910,20 @@ eThreadState new_Run(GtaThread* This) {
 						
 						Vehicle pedVeh = NULL;
 						pedVeh = PED::GET_VEHICLE_PED_IS_IN(selectedPed, TRUE);
+						int counter;
 						if (ENTITY::DOES_ENTITY_EXIST(pedVeh))
 						{
 							Hash vehicleModelHash = ENTITY::GET_ENTITY_MODEL(pedVeh);
 							if (VEHICLE::IS_THIS_MODEL_A_CAR(vehicleModelHash) && !VEHICLE::IS_BIG_VEHICLE(vehicleModelHash))
 							{
+								counter = 0;
+								for each (Vector3 carparkcoordinate in carpark)
+								{
+									GAMEPLAY::CLEAR_AREA_OF_VEHICLES(carparkcoordinate.x, carparkcoordinate.y, carparkcoordinate.z, 2.0f, true, true, true, true, true);
+								}
+
 								STREAMING::REQUEST_MODEL(vehicleModelHash); //This should already be loaded since we're stealing it from someone in memory.
+								counter = 0;
 								for each (Vector3 carparkcoordinate in carpark) 
 								{
 									Vehicle clonedVeh = VEHICLE::CREATE_VEHICLE(vehicleModelHash, carparkcoordinate.x, carparkcoordinate.y, carparkcoordinate.z, carparkheading, TRUE, TRUE);
@@ -964,6 +975,8 @@ eThreadState new_Run(GtaThread* This) {
 									VEHICLE::SET_VEHICLE_ALARM(clonedVeh, true);
 									STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(vehicleModelHash);
 									BoostBaseVehicleStats(clonedVeh);
+									LSCCarParkVehicles[counter] = clonedVeh;
+									counter++;
 								}
 								drawNotification("Cloned and parked that shit");
 							} else 
@@ -986,7 +999,7 @@ eThreadState new_Run(GtaThread* This) {
 					/*AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
 					GetControllofEntity(selectedPed);
 					AI::TASK_FOLLOW_NAV_MESH_TO_COORD(selectedPed, 254.74130f, 4042.002930f, -3.102535f, 1.0f, 1000, 1048576000.0f, 0, 1193033728.0f);
-					drawNotification(GetPlayerName(selectedPed) + " teleported to alamos sea");
+					drawNotification(GetPlayerName(selectedPlayer) + " teleported to alamos sea");
 					*/
 					bFlowerPowerActive = !bFlowerPowerActive;
 				}
@@ -1039,8 +1052,7 @@ eThreadState new_Run(GtaThread* This) {
 					prop_bball_arcade_01				0xA50DDDD0 
 					Garbage can							651101403
 					*/
-					Hash objectModel = 1840863642
-						;
+					Hash objectModel = 1840863642;
 					if (!STREAMING::HAS_MODEL_LOADED(objectModel))
 					{
 						STREAMING::REQUEST_MODEL(objectModel);
@@ -1058,13 +1070,13 @@ eThreadState new_Run(GtaThread* This) {
 						ENTITY::ATTACH_ENTITY_TO_ENTITY(junkObject, selectedPed, PED::GET_PED_BONE_INDEX(selectedPed, SKEL_Head),
 							0.00,	//floatx
 							0.00,	//floaty
-							0.0,	//floatz
+							0.15,	//floatz
 							0.0,	//xrot
 							180.0,	//yrot 
 							0.0,	//zrot
 							false, false, false, false, 2, true);
 						//STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(objectModel);
-						drawNotification("Attached junk to " + GetPlayerName(selectedPed));
+						drawNotification("Attached junk to " + GetPlayerName(selectedPlayer));
 					}
 				}
 
@@ -1166,7 +1178,7 @@ eThreadState new_Run(GtaThread* This) {
 							iCounter++;
 							if (iCounter > 5)
 								iCounter = 0;
-							drawNotification(GetPlayerName(selectedPed) + " framed!");
+							drawNotification(GetPlayerName(selectedPlayer) + " framed!");
 						}
 						else
 						{	
@@ -1181,7 +1193,7 @@ eThreadState new_Run(GtaThread* This) {
 							{
 								FIRE::ADD_EXPLOSION(playerPosition.x, playerPosition.y, playerPosition.z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f);
 							}
-							drawNotification(GetPlayerName(selectedPed) + " killed");
+							drawNotification(GetPlayerName(selectedPlayer) + " killed");
 						}
 					
 						//how does this freezing stuf work?
@@ -1207,7 +1219,7 @@ eThreadState new_Run(GtaThread* This) {
 									{
 									WEAPON::REMOVE_ALL_PED_WEAPONS(selectedPed, TRUE);
 									AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
-									drawNotification("Took away all " + GetPlayerName(selectedPed) + " guns");
+									drawNotification("Took away all " + GetPlayerName(selectedPlayer) + " guns");
 									}
 								}
 						}
@@ -1468,7 +1480,7 @@ eThreadState new_Run(GtaThread* This) {
 						Ped pedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
 						if (ENTITY::DOES_ENTITY_EXIST(pedIterator))
 						{
-							if (NETWORK::NETWORK_IS_PLAYER_TALKING(pedIterator))
+							if (NETWORK::NETWORK_IS_PLAYER_TALKING(playerIterator))
 							{
 								Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(pedIterator, FALSE);
 								if (pedIterator)
@@ -1480,7 +1492,7 @@ eThreadState new_Run(GtaThread* This) {
 								{
 									FIRE::ADD_EXPLOSION(playerPosition.x, playerPosition.y, playerPosition.z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f);
 								}
-								drawNotification(GetPlayerName(pedIterator) + " killed for speaking out loud");
+								drawNotification(GetPlayerName(playerIterator) + " killed for speaking out loud");
 								
 							}
 						}
