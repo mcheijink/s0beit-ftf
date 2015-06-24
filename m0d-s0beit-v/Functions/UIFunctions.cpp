@@ -118,11 +118,11 @@ void drawNotification(std::string str, bool isGxtEntry = false)
 std::string GetPlayerName(Player Player)
 {
 
-	//char chStringName[50];
-	//strcpy_s(chStringName, PLAYER::GET_PLAYER_NAME(Player));
+	char chStringName[50];
+	strcpy_s(chStringName, PLAYER::GET_PLAYER_NAME(Player));
 
-	char chStringName[32];
-	sprintf_s(chStringName, "%s", PLAYER::GET_PLAYER_NAME(Player));
+	//char chStringName[32];
+	//sprintf_s(chStringName, "%s", PLAYER::GET_PLAYER_NAME(Player));
 	//sprintf_s(chStringName, "%s", chStringName);
 
 	std::string stringName = (std::string)chStringName;

@@ -1221,7 +1221,7 @@ void SetOffAlarmofPlayerVehicle(Ped selectedPed)
 	}
 }
 
-int LSCCarParkClone(Ped selectedPed)
+bool LSCCarParkClone(Ped selectedPed)
 {
 	Vector3 carpark[10];
 	float carparkheading = 298.0f;
@@ -1304,17 +1304,10 @@ int LSCCarParkClone(Ped selectedPed)
 				STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(vehicleModelHash);
 				BoostBaseVehicleStats(clonedVeh);
 			}
-			return 0;
-		}
-		else
-		{
-			return 1;
+			return true;
 		}
 	}
-	else
-	{
-		return 2;
-	}
+	return false;
 }
 
 void BurstSelectedPlayerTires(Ped selectedPed)

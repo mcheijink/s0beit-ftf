@@ -166,7 +166,8 @@ eThreadState new_Run(GtaThread* This) {
 	//var init
 	static bool bGodmodeActive, bGodmodeSwitchset, bF7Pressed, bMoneyDropActive, bSubtractPressed, bHackActive, 
 				bF5Pressed, bMenuActive, bF6Pressed, bKillTargetsActive, bNumpad9Pressed, bPoliceIgnorePlayer, 
-				bF10Pressed, bHackHidden, bFlowerPowerActive, bMoneyFountainActive, bSpectateMode, bKillSpeakers = false;
+				bF10Pressed, bHackHidden, bFlowerPowerActive, bMoneyFountainActive, bSpectateMode, bKillSpeakers,
+				bPoliceIgnoreSwitchSet = false;
 	static bool featureRestrictedZones = true;
 	static int iFreeze = -1;
 	static int modulesActive = 0;
@@ -184,16 +185,9 @@ eThreadState new_Run(GtaThread* This) {
 			if (bHackActive) 
 			{	//housekeeping of vars
 				drawNotification("Deactivating hack");
-				bMoneyDropActive = false;
-				bGodmodeActive = false;
-				bGodmodeSwitchset = false;
-				bMenuActive = false;
-				bKillTargetsActive = false;
-				bPoliceIgnorePlayer = false;
-				bFlowerPowerActive = false;
-				bSpectateMode = false;
-				bKillSpeakers = false;
-
+				bMoneyDropActive, bGodmodeActive, bGodmodeSwitchset, bMenuActive, 
+					bKillTargetsActive, bPoliceIgnorePlayer, bPoliceIgnoreSwitchSet, 
+					bFlowerPowerActive, bSpectateMode, bKillSpeakers = false;
 			}
 			else if (!bHackActive) {
 				drawNotification("Activating hack");
@@ -288,7 +282,7 @@ eThreadState new_Run(GtaThread* This) {
 						draw_menu_line("Numpad3	- Remove all weapons", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
 						draw_menu_line("Numpad4	- Pay and sprayclone", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
 						draw_menu_line("Numpad5	- (alpha) flowerpower", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bFlowerPowerActive, false, bFlowerPowerActive, false);
-						draw_menu_line("Numpad6	- attach garbage bin", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
+						draw_menu_line("Numpad6	- attach basketball", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
 						draw_menu_line("Numpad7	- (alpha) destroy tires", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
 						draw_menu_line("Numpad8	- remove player from vehicle", menuWidth, 4.0f, menuTop + 13.0f * 17, menuLeft, 5.0f, false, false, false, false);
 						draw_menu_line("Numpad9	- remove garbage bin", menuWidth, 4.0f, menuTop + 13.0f * 18, menuLeft, 5.0f, false, false, false, false);
@@ -315,10 +309,10 @@ eThreadState new_Run(GtaThread* This) {
 						bool bSelectedPed = (playerIterator == iSelectedPlayer);
 						if (bSelectedPed)
 							selectedPed = PLAYER::GET_PLAYER_PED(playerIterator);
-						selectedPlayer = playerIterator;
 						Ped pedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
 						if (ENTITY::DOES_ENTITY_EXIST(pedIterator))
 						{
+							selectedPlayer = playerIterator;
 							if (!bHackHidden)
 							{
 								char chStringToDraw[50];
@@ -387,20 +381,10 @@ eThreadState new_Run(GtaThread* This) {
 					static bool bNumpad4Pressed = false;
 					if (isKeyPressedOnce(bNumpad4Pressed, VK_NUMPAD4))
 					{
-						switch (LSCCarParkClone(selectedPed)) {
-						case 0:
+						if (LSCCarParkClone(selectedPed))
 							drawNotification("Cloned and parked that shit");
-							break;
-						case 1:
-							drawNotification("Vehicle not a car or to big");
-							break;
-						case 2:
-							drawNotification("Playervehicle not found");
-							break;
-						default:
-							drawNotification("Failed to execute function");
-							break;
-						}
+						else
+							drawNotification("Clone and park Failed");
 					}
 
 					//get some plants in LS
@@ -411,7 +395,7 @@ eThreadState new_Run(GtaThread* This) {
 					}
 					if (bFlowerPowerActive)
 					{
-						FlowerPower(selectedPed);
+						//FlowerPower(selectedPed);
 					}
 
 					//Attach junk to player
@@ -521,7 +505,9 @@ eThreadState new_Run(GtaThread* This) {
 					bKillSpeakers = !bKillSpeakers;
 				}
 				if (bKillSpeakers) {
-					drawNotification(GetPlayerName(KillalltheSpeakingPlayers()) + " killed for speaking out loud");
+					Player speakingPlayer = KillalltheSpeakingPlayers();
+					if (speakingPlayer != -1)
+						drawNotification(GetPlayerName(speakingPlayer) + " killed for speaking out loud");
 				}
 
 				// no fly zone
@@ -570,6 +556,7 @@ eThreadState new_Run(GtaThread* This) {
 				
 
 				//Shoot all spaghettios (Fuck Deliver EMP)
+				static bool bNumpad9Pressed = false;
 				if (isKeyPressedOnce(bNumpad9Pressed, VK_NUMPAD9))
 				{
 					if (bKillTargetsActive){
@@ -598,6 +585,7 @@ eThreadState new_Run(GtaThread* This) {
 			}
 
 			//switch for godmode
+			static bool bF7Pressed = false;
 			if (isKeyPressedOnce(bF7Pressed, VK_F7))
 			{
 				bGodmodeActive = !bGodmodeActive;
@@ -629,13 +617,11 @@ eThreadState new_Run(GtaThread* This) {
 	KillAllTargets(playerPed, g_blipList, bKillTargetsActive);
 
 	//police ignore player
-	featureRestrictedZones = PoliceIgnorePlayer(player, bPoliceIgnorePlayer);
+	bPoliceIgnoreSwitchSet = PoliceIgnorePlayer(player, bPoliceIgnorePlayer, bPoliceIgnoreSwitchSet);
+	EnableRestrictedZones(!bPoliceIgnoreSwitchSet);
 
 	//Godmode
-	GodMode(player, playerPed, bGodmodeActive, bGodmodeSwitchset);
-	EnableRestrictedZones(featureRestrictedZones);
-
-
+	bGodmodeSwitchset = GodMode(player, playerPed, bGodmodeActive, bGodmodeSwitchset);
 
 	//Return control to the thread we stole it from.
 	SetActiveThread(runningThread);

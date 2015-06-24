@@ -140,34 +140,70 @@ bool AttachJunktoSelectedPlayer(Ped selectedPed)
 	prop_defilied_ragdoll_01=-332567508	0x7A2A3826
 	prop_bball_arcade_01				0xA50DDDD0
 	Garbage can							651101403
+	Basketball							1840863642
 	*/
-	Hash objectModel = 1840863642;
-	if (!STREAMING::HAS_MODEL_LOADED(objectModel))
+	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
 	{
-		STREAMING::REQUEST_MODEL(objectModel);
-	}
-	if (STREAMING::HAS_MODEL_LOADED(objectModel) == TRUE)
-	{
-		Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
-		Object junkObject = OBJECT::CREATE_OBJECT(objectModel, playerPosition.x, playerPosition.y, playerPosition.z, 1, 1, 0);
-		OBJECT::PLACE_OBJECT_ON_GROUND_PROPERLY(junkObject);
-		if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
+		Hash objectModel = 651101403;
+		if (!STREAMING::HAS_MODEL_LOADED(objectModel))
 		{
-			AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
+			STREAMING::REQUEST_MODEL(objectModel);
 		}
-		GetControllofEntity(junkObject);
-		ENTITY::ATTACH_ENTITY_TO_ENTITY(junkObject, selectedPed, PED::GET_PED_BONE_INDEX(selectedPed, SKEL_Head),
-			0.00f,	//floatx
-			0.10f,	//floaty
-			0.00f,	//floatz
-			0.0f,	//xrot
-			180.0f,	//yrot 
-			0.0f,	//zrot
-			false, false, false, false, 2, true);
-		//STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(objectModel);
-		return true;
+		if (STREAMING::HAS_MODEL_LOADED(objectModel) == TRUE)
+		{
+			Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
+			Object junkObject = OBJECT::CREATE_OBJECT(objectModel, playerPosition.x, playerPosition.y, playerPosition.z, 1, 1, 0);
+			OBJECT::PLACE_OBJECT_ON_GROUND_PROPERLY(junkObject);
+			if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
+			{
+				AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
+			}
+			GetControllofEntity(junkObject);
+			ENTITY::ATTACH_ENTITY_TO_ENTITY(junkObject, selectedPed, PED::GET_PED_BONE_INDEX(selectedPed, SKEL_Spine_Root),
+				0.00f,	//floatx
+				0.00f,	//floaty
+				0.50f,	//floatz
+				0.0f,	//xrot
+				180.0f,	//yrot 
+				0.0f,	//zrot
+				false, false, false, false, 2, true);
+			//STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(objectModel);
+			return true;
+		}
+		else 
+			return false;
 	}
-	else { return false; }
+	else 
+	{
+		Hash objectModel = 1840863642;
+		if (!STREAMING::HAS_MODEL_LOADED(objectModel))
+		{
+			STREAMING::REQUEST_MODEL(objectModel);
+		}
+		if (STREAMING::HAS_MODEL_LOADED(objectModel) == TRUE)
+		{
+			Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
+			Object junkObject = OBJECT::CREATE_OBJECT(objectModel, playerPosition.x, playerPosition.y, playerPosition.z, 1, 1, 0);
+			OBJECT::PLACE_OBJECT_ON_GROUND_PROPERLY(junkObject);
+			if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
+			{
+				AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
+			}
+			GetControllofEntity(junkObject);
+			ENTITY::ATTACH_ENTITY_TO_ENTITY(junkObject, selectedPed, PED::GET_PED_BONE_INDEX(selectedPed, SKEL_Head),
+				0.05f,	//floatx
+				0.01f,	//floaty
+				0.00f,	//floatz
+				0.0f,	//xrot
+				180.0f,	//yrot 
+				0.0f,	//zrot
+				false, false, false, false, 2, true);
+			//STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(objectModel);
+			return true;
+		}
+		else 
+			return false;
+	}
 }
 
 void AttackPlayerWithRandomPeds(Ped selectedPed)
@@ -243,40 +279,47 @@ void ExplodeSelectedPlayer(Ped selectedPed, Ped playerPed)
 	}
 }
 
-bool PoliceIgnorePlayer(Player player, BOOL bPoliceIgnorePlayer)
+bool PoliceIgnorePlayer(Player player, bool bPoliceIgnorePlayer, bool bPoliceIgnoreSwitchSet)
 {
-	bool featureRestrictedZones;
-	if (bPoliceIgnorePlayer){
-		//regain wantedlevel
-		PLAYER::SET_MAX_WANTED_LEVEL(5);
+	if (bPoliceIgnorePlayer)
+	{
+		if (!bPoliceIgnoreSwitchSet)
+		{
+			//police wont catch me
+			int frozenWantedLevel = 0;
+			PLAYER::CLEAR_PLAYER_WANTED_LEVEL(player);
+			PLAYER::SET_MAX_WANTED_LEVEL(frozenWantedLevel);
 
-		//stop ignoring me
-		PLAYER::SET_POLICE_IGNORE_PLAYER(player, false);
-		PLAYER::SET_EVERYONE_IGNORE_PLAYER(player, false);
-		PLAYER::SET_PLAYER_CAN_BE_HASSLED_BY_GANGS(player, true);
-		PLAYER::SET_IGNORE_LOW_PRIORITY_SHOCKING_EVENTS(player, false);
-		//enable army base:
-		featureRestrictedZones = true;
+			//people will ignore me
+			PLAYER::SET_POLICE_IGNORE_PLAYER(player, true);
+			PLAYER::SET_EVERYONE_IGNORE_PLAYER(player, true);
+			PLAYER::SET_PLAYER_CAN_BE_HASSLED_BY_GANGS(player, false);
+			PLAYER::SET_IGNORE_LOW_PRIORITY_SHOCKING_EVENTS(player, true);
 
-		drawNotification("Police started looking again");
+			//disable army base:
+			drawNotification("Police disabled");
+			bPoliceIgnoreSwitchSet = true;
+		}
 	}
-	else if (!bPoliceIgnorePlayer) {
-		//police wont catch me
-		int frozenWantedLevel = 0;
-		PLAYER::CLEAR_PLAYER_WANTED_LEVEL(player);
-		PLAYER::SET_MAX_WANTED_LEVEL(frozenWantedLevel);
+	else if (!bPoliceIgnorePlayer)
+	{
+		if (bPoliceIgnoreSwitchSet){
+			//regain wantedlevel
+			PLAYER::SET_MAX_WANTED_LEVEL(5);
 
-		//people will ignore me
-		PLAYER::SET_POLICE_IGNORE_PLAYER(player, true);
-		PLAYER::SET_EVERYONE_IGNORE_PLAYER(player, true);
-		PLAYER::SET_PLAYER_CAN_BE_HASSLED_BY_GANGS(player, false);
-		PLAYER::SET_IGNORE_LOW_PRIORITY_SHOCKING_EVENTS(player, true);
-
-		//disable army base:
-		featureRestrictedZones = false;
-		drawNotification("Police disabled");
+			//stop ignoring me
+			PLAYER::SET_POLICE_IGNORE_PLAYER(player, false);
+			PLAYER::SET_EVERYONE_IGNORE_PLAYER(player, false);
+			PLAYER::SET_PLAYER_CAN_BE_HASSLED_BY_GANGS(player, true);
+			PLAYER::SET_IGNORE_LOW_PRIORITY_SHOCKING_EVENTS(player, false);
+			//enable army base:
+			bPoliceIgnoreSwitchSet = false;
+			drawNotification("Police started looking again");
+		}
 	}
-	return featureRestrictedZones;
+	else
+		bPoliceIgnoreSwitchSet = false;
+	return bPoliceIgnoreSwitchSet;
 }
 
 //kill al the speakers
@@ -290,15 +333,10 @@ Player KillalltheSpeakingPlayers()
 			if (NETWORK::NETWORK_IS_PLAYER_TALKING(playerIterator))
 			{
 				Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(pedIterator, FALSE);
-				if (pedIterator)
-				{
-					AI::CLEAR_PED_TASKS_IMMEDIATELY(pedIterator);
-					FIRE::ADD_OWNED_EXPLOSION(pedIterator, playerPosition.x, playerPosition.y, playerPosition.z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f);
-				}
-				else
-				{
-					FIRE::ADD_EXPLOSION(playerPosition.x, playerPosition.y, playerPosition.z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f);
-				}
+				AI::CLEAR_PED_TASKS_IMMEDIATELY(pedIterator);
+				FIRE::ADD_OWNED_EXPLOSION(pedIterator, playerPosition.x, playerPosition.y, playerPosition.z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f);
+			
+				FIRE::ADD_EXPLOSION(playerPosition.x, playerPosition.y, playerPosition.z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f);
 				return playerIterator;
 			}
 		}
@@ -413,6 +451,7 @@ void FixPlayer(Ped playerPed)
 	//We can only change stats that are not ServerAuthoritative="true" in mpstatssetup.xml.
 	//STATS::STAT_SET_FLOAT(GAMEPLAY::GET_HASH_KEY("MP0_PLAYER_MENTAL_STATE"), 0.0f, TRUE);
 }
+
 void MoneyFountain(bool bMoneyFountainActive)
 {
 	if (bMoneyFountainActive)
@@ -478,7 +517,7 @@ void KillAllTargets(Ped playerPed, BlipList* g_blipList, bool bKillTargetsActive
 	}	
 }
 
-void GodMode(Player player, Ped playerPed, bool bGodmodeActive, bool bGodmodeSwitchset)
+bool GodMode(Player player, Ped playerPed, bool bGodmodeActive, bool bGodmodeSwitchset)
 {
 	if (bGodmodeActive)
 	{
@@ -523,6 +562,7 @@ void GodMode(Player player, Ped playerPed, bool bGodmodeActive, bool bGodmodeSwi
 			PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, TRUE);
 		}
 	}
+	return bGodmodeSwitchset;
 }
 
 void IncreaseWantedLevel(Player player)

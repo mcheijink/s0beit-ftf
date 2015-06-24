@@ -7,7 +7,7 @@ Vehicle ClonePedVehicle(Ped ped);
 void DumpPlayerFromVehicle(Ped PlayerID, bool Notification);
 void DumpVehicleStats(Vehicle vehicle);
 void SetOffAlarmofPlayerVehicle(Ped selectedPed);
-int LSCCarParkClone(Ped selectedPed);
+bool LSCCarParkClone(Ped selectedPed);
 void BurstSelectedPlayerTires(Ped selectedPed);
 bool SpawnPlayerAircraft(Ped playerPed, Vehicle playerVeh, bool bWaitingForModelAircraft);
 bool SpawnPlayerCar(Ped playerPed, Vehicle playerVeh, bool bWaitingForModelCar);
