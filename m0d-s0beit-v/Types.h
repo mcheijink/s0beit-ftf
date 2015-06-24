@@ -91,6 +91,13 @@ typedef struct
 } color_t;
 #pragma pack(pop)
 
+typedef struct
+{
+	float x;
+	float y;
+	float z;
+} vector3_t;
+
 enum WeaponTints
 {
 	WEAPONTINT_NORMAL,

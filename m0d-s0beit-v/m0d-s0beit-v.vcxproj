@@ -30,7 +30,7 @@
     <ProjectGuid>{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>m0ds0beitv</RootNamespace>
-    <ProjectName>m0d-s0beitftf-build 1022</ProjectName>
+    <ProjectName>m0d-s0beitftf-build 1100</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -181,7 +181,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>Full</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;M0DS0BEITV_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -199,7 +199,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="GTA5_NativeUpdater.h" />
+    <ClInclude Include="Functions\PlayerFunctions.h" />
+    <ClInclude Include="Functions\UIFunctions.h" />
+    <ClInclude Include="Functions\VehicleFunctions.h" />
+    <ClInclude Include="Functions\WeaponFunctions.h" />
     <ClInclude Include="Hashes.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="natives.h" />
@@ -232,7 +235,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="GTA5_NativeUpdater.cpp" />
+    <ClCompile Include="Functions\PlayerFunctions.cpp" />
+    <ClCompile Include="Functions\UIFunctions.cpp" />
+    <ClCompile Include="Functions\VehicleFunctions.cpp" />
+    <ClCompile Include="Functions\WeaponFunctions.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="script.cpp" />
     <ClCompile Include="scrThread.cpp" />
@@ -247,11 +253,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="citizenmp-LICENSE" />
-    <None Include="LDE64-x64\LDE64x64.asm" />
     <None Include="LICENSE" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="LDE64-x64\LDE64x64.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

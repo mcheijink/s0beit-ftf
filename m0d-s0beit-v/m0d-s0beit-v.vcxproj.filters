@@ -24,8 +24,11 @@
     <Filter Include="LICENSE">
       <UniqueIdentifier>{45b5a263-0893-45e1-9f75-f20a54099ca9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LDE64-x64">
-      <UniqueIdentifier>{403e8bff-6495-4e1c-a65a-090e6598a02c}</UniqueIdentifier>
+    <Filter Include="Source Files\Functions">
+      <UniqueIdentifier>{421507cd-0f52-448c-b8a9-5814b6876def}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Functions">
+      <UniqueIdentifier>{a87d131b-8a96-4d06-9487-35fbe8cc54df}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -50,9 +53,6 @@
     <ClInclude Include="Pattern.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="GTA5_NativeUpdater.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="natives.h">
       <Filter>Header Files\Script</Filter>
     </ClInclude>
@@ -61,6 +61,18 @@
     </ClInclude>
     <ClInclude Include="vehicleValues.h">
       <Filter>Header Files\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Functions\PlayerFunctions.h">
+      <Filter>Header Files\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="Functions\WeaponFunctions.h">
+      <Filter>Header Files\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="Functions\UIFunctions.h">
+      <Filter>Header Files\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="Functions\VehicleFunctions.h">
+      <Filter>Header Files\Functions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -79,8 +91,17 @@
     <ClCompile Include="scrThread.cpp">
       <Filter>Source Files\Script</Filter>
     </ClCompile>
-    <ClCompile Include="GTA5_NativeUpdater.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Functions\PlayerFunctions.cpp">
+      <Filter>Source Files\Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="Functions\VehicleFunctions.cpp">
+      <Filter>Source Files\Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="Functions\WeaponFunctions.cpp">
+      <Filter>Source Files\Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="Functions\UIFunctions.cpp">
+      <Filter>Source Files\Functions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -90,13 +111,5 @@
     <None Include="LICENSE">
       <Filter>LICENSE</Filter>
     </None>
-    <None Include="LDE64-x64\LDE64x64.asm">
-      <Filter>LDE64-x64</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="LDE64-x64\LDE64x64.lib">
-      <Filter>LDE64-x64</Filter>
-    </Library>
   </ItemGroup>
 </Project>

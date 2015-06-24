@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "m0d-s0beit-v-mchedit", "m0d-s0beit-v\m0d-s0beit-v.vcxproj", "{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "m0d-s0beitftf-build 1100", "m0d-s0beit-v\m0d-s0beit-v.vcxproj", "{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
