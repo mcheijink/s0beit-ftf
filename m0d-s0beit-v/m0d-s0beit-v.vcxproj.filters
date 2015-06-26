@@ -74,6 +74,9 @@
     <ClInclude Include="Functions\VehicleFunctions.h">
       <Filter>Header Files\Functions</Filter>
     </ClInclude>
+    <ClInclude Include="Functions\WorldFunctions.h">
+      <Filter>Header Files\Functions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -101,6 +104,9 @@
       <Filter>Source Files\Functions</Filter>
     </ClCompile>
     <ClCompile Include="Functions\UIFunctions.cpp">
+      <Filter>Source Files\Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="Functions\WorldFunctions.cpp">
       <Filter>Source Files\Functions</Filter>
     </ClCompile>
   </ItemGroup>

@@ -30,7 +30,7 @@
     <ProjectGuid>{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>m0ds0beitv</RootNamespace>
-    <ProjectName>m0d-s0beitftf-build 1100</ProjectName>
+    <ProjectName>m0d-s0beitftf-build 1101</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -203,6 +203,7 @@
     <ClInclude Include="Functions\UIFunctions.h" />
     <ClInclude Include="Functions\VehicleFunctions.h" />
     <ClInclude Include="Functions\WeaponFunctions.h" />
+    <ClInclude Include="Functions\WorldFunctions.h" />
     <ClInclude Include="Hashes.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="natives.h" />
@@ -239,6 +240,7 @@
     <ClCompile Include="Functions\UIFunctions.cpp" />
     <ClCompile Include="Functions\VehicleFunctions.cpp" />
     <ClCompile Include="Functions\WeaponFunctions.cpp" />
+    <ClCompile Include="Functions\WorldFunctions.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="script.cpp" />
     <ClCompile Include="scrThread.cpp" />

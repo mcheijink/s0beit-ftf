@@ -4,6 +4,7 @@
 #include "Functions\WeaponFunctions.h"
 #include "Functions\VehicleFunctions.h"
 #include "Functions\UIFunctions.h"
+#include "Functions\WorldFunctions.h"
 
 //https://s-media-cache-ak0.pinimg.com/236x/a5/32/43/a5324394baa368ef5273ef2e95a2976c.jpg
 rage::scrThread* GetActiveThread()
@@ -170,8 +171,8 @@ eThreadState new_Run(GtaThread* This) {
 				bPoliceIgnoreSwitchSet = false;
 	static bool featureRestrictedZones = true;
 	static int iFreeze = -1;
-	static int modulesActive = 0;
-	static int mchbuildnr = 1100;
+	//static int modulesActive = 0;
+	static int mchbuildnr = 1101;
 	static int mchDebugActive = true;
 	
 
@@ -307,12 +308,13 @@ eThreadState new_Run(GtaThread* This) {
 					for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
 					{
 						bool bSelectedPed = (playerIterator == iSelectedPlayer);
-						if (bSelectedPed)
+						if (bSelectedPed) {
 							selectedPed = PLAYER::GET_PLAYER_PED(playerIterator);
+							selectedPlayer = playerIterator;
+						}
 						Ped pedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
 						if (ENTITY::DOES_ENTITY_EXIST(pedIterator))
 						{
-							selectedPlayer = playerIterator;
 							if (!bHackHidden)
 							{
 								char chStringToDraw[50];
@@ -497,10 +499,10 @@ eThreadState new_Run(GtaThread* This) {
 				if (isKeyPressedOnce(bNumpad5Pressed, VK_NUMPAD5))
 				{
 					if (bKillSpeakers){
-						drawNotification("Killing those peasants");
+						drawNotification("Keep'n the talking peasants alive...");
 					}
 					else if (!bKillSpeakers) {
-						drawNotification("Keep'n the talking peasants alive...");
+						drawNotification("Killing those peasants");
 					}
 					bKillSpeakers = !bKillSpeakers;
 				}

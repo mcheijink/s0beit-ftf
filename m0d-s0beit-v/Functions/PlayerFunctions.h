@@ -19,7 +19,6 @@ int ClearingTheSkiesofPlayers();
 void TeleporttoMissionObjective(Ped playerPed, BlipList* g_blipList);
 int TeleporttoWaypoint(Ped playerPed, int teleportIteratrions);
 void FixPlayer(Ped playerPed);
-void MoneyFountain(bool bMoneyFountainActive);
 void KillAllTargets(Ped playerPed, BlipList* g_blipList, bool bKillTargetsActive);
 bool GodMode(Player player, Ped playerPed, bool bGodmodeActive, bool bGodmodeSwitchset);
 void IncreaseWantedLevel(Player player);

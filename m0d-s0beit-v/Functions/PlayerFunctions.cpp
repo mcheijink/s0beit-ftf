@@ -162,9 +162,9 @@ bool AttachJunktoSelectedPlayer(Ped selectedPed)
 			ENTITY::ATTACH_ENTITY_TO_ENTITY(junkObject, selectedPed, PED::GET_PED_BONE_INDEX(selectedPed, SKEL_Spine_Root),
 				0.00f,	//floatx
 				0.00f,	//floaty
-				0.50f,	//floatz
+				-0.5f,	//floatz
 				0.0f,	//xrot
-				180.0f,	//yrot 
+				-90.0f,	//yrot 
 				0.0f,	//zrot
 				false, false, false, false, 2, true);
 			//STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(objectModel);
@@ -452,36 +452,6 @@ void FixPlayer(Ped playerPed)
 	//STATS::STAT_SET_FLOAT(GAMEPLAY::GET_HASH_KEY("MP0_PLAYER_MENTAL_STATE"), 0.0f, TRUE);
 }
 
-void MoneyFountain(bool bMoneyFountainActive)
-{
-	if (bMoneyFountainActive)
-	{
-		try
-		{
-			static int iMoney = 0;
-			iMoney++;
-			if (!STREAMING::HAS_MODEL_LOADED(0x113FD533))
-				STREAMING::REQUEST_MODEL(0x113FD533); //Manchester United: Nil Loadsamoney United: LOADS
-			if (iMoney >= 2)
-			{
-				if (STREAMING::HAS_MODEL_LOADED(0x113FD533)) //Good evening and welcome to: Loads of Money.
-				{
-					Vector3 fountainPos; //Dereck B? On your bike!
-					fountainPos.x = -519.349243f;
-					fountainPos.y = -249.006134f;
-					fountainPos.z = 36.277279f;
-					static Hash PICKUP_MONEY_CASE = GAMEPLAY::GET_HASH_KEY("PICKUP_MONEY_CASE"); //Right. Let's do up the house.
-					int MONEY_DROP_AMOUNT = rand() % 25000 + 10000; // lets make it more random so r* wont recognize a pattern mch
-					OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, fountainPos.x + (((rand() % 3000) - 1500) / 1000), fountainPos.y + (((rand() % 3000) - 1500) / 1000), fountainPos.z + (((rand() % 2000) - 1000) / 1000), 0, MONEY_DROP_AMOUNT, 0x113FD533, FALSE, TRUE); //WHOP YOUR WAD ON THE COUNTA
-					STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(0x113FD533); //SHUT YOUR MOUTH!
-				}
-				iMoney = 0;
-			}
-		}
-		catch (...){ Log::Error("Got too much money."); }
-	}
-}
-
 void KillAllTargets(Ped playerPed, BlipList* g_blipList, bool bKillTargetsActive)
 {
 	if (bKillTargetsActive)
@@ -598,6 +568,7 @@ void ReplenishAmmo(Ped playerPed)
 		}
 	}
 }
+
 void EnableRestrictedZones(bool featureRestrictedZones)
 {
 	if (!featureRestrictedZones)
