@@ -2,6 +2,7 @@
 #include <time.h>
 
 char g_logFile[MAX_PATH];
+char g_debugLogFile[MAX_PATH];
 
 void Log::Init(HMODULE hModule) {
 	memset(g_logFile, 0, sizeof(g_logFile));
@@ -17,6 +18,8 @@ void Log::Init(HMODULE hModule) {
 
 		if (slash != -1) {
 			g_logFile[slash + 1] = '\0';
+			strcpy_s(g_debugLogFile, g_logFile);
+			strcat_s(g_debugLogFile, "debug.log");
 			strcat_s(g_logFile, "hook.log");
 		}
 		else {
@@ -32,9 +35,8 @@ void Log::Init(HMODULE hModule) {
 	}
 }
 
-//#define __DEBUG
-void Log::Debug(const char* fmt, ...) {
-#ifdef __DEBUG
+void Log::Debug(const char* fmt, ...) 
+{
 	va_list va_alist;
 	char szLogbuf[4096];
 	char szParameters[4066];
@@ -50,13 +52,11 @@ void Log::Debug(const char* fmt, ...) {
 	_vsnprintf_s(szParameters, sizeof(szParameters), fmt, va_alist);
 	va_end(va_alist);
 	sprintf_s(szLogbuf, szTimestamp, szParameters);
-	if ((fopen_s(&file, g_logFile, "a")) == 0)
+	if ((fopen_s(&file, g_debugLogFile, "a")) == 0)
 	{
 		fprintf_s(file, "%s", szLogbuf);
 		fclose(file);
 	}
-}
-#endif
 }
 
 void Log::Msg(const char* fmt, ...) {
@@ -98,7 +98,7 @@ void Log::Error(const char* fmt, ...) {
 	_vsnprintf_s(szParameters, sizeof(szParameters), fmt, va_alist);
 	va_end(va_alist);
 	sprintf_s(szLogbuf, szTimestamp, szParameters);
-	if ((fopen_s(&file, g_logFile, "a")) == 0)
+	if ((fopen_s(&file, g_debugLogFile, "a")) == 0)
 	{
 		fprintf_s(file, "%s", szLogbuf);
 		fclose(file);
@@ -123,7 +123,7 @@ void Log::Fatal(const char* fmt, ...) {
 	_vsnprintf_s(szParameters, sizeof(szParameters), fmt, va_alist);
 	va_end(va_alist);
 	sprintf_s(szLogbuf, szTimestamp, szParameters);
-	if ((fopen_s(&file, g_logFile, "a")) == 0)
+	if ((fopen_s(&file, g_debugLogFile, "a")) == 0)
 	{
 		fprintf_s(file, "%s", szLogbuf);
 		fclose(file);

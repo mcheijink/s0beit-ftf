@@ -98,3 +98,25 @@ void FlowerPower(Ped selectedPed)
 		}
 	}
 }
+
+void FastReload(Ped playerPed)
+{
+	Hash currentWeapon;
+	WEAPON::GET_CURRENT_PED_WEAPON(playerPed, &currentWeapon, 1);
+
+	Vehicle playerVeh;
+	if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, FALSE))
+		playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
+
+	if (WEAPON::IS_WEAPON_VALID(currentWeapon) && WEAPON::GET_WEAPONTYPE_GROUP(currentWeapon) == WEAPON_TYPE_GROUP_PISTOL && playerVeh == NULL) //Only pistols need this. #ONLY90SKIDSREMBERTHINGSFROMTHE90S
+	{
+		int clipazine, maxAmmo;
+		WEAPON::GET_AMMO_IN_CLIP(playerPed, currentWeapon, &clipazine); //m8 do you even 30 caliber assault magazine clips?
+		maxAmmo = WEAPON::GET_MAX_AMMO_IN_CLIP(playerPed, currentWeapon, TRUE);
+		if (clipazine != maxAmmo)
+		{
+			keybd_event(0x52, 0, KEYEVENTF_KEYUP, 0); //We need to jitter the game's listener for the R key for one frame.
+			WEAPON::SET_AMMO_IN_CLIP(playerPed, currentWeapon, 0);
+		}
+	}
+}

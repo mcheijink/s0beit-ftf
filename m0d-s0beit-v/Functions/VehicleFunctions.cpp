@@ -30,1003 +30,17 @@ void BoostBaseVehicleStats(Vehicle vehicle)
 	VEHICLE::SET_VEHICLE_BODY_HEALTH(vehicle, 1000.0f); //This is what the game does
 }
 
-bool GetVehicleInfoForClanLogo(Hash vehicleModel, vector3_t& x, vector3_t& y, vector3_t& z, float& scale)
+void AddClanLogoToVehicle(Vehicle vehicle, Ped ped)
 {
-	switch (vehicleModel)
+	vector3_t x, y, z;
+	float scale;
+	Hash modelHash = ENTITY::GET_ENTITY_MODEL(vehicle);
+	if (GetVehicleInfoForClanLogo(modelHash, x, y, z, scale))
 	{
-	case VEHICLE_DOMINATOR:
-		x = { 0.0f, 1.4f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_FELTZER2:
-		x = { 0.0f, 1.4f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_ADDER:
-		x = { 0.0f, 1.54f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_AKUMA:
-		x = { 0.0f, 0.06f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.18f;
-		return true;
-	case VEHICLE_ASEA:
-		x = { 0.0f, 1.5f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_ASTEROPE:
-		x = { 0.0f, 1.7f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_BAGGER:
-		x = { 0.0f, 0.053f, 1.23f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.15f;
-		return true;
-	case VEHICLE_BALLER:
-		x = { 0.0f, 1.4f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_BALLER2:
-		x = { 0.0f, 1.55f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_BANSHEE:
-		x = { 0.0f, 0.94f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.4f;
-		return true;
-	case VEHICLE_BATI:
-		x = { 0.0f, 0.2f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.15f;
-		return true;
-	case VEHICLE_BATI2:
-		x = { 0.0f, 0.2f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.15f;
-		return true;
-	case VEHICLE_BFINJECTION:
-		x = { -1.0f, 0.08f, 0.19f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_BISON:
-		x = { 0.0f, 1.99f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_BJXL:
-		x = { 0.0f, 1.2f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.4f;
-		return true;
-	case VEHICLE_BLISTA:
-		x = { 0.0f, 1.49f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.29f;
-		return true;
-	case VEHICLE_BOBCATXL:
-		x = { 0.0f, 1.68f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.65f;
-		return true;
-	case VEHICLE_BODHI2:
-		x = { 0.0f, 1.95f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_BUCCANEER:
-		x = { 0.0f, 2.01f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.37f;
-		return true;
-	case VEHICLE_BUFFALO:
-		x = { 0.0f, 1.6f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_BUFFALO2:
-		x = { 0.0f, 2.24f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.2f;
-		return true;
-	case VEHICLE_BULLET:
-		x = { -1.57f, 0.07f, 0.16f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.3f;
-		return true;
-	case VEHICLE_CARBONRS:
-		x = { 0.0f, 0.09f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.18f;
-		return true;
-	case VEHICLE_CARBONIZZARE:
-		x = { 0.0f, 1.45f, 1.0f };
-		y = { 0.0f, 0.11f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_CAVALCADE:
-		x = { 0.0f, 1.51f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.55f;
-		return true;
-	case VEHICLE_CAVALCADE2:
-		x = { 0.0f, 1.59f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_CHEETAH:
-		x = { -1.61f, 0.26f, 0.17f };
-		y = { 0.9f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.35f;
-		return true;
-	case VEHICLE_COGCABRIO:
-		x = { 0.0f, 1.42f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_COMET2:
-		x = { 0.0f, 1.35f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_COQUETTE:
-		x = { 0.0f, 0.96f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.22f;
-		return true;
-	case VEHICLE_DAEMON:
-		x = { 0.0f, 0.06f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.15f;
-		return true;
-	case VEHICLE_DILETTANTE:
-		x = { 0.0f, 1.59f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_DLOADER:
-		x = { 0.0f, 1.52f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_DOUBLE:
-		x = { 0.0f, 0.08f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.2f;
-		return true;
-	case VEHICLE_DUBSTA:
-		x = { -1.71f, 0.31f, 0.27f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_DUBSTA2:
-		x = { 0.0f, 1.4f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.75f;
-		return true;
-	case VEHICLE_ELEGY2:
-		x = { 0.0f, 1.14f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.35f;
-		return true;
-	case VEHICLE_EMPEROR:
-		x = { 0.0f, 1.31f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_EMPEROR2:
-		x = { 0.0f, 1.31f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_ENTITYXF:
-		x = { 1.52f, 0.41f, 0.15f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.3f;
-		return true;
-	case VEHICLE_EXEMPLAR:
-		x = { 0.0f, 1.32f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_F620:
-		x = { 0.0f, 1.28f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.45f;
-		return true;
-	case VEHICLE_FAGGIO2:
-		x = { -1.0f, 0.48f, 0.11f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.15f;
-		return true;
-	case VEHICLE_FELON:
-		x = { 0.0f, 1.24f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.35f;
-		return true;
-	case VEHICLE_FELON2:
-		x = { 0.0f, 1.24f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.35f;
-		return true;
-	case VEHICLE_FQ2:
-		x = { 0.0f, 1.4f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_FUGITIVE:
-		x = { 0.0f, 1.62f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_FUSILADE:
-		x = { 0.0f, 0.98f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.2f;
-		return true;
-	case VEHICLE_FUTO:
-		x = { 0.0f, 1.28f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.45f;
-		return true;
-	case VEHICLE_GAUNTLET:
-		x = { 0.0f, 1.735f, 1.05f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.33f;
-		return true;
-	case VEHICLE_GRANGER:
-		x = { 0.0f, 2.07f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_GRESLEY:
-		x = { 0.0f, 1.75f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_HABANERO:
-		x = { 0.0f, 1.69f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_HEXER:
-		x = { 0.0f, -0.46f, 1.0f };
-		y = { 0.0f, 1.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.14f;
-		return true;
-	case VEHICLE_HOTKNIFE:
-		x = { 1.43f, -0.14f, 0.18f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_INFERNUS:
-		x = { -1.0f, 0.33f, 0.08f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.06f };
-		scale = 0.25f;
-		return true;
-	case VEHICLE_INGOT:
-		x = { 0.0f, 1.58f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_INTRUDER:
-		x = { 0.0f, 1.623f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_ISSI2:
-		x = { 0.0f, 1.21f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.3f;
-		return true;
-	case VEHICLE_JACKAL:
-		x = { 0.0f, 1.36f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.4f;
-		return true;
-	case VEHICLE_JB700:
-		x = { 0.0f, 1.2f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.37f;
-		return true;
-	case VEHICLE_KHAMELION:
-		x = { 0.0f, 1.46f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.475f;
-		return true;
-	case VEHICLE_LANDSTALKER:
-		x = { 0.0f, 1.83f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_MANANA:
-		x = { 0.0f, 0.86f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.37f;
-		return true;
-	case VEHICLE_MESA:
-		x = { 0.0f, 1.47f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_MESA3:
-		x = { 0.0f, 1.47f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_MINIVAN:
-		x = { 0.0f, 1.95f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_MONROE:
-		x = { 0.0f, 1.23f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.43f;
-		return true;
-	case VEHICLE_NEMESIS:
-		x = { 0.0f, 0.14f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.1f;
-		return true;
-	case VEHICLE_NINEF:
-		x = { 0.0f, 1.7f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_NINEF2:
-		x = { 0.0f, 1.7f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_ORACLE:
-		x = { 0.0f, 1.6f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_ORACLE2:
-		x = { 0.0f, 1.7f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_PATRIOT:
-		x = { 0.0f, 1.75f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_PCJ:
-		x = { 0.0f, 0.02f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.15f;
-		return true;
-	case VEHICLE_PENUMBRA:
-		x = { 0.0f, 1.46f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_PEYOTE:
-		x = { -1.0f, -0.36f, 0.2125f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_PHOENIX:
-		x = { 0.0f, 1.833f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.44f;
-		return true;
-	case VEHICLE_PICADOR:
-		x = { 0.0f, 1.43f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.515f;
-		return true;
-	case VEHICLE_PRAIRIE:
-		x = { 0.0f, 1.41f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.31f;
-		return true;
-	case VEHICLE_PREMIER:
-		x = { 0.0f, 1.6f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_PRIMO:
-		x = { 0.0f, 1.62f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_RADI:
-		x = { 0.0f, 1.74f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_RANCHERXL:
-		x = { 0.0f, 1.54f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_RAPIDGT:
-		x = { 0.0f, 1.263f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_RAPIDGT2:
-		x = { 0.0f, 1.263f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_RATLOADER:
-		x = { 1.78f, 0.52f, 0.52f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.45f;
-		return true;
-	case VEHICLE_REBEL:
-		x = { -1.22f, 0.6f, 0.44f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_REBEL2:
-		x = { 0.0f, 1.623f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_REGINA:
-		x = { 0.0f, 1.473f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_ROCOTO:
-		x = { 0.0f, 1.623f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_ROMERO:
-		x = { 0.0f, 1.83f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_RUFFIAN:
-		x = { 0.0f, 0.02f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.19f;
-		return true;
-	case VEHICLE_RUINER:
-		x = { 0.0f, 1.34f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_SABREGT:
-		x = { -1.0f, 0.0f, 0.14f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.015f };
-		scale = 0.35f;
-		return true;
-	case VEHICLE_SADLER:
-		x = { 0.0f, 2.26f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_SANDKING:
-		x = { 0.0f, 2.496f, 1.55f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_SANDKING2:
-		x = { 0.0f, 2.286f, 1.55f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_SCHAFTER2:
-		x = { 0.0f, 1.56f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.28f;
-		return true;
-	case VEHICLE_SCHWARZER:
-		x = { 0.0f, 1.43f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.28f;
-		return true;
-	case VEHICLE_SEMINOLE:
-		x = { 0.0f, 1.45f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_SENTINEL:
-		x = { 0.0f, 1.52f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_SENTINEL2:
-		x = { 0.0f, 1.52f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_SERRANO:
-		x = { 0.0f, 1.68f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.49f;
-		return true;
-	case VEHICLE_STANIER:
-		x = { 0.0f, 1.55f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_STINGER:
-		x = { 0.0f, 1.3f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_STINGERGT:
-		x = { -1.0f, -0.17f, 0.12f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.35f;
-		return true;
-	case VEHICLE_STRATUM:
-		x = { 0.0f, 1.52f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_SULTAN:
-		x = { 0.0f, 1.77f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.33f;
-		return true;
-	case VEHICLE_SUPERD:
-		x = { 0.0f, 1.62f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_SURANO:
-		x = { 0.0f, 1.38f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_SURFER:
-		x = { 0.0f, 2.48f, 0.26f };
-		y = { 0.0f, -1.0f, 0.212f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.32f;
-		return true;
-	case VEHICLE_SURFER2:
-		x = { 0.0f, 2.48f, 0.26f };
-		y = { 0.0f, -1.0f, 0.212f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.32f;
-		return true;
-	case VEHICLE_SURGE:
-		x = { 0.0f, 1.69f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_TAILGATER:
-		x = { 0.0f, 1.783f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.4f;
-		return true;
-	case VEHICLE_TORNADO:
-		x = { -1.23f, 0.11f, 0.21f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.4f;
-		return true;
-	case VEHICLE_TORNADO2:
-		x = { 0.0f, 1.44f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_TORNADO3:
-		x = { 0.0f, 1.44f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_VACCA:
-		x = { 0.0f, 1.76f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.35f;
-		return true;
-	case VEHICLE_VADER:
-		x = { 0.0f, 0.08f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.15f;
-		return true;
-	case VEHICLE_VIGERO:
-		x = { -1.0f, 0.11f, -0.15f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.45f;
-		return true;
-	case VEHICLE_VOLTIC:
-		x = { 0.0f, 1.763f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.29f;
-		return true;
-	case VEHICLE_VOODOO2:
-		x = { 0.0f, 1.48f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_WASHINGTON:
-		x = { 0.0f, 1.61f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_YOUGA:
-		x = { 0.0f, 2.02f, 1.0f };
-		y = { 0.0f, -0.108f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.4f;
-		return true;
-	case VEHICLE_ZION:
-		x = { 0.0f, 1.48f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.45f;
-		return true;
-	case VEHICLE_ZION2:
-		x = { 0.0f, 1.48f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.45f;
-		return true;
-	case VEHICLE_ZTYPE:
-		x = { 0.96f, 0.69f, 0.35f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.4f;
-		return true;
-	case VEHICLE_KALAHARI:
-		x = { -1.0f, 0.18f, 0.1f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_PARADISE:
-		x = { 0.0f, 2.23f, 1.0f };
-		y = { 0.0f, 0.22f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_ALPHA:
-		x = { -1.0f, 0.18f, -0.05f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_HUNTLEY:
-		x = { 0.0f, 1.52f, 0.99f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.4f;
-		return true;
-	case VEHICLE_ZENTORNO:
-		x = { -1.24f, 0.42f, -0.14f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.035f };
-		scale = 0.3f;
-		return true;
-	case VEHICLE_JESTER:
-		x = { -1.0f, 0.17f, 0.22f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.05f };
-		scale = 0.33f;
-		return true;
-	case VEHICLE_MASSACRO:
-		x = { 0.0f, 1.37f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.33f;
-		return true;
-	case VEHICLE_TURISMOR:
-		x = { -1.0f, 0.3f, 0.27f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.35f;
-		return true;
-	case VEHICLE_THRUST:
-		x = { -1.0f, 0.405f, 0.4625f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.1625f;
-		return true;
-	case VEHICLE_BTYPE:
-		x = { 0.0f, 1.143f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.7125f;
-		return true;
-	case VEHICLE_RHAPSODY:
-		x = { -1.0f, 0.47f, -0.25f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.2625f;
-		return true;
-	case VEHICLE_GLENDALE:
-		x = { 0.0f, 1.683f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.775f;
-		return true;
-	case VEHICLE_WARRENER:
-		x = { 0.0f, 1.623f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.775f;
-		return true;
-	case VEHICLE_BLADE:
-		x = { -1.0f, 0.445f, 0.2075f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.325f;
-		return true;
-	case VEHICLE_PANTO:
-		x = { -1.0f, 0.0f, 0.335f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_DUBSTA3:
-		x = { -1.0f, 0.34f, 0.2975f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_PIGALLE:
-		x = { 0.0f, 1.623f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_COQUETTE2:
-		x = { -1.0f, 0.1775f, 0.195f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.35f;
-		return true;
-	case VEHICLE_INNOVATION:
-		x = { 0.0f, 0.15f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.18f;
-		return true;
-	case VEHICLE_HAKUCHOU:
-		x = { 0.0f, 0.27f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.16f;
-		return true;
-	case VEHICLE_FUROREGT:
-		x = { -1.0f, 0.0f, 0.2075f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.45f;
-		return true;
-	case VEHICLE_RATLOADER2:
-		x = { 1.78f, 0.52f, 0.52f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.45f;
-		return true;
-	case VEHICLE_SLAMVAN:
-		x = { -1.0f, 0.275f, 0.195f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_DUKES2:
-		x = { -1.0f, 0.0f, 0.0f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.375f;
-		return true;
-	case VEHICLE_DUKES:
-		x = { -1.0f, 0.0f, 0.0375f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.3875f;
-		return true;
-	case VEHICLE_STALION:
-		x = { -1.0f, 0.0f, 0.0925f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.4375f;
-		return true;
-	case VEHICLE_BLISTA2:
-		x = { -1.0f, 0.5325f, 0.245f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.2875f;
-		return true;
-	case VEHICLE_CASCO:
-		x = { 0.0f, 0.94f, 1.03f };
-		y = { 0.0f, 0.03f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.3f;
-		return true;
-	case VEHICLE_ENDURO:
-		x = { 0.0f, -0.17f, 1.0f };
-		y = { 0.0f, 0.34f, -0.786f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.15f;
-		return true;
-	case VEHICLE_GBURRITO2:
-		x = { 0.0f, 2.32f, 0.94f };
-		y = { 0.0f, 0.182f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.4f;
-		return true;
-	case VEHICLE_GUARDIAN:
-		x = { -1.94f, 1.07f, 0.38f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.35f;
-		return true;
-	case VEHICLE_KURUMA:
-	case VEHICLE_KURUMA2:
-		x = { -1.0f, 0.2475f, 0.175f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.435f;
-		return true;
-	case VEHICLE_LECTRO:
-		x = { 0.0f, 0.3f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.09f;
-		return true;
-	case VEHICLE_FELTZER3:
-		x = { 0.0f, 1.4f, 1.0f };
-		y = { 0.0f, 0.0f, -1.0f };
-		z = { -1.0f, 0.0f, 0.0f };
-		scale = 0.5f;
-		return true;
-	case VEHICLE_OSIRIS:
-		x = { -1.0f, 0.27f, 0.03f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.3f;
-		return true;
-	case VEHICLE_VIRGO:
-		x = { 1.05f, 0.0f, 0.075f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.45f;
-		return true;
-	case VEHICLE_WINDSOR:
-		x = { -1.2f, 0.39f, 0.12f };
-		y = { 1.0f, 0.0f, 0.0f };
-		z = { 0.0f, -1.0f, 0.0f };
-		scale = 0.55f;
-		return true;
-	default:
-		return false;
+		int alpha = 200;
+		if (modelHash == VEHICLE_WINDSOR)
+			alpha = 255;
+		GRAPHICS::_ADD_CLAN_DECAL_TO_VEHICLE(vehicle, ped, ENTITY::_GET_ENTITY_BONE_INDEX(vehicle, "chassis_dummy"), x.x, x.y, x.z, y.x, y.y, y.z, z.x, z.y, z.z, scale, 0, alpha);
 	}
 }
 
@@ -1094,15 +108,7 @@ Vehicle ClonePedVehicle(Ped ped)
 			VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVeh, VEHICLE::GET_VEHICLE_DIRT_LEVEL(pedVeh));
 			if (GRAPHICS::_HAS_VEHICLE_GOT_DECAL(pedVeh, 0) == TRUE)
 			{
-				vector3_t x, y, z;
-				float scale;
-				if (GetVehicleInfoForClanLogo(vehicleModelHash, x, y, z, scale))
-				{
-					int alpha = 200;
-					if (vehicleModelHash == VEHICLE_WINDSOR)
-						alpha = 255;
-					GRAPHICS::_ADD_CLAN_DECAL_TO_VEHICLE(playerVeh, ped, ENTITY::_GET_ENTITY_BONE_INDEX(playerVeh, "chassis_dummy"), x.x, x.y, x.z, y.x, y.y, y.z, z.x, z.y, z.z, scale, 0, alpha);
-				}
+				AddClanLogoToVehicle(playerVeh, ped);
 			}
 		}
 		STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(vehicleModelHash);
@@ -1200,10 +206,7 @@ void DumpVehicleStats(Vehicle vehicle)
 		}
 		if (GRAPHICS::_HAS_VEHICLE_GOT_DECAL(vehicle, 0) == TRUE)
 		{
-			Log::Msg("vector3_t x, y, z");
-			Log::Msg("float scale");
-			Log::Msg("GetVehicleInfoForClanLogo(VEHICLE_%s, x, y, z, scale);", VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(vehicle)));
-			Log::Msg("GRAPHICS::_ADD_CLAN_DECAL_TO_VEHICLE(playerVeh, playerPed, ENTITY::_GET_ENTITY_BONE_INDEX(playerVeh, \"chassis_dummy\"), x.x, x.y, x.z, y.x, y.y, y.z, z.x, z.y, z.z, scale, 0, %i);", (ENTITY::GET_ENTITY_MODEL(vehicle) == VEHICLE_WINDSOR) ? 255 : 200);
+			Log::Msg("AddClanLogoToVehicle(playerVeh, playerPed);");
 		}
 	}
 }
@@ -1212,12 +215,11 @@ void SetOffAlarmofPlayerVehicle(Ped selectedPed)
 {
 	if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
 	{
-		Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
-		if (GetControllofEntity(selectedVehicle)) {
-			VEHICLE::SET_VEHICLE_ALARM(selectedVehicle, true);
-			VEHICLE::START_VEHICLE_ALARM(selectedVehicle);
-			drawNotification("Set off alarm of vehicle");
-		}
+		Entity selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
+		RequestControl(PED::GET_VEHICLE_PED_IS_USING(selectedPed));
+		VEHICLE::SET_VEHICLE_ALARM(selectedVehicle, true);
+		VEHICLE::START_VEHICLE_ALARM(selectedVehicle);
+		drawNotification("Set off alarm of vehicle");
 	}
 }
 
@@ -1316,13 +318,13 @@ void BurstSelectedPlayerTires(Ped selectedPed)
 	{
 		//fuck up the tires
 		Vehicle selectedVehicle = PED::GET_VEHICLE_PED_IS_USING(selectedPed);
-		if (GetControllofEntity(selectedVehicle)) {
+		RequestControl(selectedVehicle);
 			VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(selectedVehicle, TRUE);
 			static int tireID = 0;
-			for (tireID = 0; tireID < 8; tireID++) {
+			for (tireID = 0; tireID < 8; tireID++) 
+			{
 				VEHICLE::SET_VEHICLE_TYRE_BURST(selectedVehicle, tireID, true, 1000.0);
 			}
-		}
 	}
 }
 
@@ -1357,7 +359,7 @@ bool SpawnPlayerAircraft(Ped playerPed, Vehicle playerVeh, bool bWaitingForModel
 	if (playerVeh != NULL && (VEHICLE::IS_THIS_MODEL_A_PLANE(ENTITY::GET_ENTITY_MODEL(playerVeh)) == TRUE || VEHICLE::IS_THIS_MODEL_A_HELI(ENTITY::GET_ENTITY_MODEL(playerVeh)) == TRUE ||
 		ENTITY::GET_ENTITY_MODEL(playerVeh) == VEHICLE_BLIMP || ENTITY::GET_ENTITY_MODEL(playerVeh) == VEHICLE_BLIMP2 || ENTITY::GET_ENTITY_MODEL(playerVeh) == VEHICLE_TITAN))
 	{
-		GetControllofEntity(playerVeh);
+		RequestControl(playerVeh);
 		Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerVeh, FALSE);
 		if (playerPosition.z < 350.0f)
 			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(playerVeh, playerPosition.x, playerPosition.y, playerPosition.z + 800, FALSE, FALSE, TRUE);
@@ -1387,7 +389,7 @@ bool SpawnPlayerCar(Ped playerPed, Vehicle playerVeh, bool bWaitingForModelCar)
 		{
 			Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPed, FALSE);
 			playerVeh = VEHICLE::CREATE_VEHICLE(vehicleModelHash, playerPosition.x, playerPosition.y, playerPosition.z, ENTITY::GET_ENTITY_HEADING(playerPed), TRUE, TRUE);
-			GetControllofEntity(playerVeh);
+			RequestControl(playerVeh);
 			PED::SET_PED_INTO_VEHICLE(playerPed, playerVeh, SEAT_DRIVER);
 			BoostBaseVehicleStats(playerVeh);
 			if (vehicleModelHash == VEHICLE_KURUMA2) //Test that I can make a perfect 1:1 clone of my Kuruma with only calling natives.
@@ -1401,10 +403,10 @@ bool SpawnPlayerCar(Ped playerPed, Vehicle playerVeh, bool bWaitingForModelCar)
 				VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTWHEELS, WHEEL_HIGHEND_SUPAGEE, TRUE); //TRUE because we want the Custom Tires.
 				VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_XENONLIGHTS, TRUE);
 				VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_BLACK);
-				VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_WHITE);
+				VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_BLACK);
 				VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_TIRESMOKE, TRUE);
 				VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVeh, TIRESMOKE_COLOR_BLACK);
-				VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_MATTE_WHITE);
+				VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_MATTE_BLACK);
 				/*for (int i = 0; i < NEON_BACK; i++) //This will turn on all the neon emitters except the back one. That shit's annoying when I'm trying to drive.
 				{
 				VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, i, TRUE);
@@ -1427,22 +429,17 @@ bool SpawnPlayerCar(Ped playerPed, Vehicle playerVeh, bool bWaitingForModelCar)
 				VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_XENONLIGHTS, TRUE);
 				VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_BLACK);
 				VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(playerVeh, PLATE_YELLOWONBLUE);
-				VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_WHITE);
+				VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_BLACK);
 				VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_TIRESMOKE, TRUE);
 				VEHICLE::SET_VEHICLE_TYRE_SMOKE_COLOR(playerVeh, TIRESMOKE_COLOR_BLACK);
-				VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_MATTE_WHITE);
+				VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_MATTE_BLACK);
 				/*for (int i = 0; i < NEON_BACK; i++) //This will turn on all the neon emitters except the back one. That shit's annoying when I'm trying to drive.
 				{
 				VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, i, TRUE);
 				}
 				VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(playerVeh, NEON_COLOR_ELECTRICBLUE);
 				*/
-				vector3_t x, y, z;
-				float scale;
-				if (GetVehicleInfoForClanLogo(VEHICLE_ZENTORNO, x, y, z, scale))
-				{
-					GRAPHICS::_ADD_CLAN_DECAL_TO_VEHICLE(playerVeh, playerPed, ENTITY::_GET_ENTITY_BONE_INDEX(playerVeh, "chassis_dummy"), x.x, x.y, x.z, y.x, y.y, y.z, z.x, z.y, z.z, scale, 0, 200);
-				}
+				AddClanLogoToVehicle(playerVeh, playerPed);
 				drawNotification("Spawned Zentorno");
 
 			}
@@ -1460,7 +457,7 @@ bool SpawnPlayerCar(Ped playerPed, Vehicle playerVeh, bool bWaitingForModelCar)
 			}
 			else if (vehicleModelHash == VEHICLE_RUINER)
 			{
-				VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_METALLIC_ULTRA_BLUE, COLOR_MATTE_WHITE);
+				VEHICLE::SET_VEHICLE_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_BLACK);
 				VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_BLACK);
 				VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(playerVeh, FALSE);
 				VEHICLE::SET_VEHICLE_WHEEL_TYPE(playerVeh, WHEEL_TYPE_MUSCLE);
@@ -1472,7 +469,7 @@ bool SpawnPlayerCar(Ped playerPed, Vehicle playerVeh, bool bWaitingForModelCar)
 				VEHICLE::TOGGLE_VEHICLE_MOD(playerVeh, MOD_XENONLIGHTS, TRUE);
 				VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_FRONTWHEELS, WHEEL_MUSCLE_CLASSICFIVE, TRUE);
 				VEHICLE::SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(playerVeh, PLATE_YELLOWONBLUE);
-				VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, COLOR_METALLIC_ULTRA_BLUE, COLOR_METALLIC_ULTRA_BLUE);
+				VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, COLOR_MATTE_BLACK, COLOR_MATTE_BLACK);
 				VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(playerVeh, NEON_COLOR_ELECTRICBLUE);
 				VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, 0, TRUE);
 				VEHICLE::_SET_VEHICLE_NEON_LIGHT_ENABLED(playerVeh, 1, TRUE);
@@ -1482,12 +479,7 @@ bool SpawnPlayerCar(Ped playerPed, Vehicle playerVeh, bool bWaitingForModelCar)
 				VEHICLE::SET_VEHICLE_EXTRA(playerVeh, 7, TRUE);
 				VEHICLE::SET_VEHICLE_EXTRA(playerVeh, 10, TRUE);
 				VEHICLE::SET_VEHICLE_EXTRA(playerVeh, 11, TRUE);
-				vector3_t x, y, z;
-				float scale;
-				if (GetVehicleInfoForClanLogo(VEHICLE_RUINER, x, y, z, scale))
-				{
-					GRAPHICS::_ADD_CLAN_DECAL_TO_VEHICLE(playerVeh, playerPed, ENTITY::_GET_ENTITY_BONE_INDEX(playerVeh, "chassis_dummy"), x.x, x.y, x.z, y.x, y.y, y.z, z.x, z.y, z.z, scale, 0, 200);
-				}
+				AddClanLogoToVehicle(playerVeh, playerPed);
 				drawNotification("Spawned Ruiner");
 			}
 			else
@@ -1505,7 +497,7 @@ bool SpawnPlayerCar(Ped playerPed, Vehicle playerVeh, bool bWaitingForModelCar)
 	}
 	else if (playerVeh != NULL)
 	{
-		GetControllofEntity(playerVeh);
+		RequestControl(playerVeh);
 		VEHICLE::SET_VEHICLE_FORWARD_SPEED(playerVeh, VEHICLE::_GET_VEHICLE_MAX_SPEED(ENTITY::GET_ENTITY_MODEL(playerVeh)));
 	}
 	return bWaitingForModelCar;

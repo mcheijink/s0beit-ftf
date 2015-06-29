@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef _DEBUG
+#ifdef __DEBUG
 #define DEBUGOUT( X, ... ) Log::Debug( X, __VA_ARGS__ )
 #else
 #define DEBUGOUT( X, ... )

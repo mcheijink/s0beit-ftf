@@ -6,7 +6,7 @@
 #pragma once
 
 #define WIN32_LEAN_AND_MEAN
-#define _CRT_SECURE_NO_WARNINGS
+//#define __DEBUG
 
 // Windows Header Files:
 #include <windows.h>
@@ -19,10 +19,10 @@
 #include <Psapi.h>
 #include <iostream>
 #include <fstream>
+#include <timeapi.h>
 
-#pragma comment(lib, "Psapi")
+#pragma comment(lib, "winmm.lib")
 
-//
 extern MODULEINFO g_MainModuleInfo;
 
 // Mine
@@ -34,7 +34,11 @@ extern MODULEINFO g_MainModuleInfo;
 #include "pgCollection.h"
 #include "scrThread.h"
 #include "Hashes.h"
-#include "vehicleValues.h"
+#include "VehicleValues.h"
 
 // Main
 #include "script.h"
+
+void Tick();
+void Run();
+void RunUnreliable();

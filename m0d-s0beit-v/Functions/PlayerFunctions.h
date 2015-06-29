@@ -3,7 +3,6 @@
 #include "../stdafx.h"
 
 void RemoveAllPropsFromPlayer(Ped ped);
-bool GetControllofEntity(Entity entity);
 bool IsPlayerFriend(Player player);
 void TeleporttoSelectedPlayerVehicle(Ped playerPed, Ped selectedPed);
 void TeleporttoSelectedPlayer(Ped playerPed, Ped selectedPed);
@@ -25,3 +24,4 @@ void IncreaseWantedLevel(Player player);
 void ClearWantedLevel(Player player);
 void ReplenishAmmo(Ped playerPed);
 void EnableRestrictedZones(bool featureRestrictedZones);
+void RequestControl(Entity e);

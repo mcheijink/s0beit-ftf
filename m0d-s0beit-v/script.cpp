@@ -44,6 +44,9 @@ void ReleaseKeys()
 	keybd_event(VK_SUBTRACT, 0, KEYEVENTF_KEYUP, 0);
 }
 
+char* radioNames[] = { "RADIO_01_CLASS_ROCK", "RADIO_02_POP", "RADIO_03_HIPHOP_NEW", "RADIO_04_PUNK", "RADIO_05_TALK_01", "RADIO_06_COUNTRY", "RADIO_07_DANCE_01", "RADIO_08_MEXICAN", "RADIO_09_HIPHOP_OLD", "RADIO_12_REGGAE", "RADIO_13_JAZZ", "RADIO_14_DANCE_02", "RADIO_15_MOTOWN", "RADIO_20_THELAB", "RADIO_16_SILVERLAKE", "RADIO_17_FUNK", "RADIO_18_90S_ROCK", "RADIO_19_USER", "RADIO_11_TALK_02", "HIDDEN_RADIO_AMBIENT_TV_BRIGHT", "OFF" };
+
+
 void CheckPlayer(int& iPlayer, bool direction)
 {
 	int iOriginalPlayer = iPlayer;
@@ -152,17 +155,100 @@ rage::pgPtrCollection<GtaThread>* GetGtaThreadCollection() {
 GtaThread_VTable gGtaThreadOriginal;
 GtaThread_VTable gGtaThreadNew;
 
-eThreadState new_Run(GtaThread* This) {
+HANDLE mainFiber;
+DWORD wakeAt;
+
+void WAIT(DWORD ms)
+{
+#ifndef __DEBUG
+	wakeAt = timeGetTime() + ms;
+	SwitchToFiber(mainFiber);
+#endif
+}
+
+eThreadState Trampoline(GtaThread* This)
+{
 	rage::scrThread* runningThread = GetActiveThread();
-	SetActiveThread(This); //Set the active thread to our hijacked thread.
+	SetActiveThread(This);
+#ifdef  __DEBUG 
+	Run(); //We don't want to also call RunUnlireable, since it's expecting WAIT() to work, which it doesn't in debug mode. #depechemode
+#else
+	Tick();
+#endif
+	SetActiveThread(runningThread);
+	return gGtaThreadOriginal.Run(This);
+}
+
+void __stdcall ReliableScriptFunction(LPVOID lpParameter)
+{
+	try
+	{
+		while (1)
+		{
+			Run();
+			SwitchToFiber(mainFiber);
+		}
+	}
+	catch (...)
+	{
+		Log::Fatal("Failed scriptFiber");
+	}
+}
+
+void __stdcall HeavyWaitFunction(LPVOID lpParameter)
+{
+	try
+	{
+		while (1)
+		{
+			RunUnreliable();
+			SwitchToFiber(mainFiber);
+		}
+	}
+	catch (...)
+	{
+		Log::Fatal("Failed scriptFiber");
+	}
+}
+
+void Tick()
+{
+	if (mainFiber == nullptr)
+		mainFiber = ConvertThreadToFiber(nullptr);
+
+	static HANDLE reliableFiber;
+	if (reliableFiber)
+		SwitchToFiber(reliableFiber);
+	else
+		reliableFiber = CreateFiber(NULL, ReliableScriptFunction, nullptr);
+
+	if (timeGetTime() < wakeAt)
+		return;
+
+	static HANDLE scriptFiber;
+	if (scriptFiber)
+		SwitchToFiber(scriptFiber);
+	else
+		scriptFiber = CreateFiber(NULL, HeavyWaitFunction, nullptr);
+}
+
+void RunUnreliable() //Put functions that don't really need to be run every frame that can cause heavy wait times for the function here.
+{
+	
+}
+
+void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and call this again regardless of the specified wakeAt time.
+{
+#ifdef __DEBUG
+	static bool bQuit, F12 = false;
+	if (isKeyPressedOnce(F12, VK_F12)){ bQuit = true; }
+	if (bQuit) { return; }
+#endif
+	//Run your natives here.
 
 	//Anything after here is fair game for you to run whatever natives you want.
 	Player player = PLAYER::PLAYER_ID();
 	Ped playerPed = PLAYER::PLAYER_PED_ID();
-
-	//static bool bQuit, F12 = false;
-	//if (isKeyPressedOnce(F12, VK_F12)){ bQuit = true;}
-	//if (bQuit) { return gGtaThreadOriginal.Run(This); }
 
 	//var init
 	static bool bGodmodeActive, bGodmodeSwitchset, bF7Pressed, bMoneyDropActive, bSubtractPressed, bHackActive, 
@@ -376,6 +462,8 @@ eThreadState new_Run(GtaThread* This) {
 					{
 						Vehicle clonedVeh = ClonePedVehicle(selectedPed);
 						BoostBaseVehicleStats(clonedVeh); //Gotta go fast
+						WAIT(0); //We need to wait for the game to assign a random radio station to the car first before changing it.
+						AUDIO::SET_VEH_RADIO_STATION(playerVeh, radioNames[RADIO_SELFRADIO]);
 						drawNotification("Vehicle cloned");
 					}
 
@@ -572,6 +660,11 @@ eThreadState new_Run(GtaThread* This) {
 
 			}// end of menu
 
+			//Force full reload animation on weapon. If you want a quicker reload, just quickly tap R. The 0x1 state seems to be time sensitive.
+				if (GetAsyncKeyState(0x52) & 0x1)
+				{
+					FastReload(playerPed);
+				}
 
 			//Increase wanted level.
 			static bool bAddPressed = false;
@@ -625,9 +718,7 @@ eThreadState new_Run(GtaThread* This) {
 	//Godmode
 	bGodmodeSwitchset = GodMode(player, playerPed, bGodmodeActive, bGodmodeSwitchset);
 
-	//Return control to the thread we stole it from.
-	SetActiveThread(runningThread);
-	return gGtaThreadOriginal.Run(This);
+	return;
 }
 
 bool AttemptScriptHook() {
@@ -653,7 +744,7 @@ bool AttemptScriptHook() {
 			memcpy(&gGtaThreadOriginal, (DWORD64*)((DWORD64*)pThread)[0], sizeof(gGtaThreadOriginal)); //Create a backup of the original table so we can call the original functions from our hook.
 			memcpy(&gGtaThreadNew, &gGtaThreadOriginal, sizeof(GtaThread_VTable)); //Construct our VMT replacement table.
 
-			gGtaThreadNew.Run = new_Run; //Replace the .Run method in the new table with our method.
+			gGtaThreadNew.Run = Trampoline; //Replace the .Run method in the new table with our method.
 		}
 
 		if (((DWORD64*)pThread)[0] != (DWORD64)&gGtaThreadNew) { //If the table is not VMT Hooked.
@@ -683,5 +774,11 @@ void BypassOnlineModelRequestBlock() {
 	if (dwGetModelTableFunctionAddress != NULL)
 		*(unsigned short*)(dwGetModelTableFunctionAddress + 0x8) = 0x9090;
 	else
-		Log::Error("Failed to find model table signature");
+		{
+		#ifndef __DEBUG
+				Log::Error("Failed to find model table signature");
+		#else
+				Log::Debug("Failed to find model table signature");
+		#endif
+		}
 }

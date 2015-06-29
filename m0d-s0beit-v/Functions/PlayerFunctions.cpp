@@ -1,5 +1,6 @@
 #include "../stdafx.h"
 #include "../natives.h"
+#include "../script.h"
 #include "UIFunctions.h"
 #include "VehicleFunctions.h"
 
@@ -39,17 +40,12 @@ void RemoveAllPropsFromPlayer(Ped ped)
 	}
 }
 
-bool GetControllofEntity(Entity entity)
+void RequestControl(Entity e)
 {
-	if (ENTITY::DOES_ENTITY_EXIST(entity))
-	{
-		if (NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(entity)){
-			if (NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(entity)){
-				return true;
-			}
-		}
-	}
-	return false;
+	NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(e);
+	if (!NETWORK::NETWORK_HAS_CONTROL_OF_ENTITY(e))
+		WAIT(0);
+	NETWORK::NETWORK_REQUEST_CONTROL_OF_ENTITY(e);
 }
 
 //Function to determine if a Player object is on your Rockstar Social Club friends list.
@@ -127,7 +123,7 @@ void TeleportSelectedPlayertoAlamosSea(Ped selectedPed)
 {
 	//funcion is not working
 	AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
-	GetControllofEntity(selectedPed);
+	RequestControl(selectedPed);
 	AI::TASK_FOLLOW_NAV_MESH_TO_COORD(selectedPed, 254.74130f, 4042.002930f, -3.102535f, 1.0f, 1000, 1048576000.0f, 0, 1193033728.0f);
 }
 
@@ -158,7 +154,7 @@ bool AttachJunktoSelectedPlayer(Ped selectedPed)
 			{
 				AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
 			}
-			GetControllofEntity(junkObject);
+			RequestControl(junkObject);
 			ENTITY::ATTACH_ENTITY_TO_ENTITY(junkObject, selectedPed, PED::GET_PED_BONE_INDEX(selectedPed, SKEL_Spine_Root),
 				0.00f,	//floatx
 				0.00f,	//floaty
@@ -189,7 +185,7 @@ bool AttachJunktoSelectedPlayer(Ped selectedPed)
 			{
 				AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
 			}
-			GetControllofEntity(junkObject);
+			RequestControl(junkObject);
 			ENTITY::ATTACH_ENTITY_TO_ENTITY(junkObject, selectedPed, PED::GET_PED_BONE_INDEX(selectedPed, SKEL_Head),
 				0.05f,	//floatx
 				0.01f,	//floaty
@@ -237,31 +233,24 @@ void AttackPlayerWithRandomPeds(Ped selectedPed)
 
 void FrameSelectedPlayer(Ped selectedPed)
 {
-	static int iCounter = 0;
-	for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
+	static int playerIterator = 0;
+	for (int i = 0; i < 5; i++)
 	{
 		Ped playerPedIterator = PLAYER::GET_PLAYER_PED(playerIterator);
-		if (ENTITY::DOES_ENTITY_EXIST(playerPedIterator)) //If the iteration exists, and they're alive, and they're not me.
+		if (ENTITY::DOES_ENTITY_EXIST(playerPedIterator) && playerPedIterator) //If the iteration exists, and they're alive, and they're not me.
 		{
-			if (iCounter == 5)
-			{
 				try
 				{
 					AI::CLEAR_PED_TASKS_IMMEDIATELY(playerPedIterator); //If they're in a jet, or something. Toss them out.
 					Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPedIterator, FALSE);
-					static bool bExplode = false;
-					bExplode = !bExplode;
-					if (bExplode) {
-						FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f); //We can blame anyone for the explosion. Whoever is selected in the menu will be blamed.
-					}
+					FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f); //We can blame anyone for the explosion. Whoever is selected in the menu will be blamed.
 				}
-				catch (...) { break; Log::Error("Crashed"); iCounter = -10; } //IDK why, but if you call these functions too many times per tick, it causes a crash. We can just toss the exception. Hopefully this fixes the crash...
-			}
+				catch (...) { Log::Error("Crashed"); break; } //IDK why, but if you call these functions too many times per tick, it causes a crash. We can just toss the exception. Hopefully this fixes the crash...
 		}
+		playerIterator++;
+		if (playerIterator > 29)
+			playerIterator = 0;
 	}
-	iCounter++;
-	if (iCounter > 5)
-		iCounter = 0;
 }
 
 void ExplodeSelectedPlayer(Ped selectedPed, Ped playerPed)
@@ -441,7 +430,7 @@ void FixPlayer(Ped playerPed)
 		playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
 	if (ENTITY::DOES_ENTITY_EXIST(playerVeh) && !ENTITY::IS_ENTITY_DEAD(playerVeh))
 	{
-		GetControllofEntity(playerVeh); //Can't hurt to try.
+		RequestControl(playerVeh); //Can't hurt to try.
 		VEHICLE::SET_VEHICLE_FIXED(playerVeh);
 		VEHICLE::SET_VEHICLE_PETROL_TANK_HEALTH(playerVeh, 1000.0f);
 		VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(playerVeh);
