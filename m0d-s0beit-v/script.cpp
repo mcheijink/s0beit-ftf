@@ -1,10 +1,4 @@
 #include "stdafx.h"
-#include "natives.h"
-#include "Functions\PlayerFunctions.h"
-#include "Functions\WeaponFunctions.h"
-#include "Functions\VehicleFunctions.h"
-#include "Functions\UIFunctions.h"
-#include "Functions\WorldFunctions.h"
 
 //https://s-media-cache-ak0.pinimg.com/236x/a5/32/43/a5324394baa368ef5273ef2e95a2976c.jpg
 rage::scrThread* GetActiveThread()
@@ -258,7 +252,7 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 	static bool featureRestrictedZones = true;
 	static int iFreeze = -1;
 	//static int modulesActive = 0;
-	static int mchbuildnr = 1101;
+	static int mchbuildnr = version;
 	static int mchDebugActive = true;
 	
 
@@ -485,7 +479,7 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 					}
 					if (bFlowerPowerActive)
 					{
-						//FlowerPower(selectedPed);
+						FlowerPower(selectedPed);
 					}
 
 					//Attach junk to player
@@ -524,7 +518,7 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 						}
 						else
 						{
-							ExplodeSelectedPlayer(selectedPed, playerPed);
+							ExplodeSelectedPlayer(selectedPed);
 							drawNotification(GetPlayerName(selectedPlayer) + " killed");
 						}
 					}
@@ -561,6 +555,21 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 					draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 17, menuLeft, 5.0f, false, false, false, false);
 				}
 				
+				//kill all the speaking players
+				static bool bNumpad1Pressed = false;
+				if (isKeyPressedOnce(bNumpad1Pressed, VK_NUMPAD1))
+				{
+					if (bSpectateMode){
+						drawNotification("Stopping Spectate");
+						SpectateMode(false);
+					}
+					else if (!bSpectateMode) {
+						drawNotification("Spectating");
+						SpectateMode(true);
+					}
+					bSpectateMode = !bSpectateMode;
+				}
+
 				//Spawn a test car.
 				static bool bNumpad2Pressed, bWaitingForModelCar = false;
 				if ((isKeyPressedOnce(bNumpad2Pressed, VK_NUMPAD2) || bWaitingForModelCar == true) && playerVeh == NULL)

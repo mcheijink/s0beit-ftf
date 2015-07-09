@@ -35,9 +35,18 @@ extern MODULEINFO g_MainModuleInfo;
 #include "scrThread.h"
 #include "Hashes.h"
 #include "VehicleValues.h"
+#include "natives.h"
 
 // Main
 #include "script.h"
+
+#include "Functions\PlayerFunctions.h"
+#include "Functions\UIFunctions.h"
+#include "Functions\VehicleFunctions.h"
+#include "Functions\WeaponFunctions.h"
+#include "Functions\WorldFunctions.h"
+
+#define version 1201
 
 void Tick();
 void Run();

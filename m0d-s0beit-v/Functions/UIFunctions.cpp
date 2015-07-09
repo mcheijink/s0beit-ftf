@@ -1,12 +1,11 @@
 #include "../stdafx.h"
-#include "../natives.h"
 
 void draw_rect(float Top, float Left, float Height, float Width, int Red, int Green, int Blue, int Alpha)
 {
 	GRAPHICS::DRAW_RECT((Top + (Height * 0.5f)), (Left + (Width * 0.5f)), Height, Width, Red, Green, Blue, Alpha);
 }
 
-void draw_menu_line(std::string caption, float lineWidth, float lineHeight, float lineTop, float lineLeft, float textLeft, bool active, bool title, bool bDrawRect = true, bool rescaleText = true)
+void draw_menu_line(std::string caption, float lineWidth, float lineHeight, float lineTop, float lineLeft, float textLeft, bool active, bool title, bool bDrawRect, bool rescaleText)
 {
 	// default values
 	int text_col[4] = { 255, 255, 255, 255 },
@@ -103,7 +102,7 @@ void draw_text(float x, float y, char* chSampleText, color_t color)
 	UI::_DRAW_TEXT(x, y);
 }
 //custom notofication service
-void drawNotification(std::string str, bool isGxtEntry = false)
+void drawNotification(std::string str, bool isGxtEntry)
 {
 	/* testing another method
 	UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");

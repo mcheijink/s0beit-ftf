@@ -1,7 +1,4 @@
 #include "../stdafx.h"
-#include "../natives.h"
-#include "UIFunctions.h"
-#include "PlayerFunctions.h"
 
 void BoostBaseVehicleStats(Vehicle vehicle)
 {

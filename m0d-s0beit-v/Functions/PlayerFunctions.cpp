@@ -155,18 +155,59 @@ bool AttachJunktoSelectedPlayer(Ped selectedPed)
 				AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
 			}
 			RequestControl(junkObject);
-			ENTITY::ATTACH_ENTITY_TO_ENTITY(junkObject, selectedPed, PED::GET_PED_BONE_INDEX(selectedPed, SKEL_Spine_Root),
+			ENTITY::ATTACH_ENTITY_TO_ENTITY(junkObject, selectedPed, PED::GET_PED_BONE_INDEX(selectedPed, SKEL_ROOT),
 				0.00f,	//floatx
 				0.00f,	//floaty
-				-0.5f,	//floatz
+				1.0f,	//floatz
 				0.0f,	//xrot
-				-90.0f,	//yrot 
+				180.0f,	//yrot 
 				0.0f,	//zrot
 				false, false, false, false, 2, true);
 			//STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(objectModel);
 			return true;
 		}
 		else 
+			return false;
+	}
+	else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+	{
+		//airdancer
+		Hash objectModel = 0x8F2D17AA;
+		char* animAirDancer = "anim@p_airdancer_01_s";
+		if (!STREAMING::HAS_MODEL_LOADED(objectModel))
+		{
+			STREAMING::REQUEST_MODEL(objectModel);
+		}
+		if (!STREAMING::HAS_ANIM_DICT_LOADED(animAirDancer))
+		{
+			STREAMING::REQUEST_ANIM_DICT(animAirDancer);
+		}
+		if (STREAMING::HAS_MODEL_LOADED(objectModel) == TRUE && STREAMING::HAS_ANIM_DICT_LOADED(animAirDancer) == TRUE)
+		{
+			Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
+			Object junkObject = OBJECT::CREATE_OBJECT(objectModel, playerPosition.x, playerPosition.y, playerPosition.z, 1, 1, 0);
+			OBJECT::PLACE_OBJECT_ON_GROUND_PROPERLY(junkObject);
+			if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
+			{
+				AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
+			}
+			RequestControl(junkObject);
+			ENTITY::ATTACH_ENTITY_TO_ENTITY(junkObject, selectedPed, PED::GET_PED_BONE_INDEX(selectedPed, SKEL_ROOT),
+				0.00f,	//floatx
+				0.00f,	//floaty
+				0.0f,	//floatz
+				0.0f,	//xrot
+				0.0f,	//yrot 
+				0.0f,	//zrot
+				false, false, false, false, 2, true);
+			//STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(objectModel);
+			//Any animAirDanceScene = NETWORK::NETWORK_CREATE_SYNCHRONISED_SCENE(, 0.0, 0.0, 0.0, 2, 0, 0, 0x3f800000, 0, 0x3f800000)
+
+			ENTITY::PLAY_ENTITY_ANIM(junkObject, animAirDancer, "p_airdancer_01_s", 1000.0, 0, 0, 0, 0, 0);
+			//ENTITY::PLAY_SYNCHRONIZED_ENTITY_ANIM(v_433, v_45F, "darts_ig_intro_alt1_dart", "mini@dartsintro_alt1", 1000.0, 0x41000000, 0, 0x447a0000);
+			return true;
+		}
+		else
 			return false;
 	}
 	else 
@@ -253,19 +294,12 @@ void FrameSelectedPlayer(Ped selectedPed)
 	}
 }
 
-void ExplodeSelectedPlayer(Ped selectedPed, Ped playerPed)
+void ExplodeSelectedPlayer(Ped selectedPed)
 {
 	//and else, only himself
 	Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
-	if (selectedPed != playerPed)
-	{
 		AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
 		FIRE::ADD_OWNED_EXPLOSION(selectedPed, playerPosition.x, playerPosition.y, playerPosition.z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f);
-	}
-	else
-	{
-		FIRE::ADD_EXPLOSION(playerPosition.x, playerPosition.y, playerPosition.z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f);
-	}
 }
 
 bool PoliceIgnorePlayer(Player player, bool bPoliceIgnorePlayer, bool bPoliceIgnoreSwitchSet)
@@ -321,11 +355,7 @@ Player KillalltheSpeakingPlayers()
 		{
 			if (NETWORK::NETWORK_IS_PLAYER_TALKING(playerIterator))
 			{
-				Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(pedIterator, FALSE);
-				AI::CLEAR_PED_TASKS_IMMEDIATELY(pedIterator);
-				FIRE::ADD_OWNED_EXPLOSION(pedIterator, playerPosition.x, playerPosition.y, playerPosition.z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f);
-			
-				FIRE::ADD_EXPLOSION(playerPosition.x, playerPosition.y, playerPosition.z, EXPLOSION_TANKER, 1000.0f, FALSE, TRUE, 0.0f);
+				ExplodeSelectedPlayer(pedIterator);
 				return playerIterator;
 			}
 		}
@@ -569,4 +599,24 @@ void EnableRestrictedZones(bool featureRestrictedZones)
 		GAMEPLAY::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME("re_prison");
 		GAMEPLAY::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME("re_prisonvanbreak");
 	}
+}
+
+
+void SpectatePlayer(Ped playerped)
+{
+	Any RenderCam = CAM::GET_RENDERING_CAM();
+
+	//PED::GET_PED_ENTITY
+
+	
+	//CAM::ATTACH_CAM_TO_ENTITY(RenderCam, )
+	//CAM::POINT_CAM_AT_ENTITY
+
+
+}
+void SpectateMode(bool Active)
+{
+	Player player = PLAYER::PLAYER_ID();
+	Ped playerPed = PLAYER::PLAYER_PED_ID();
+	NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(Active, playerPed);
 }

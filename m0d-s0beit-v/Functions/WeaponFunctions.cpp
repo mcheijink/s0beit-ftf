@@ -1,7 +1,4 @@
 #include "../stdafx.h"
-#include "../natives.h"
-#include "UIFunctions.h"
-#include "PlayerFunctions.h"
 //weaponfunctions
 
 void BruteForceWeaponAddons(Ped ped, Hash weaponHash, bool bSilencer)
@@ -85,18 +82,49 @@ void FlowerPower(Ped selectedPed)
 			drawNotification(std::to_string(modelHash) + " loaded");
 		}
 	}
-	if (PED::IS_PED_SHOOTING(selectedPed))
-	{
-		drawNotification("shots found");
-		Vector3 lastHitCoordinate;
-		lastHitCoordinate.x, lastHitCoordinate.y, lastHitCoordinate.z = 0.0f;
+	//debugstart
+	Ped playerPed = PLAYER::PLAYER_PED_ID();
 
-		if (WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(selectedPed, &lastHitCoordinate))
-		{
-			drawNotification("hit at x: " + std::to_string(lastHitCoordinate.x) + "y: " + std::to_string(lastHitCoordinate.y) + "z: " + std::to_string(lastHitCoordinate.z));
-			Object junkObject = OBJECT::CREATE_OBJECT(modelHashes[rand() % 7], lastHitCoordinate.x, lastHitCoordinate.y, lastHitCoordinate.z, 1, 1, 0);
-		}
+	Ped debugPed;
+	if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, FALSE)){
+		debugPed = PED::GET_VEHICLE_PED_IS_USING(playerPed);
 	}
+	else {
+		debugPed = playerPed;
+	}
+
+	//debugend
+	Vector3 lastHitCoordinate;
+		if (PED::IS_PED_SHOOTING(selectedPed))
+		{
+			if (WEAPON::GET_PED_LAST_WEAPON_IMPACT_COORD(selectedPed, &lastHitCoordinate))
+			{
+				//debugstart
+				Vector3 playerCoordinate = ENTITY::GET_ENTITY_COORDS(debugPed, FALSE); //Dereck B? On your bike!
+				float playerHeading = ENTITY::GET_ENTITY_HEADING(debugPed);
+
+				Log::Msg("Hit found!");
+				//player coordinates
+				Log::Msg("pedcoordinates:");
+				Log::Msg((" x: " + std::to_string(playerCoordinate.x) + " y: " + std::to_string(playerCoordinate.y) + " z: " + std::to_string(playerCoordinate.z) + " heading: " + std::to_string(playerHeading)).c_str());
+				//hitpoint coordinates
+				Log::Msg("hitcoordinates:");
+				Log::Msg((" x: " + std::to_string(lastHitCoordinate.x) + " y: " + std::to_string(lastHitCoordinate.y) + " z: " + std::to_string(lastHitCoordinate.z)).c_str());
+				//other vars
+				Log::Msg("dwordcoordinates:");
+				Log::Msg((" x: " + std::to_string(lastHitCoordinate._paddingx) + " y: " + std::to_string(lastHitCoordinate._paddingy) + " z: " + std::to_string(lastHitCoordinate._paddingz)).c_str());
+				//debugend
+
+				//lastHitCoordinate.x = Loc[0], lastHitCoordinate.y = Loc[1], lastHitCoordinate.z = Loc[2];
+
+				drawNotification("shots found");
+				//lastHitCoordinate.x, lastHitCoordinate.y, lastHitCoordinate.z = 0.0f;
+
+				drawNotification("hit at x: " + std::to_string(lastHitCoordinate.x) + "y: " + std::to_string(lastHitCoordinate.y) + "z: " + std::to_string(lastHitCoordinate.z));
+				Object junkObject = OBJECT::CREATE_OBJECT(modelHashes[rand() % 7], lastHitCoordinate.x, lastHitCoordinate.y, lastHitCoordinate.z, 1, 1, 0);
+			}
+		}
+		
 }
 
 void FastReload(Ped playerPed)
@@ -120,3 +148,4 @@ void FastReload(Ped playerPed)
 		}
 	}
 }
+
