@@ -253,7 +253,7 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 	static int iFreeze = -1;
 	//static int modulesActive = 0;
 	static int mchbuildnr = version;
-	static int mchDebugActive = true;
+	static int mchDebugActive = false;
 	
 
 	float menuLeft = 1030.0;
@@ -362,7 +362,7 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 						draw_menu_line("Numpad2	- Clone player vehicle", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
 						draw_menu_line("Numpad3	- Remove all weapons", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
 						draw_menu_line("Numpad4	- Pay and sprayclone", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
-						draw_menu_line("Numpad5	- (alpha) flowerpower", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bFlowerPowerActive, false, bFlowerPowerActive, false);
+						//draw_menu_line("Numpad5	- (alpha) flowerpower", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bFlowerPowerActive, false, bFlowerPowerActive, false);
 						draw_menu_line("Numpad6	- attach basketball", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
 						draw_menu_line("Numpad7	- (alpha) destroy tires", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
 						draw_menu_line("Numpad8	- remove player from vehicle", menuWidth, 4.0f, menuTop + 13.0f * 17, menuLeft, 5.0f, false, false, false, false);
@@ -472,6 +472,7 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 					}
 
 					//get some plants in LS
+					/*
 					static bool bNumpad5Pressed = false;
 					if (isKeyPressedOnce(bNumpad5Pressed, VK_NUMPAD5))
 					{
@@ -481,7 +482,7 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 					{
 						FlowerPower(selectedPed);
 					}
-
+					*/
 					//Attach junk to player
 					static bool bNumpad6Pressed = false;
 					if (isKeyPressedOnce(bNumpad6Pressed, VK_NUMPAD6))
