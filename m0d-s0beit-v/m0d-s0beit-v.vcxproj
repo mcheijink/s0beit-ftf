@@ -30,7 +30,7 @@
     <ProjectGuid>{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>m0ds0beitv</RootNamespace>
-    <ProjectName>m0d-s0beitftf-build 1201</ProjectName>
+    <ProjectName>m0d-s0beitftf-build 1202</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -207,6 +207,7 @@
     <ClInclude Include="Hashes.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="natives.h" />
+    <ClInclude Include="natives_bak.h" />
     <ClInclude Include="Pattern.h" />
     <ClInclude Include="pgCollection.h" />
     <ClInclude Include="script.h" />

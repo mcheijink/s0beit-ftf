@@ -248,12 +248,12 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 	static bool bGodmodeActive, bGodmodeSwitchset, bF7Pressed, bMoneyDropActive, bSubtractPressed, bHackActive, 
 				bF5Pressed, bMenuActive, bF6Pressed, bKillTargetsActive, bNumpad9Pressed, bPoliceIgnorePlayer, 
 				bF10Pressed, bHackHidden, bFlowerPowerActive, bMoneyFountainActive, bSpectateMode, bKillSpeakers,
-				bPoliceIgnoreSwitchSet = false;
+				bPoliceIgnoreSwitchSet, bLeftAltPressed, bNumpad3Pressed = false;
 	static bool featureRestrictedZones = true;
 	static int iFreeze = -1;
 	//static int modulesActive = 0;
 	static int mchbuildnr = version;
-	static int mchDebugActive = false;
+	static int mchDebugActive = true;
 	
 
 	float menuLeft = 1030.0;
@@ -362,9 +362,9 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 						draw_menu_line("Numpad2	- Clone player vehicle", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, false, false, false, false);
 						draw_menu_line("Numpad3	- Remove all weapons", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
 						draw_menu_line("Numpad4	- Pay and sprayclone", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
-						//draw_menu_line("Numpad5	- (alpha) flowerpower", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bFlowerPowerActive, false, bFlowerPowerActive, false);
+						draw_menu_line("Numpad5	- spectate player", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bSpectateMode, false, bSpectateMode, false);
 						draw_menu_line("Numpad6	- attach basketball", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
-						draw_menu_line("Numpad7	- (alpha) destroy tires", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
+						draw_menu_line("Numpad7	- jack ride", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
 						draw_menu_line("Numpad8	- remove player from vehicle", menuWidth, 4.0f, menuTop + 13.0f * 17, menuLeft, 5.0f, false, false, false, false);
 						draw_menu_line("Numpad9	- remove garbage bin", menuWidth, 4.0f, menuTop + 13.0f * 18, menuLeft, 5.0f, false, false, false, false);
 					}
@@ -385,7 +385,7 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 					int iLineNum = 0;
 					Ped selectedPed = NULL;
 					Player selectedPlayer = NULL;
-					for (Player playerIterator = 0; playerIterator < 30; playerIterator++)
+					for (Player playerIterator = 0; playerIterator < 31; playerIterator++)
 					{
 						bool bSelectedPed = (playerIterator == iSelectedPlayer);
 						if (bSelectedPed) {
@@ -409,29 +409,153 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 					//draw player menu
 					draw_rect_sc(menuTop + 13.0f, menuLeft - 145, 145.0, iLineNum * 13.0f);
 
-					//Give all weapons to selected player
-					static bool bDividePressed = false;
-					if (isKeyPressedOnce(bDividePressed, VK_DIVIDE))
-					{
-						GiveAllWeaponsToPed(selectedPed, WEAPONTINT_LSPD, selectedPed == playerPed);
-						//notify user of action
-						drawNotification("Gave all weapons to " + GetPlayerName(selectedPlayer));
-					}
-
-					//Teleport to player vehicle
-					static bool bDecimalPressed = false;
-					if (isKeyPressedOnce(bDecimalPressed, VK_DECIMAL) && selectedPed != playerPed)
-					{
-						TeleporttoSelectedPlayerVehicle(playerPed, selectedPed);
-						drawNotification("Teleported to " + GetPlayerName(selectedPlayer) + "'s vehicle");
-					}
-
 					//Teleport to selected player on the menu.
 					static bool bNumpad0Pressed = false;
 					if (isKeyPressedOnce(bNumpad0Pressed, VK_NUMPAD0) && selectedPed != playerPed)
 					{
 						TeleporttoSelectedPlayer(playerPed, selectedPed);
 						drawNotification("Teleported to " + GetPlayerName(selectedPlayer));
+					}
+
+					//kill selected player by explosion
+					if (GetAsyncKeyState(VK_NUMPAD1) & 0x8000)
+					{
+						//if controll is pressed, selected player will kill people around him.
+						if (GetAsyncKeyState(VK_RCONTROL) & 0x8000)
+						{
+							FrameSelectedPlayer(selectedPed);
+							drawNotification(GetPlayerName(selectedPlayer) + " framed!");
+						}
+						else if (GetAsyncKeyState(VK_LMENU) & 0x8000)
+						{
+							for (Player playerIterator = 0; playerIterator < 31; playerIterator++)
+							{
+								selectedPed = PLAYER::GET_PLAYER_PED(playerIterator);
+								ExplodeSelectedPlayer(selectedPed);
+							}
+							drawNotification("Everybody exploded themselve :P");
+						}
+						else
+						{
+							ExplodeSelectedPlayer(selectedPed);
+							drawNotification(GetPlayerName(selectedPlayer) + " killed");
+						}
+					}
+
+					//clone vehicle
+					static bool bNumpad2Pressed = false;
+					if (isKeyPressedOnce(bNumpad2Pressed, VK_NUMPAD2))
+					{
+						Vehicle clonedVeh = ClonePedVehicle(selectedPed);
+						BoostBaseVehicleStats(clonedVeh); //Gotta go fast
+						WAIT(0); //We need to wait for the game to assign a random radio station to the car first before changing it.
+						AUDIO::SET_VEH_RADIO_STATION(playerVeh, radioNames[RADIO_SELFRADIO]);
+						drawNotification("Vehicle cloned");
+					}
+
+					//remove all weapons
+					if (isKeyPressedOnce(bNumpad3Pressed, VK_NUMPAD3))
+					{
+						if (GetAsyncKeyState(VK_LMENU) & 0x8000)
+						{
+							for (Player playerIterator = 0; playerIterator < 31; playerIterator++)
+							{
+								selectedPed = PLAYER::GET_PLAYER_PED(playerIterator);
+								WEAPON::REMOVE_ALL_PED_WEAPONS(selectedPed, TRUE);
+							}
+							drawNotification("Everybody lost their guns");
+						}
+						else
+						{
+							WEAPON::REMOVE_ALL_PED_WEAPONS(selectedPed, TRUE);
+							drawNotification("Took away all " + GetPlayerName(selectedPlayer) + " guns");
+						}
+					}
+
+					//park and clone
+					static bool bNumpad4Pressed = false;
+					if (isKeyPressedOnce(bNumpad4Pressed, VK_NUMPAD4))
+					{
+						if (LSCCarParkClone(selectedPed))
+							drawNotification("Cloned and parked that shit");
+						else
+							drawNotification("Clone and park Failed");
+					}
+
+					static bool bNumpad5Pressed = false;
+					if (isKeyPressedOnce(bNumpad5Pressed, VK_NUMPAD5))
+					{
+						if (bSpectateMode){
+							drawNotification("Stopping Spectate");
+							AI::CLEAR_PED_TASKS(playerPed);
+							SpectateMode(false,selectedPed);
+						}
+						else if (!bSpectateMode) {
+							drawNotification("Spectating");
+							AIWanderCar(playerPed);
+							SpectateMode(true, selectedPed);
+						}
+						bSpectateMode = !bSpectateMode;
+					}
+
+					//get some plants in LS
+					/*
+					if (isKeyPressedOnce(bNumpad5Pressed, VK_NUMPAD5))
+					{
+						bFlowerPowerActive = !bFlowerPowerActive;
+					}
+					if (bFlowerPowerActive)
+					{
+						FlowerPower(selectedPed);
+					}
+					*/
+
+					//Attach junk to player
+					static bool bNumpad6Pressed = false;
+					if (isKeyPressedOnce(bNumpad6Pressed, VK_NUMPAD6))
+					{
+						//all players or just 1?
+						if (GetAsyncKeyState(VK_LMENU) & 0x8000)
+						{
+							for (Player playerIterator = 0; playerIterator < 31; playerIterator++)
+							{
+								selectedPed = PLAYER::GET_PLAYER_PED(playerIterator);
+								AttachJunktoSelectedPlayer(selectedPed);
+							}
+							drawNotification("Junk to the masses!");
+						}
+						else {
+							if (AttachJunktoSelectedPlayer(selectedPed))
+								drawNotification("Attached junk to " + GetPlayerName(selectedPlayer));
+						}
+					}
+
+					//Jack players ride
+					static bool bNumpad7Pressed = false;
+					if (isKeyPressedOnce(bNumpad7Pressed, VK_NUMPAD7))
+					{
+						AIJackVehicle(selectedPed);
+						drawNotification(GetPlayerName(selectedPlayer) + " got jacked");
+					}
+
+					//Remove player from vehicle
+					static bool bNumpad8Pressed = false;
+					if (isKeyPressedOnce(bNumpad8Pressed, VK_NUMPAD8))
+					{
+						//all players or just 1?
+						if (GetAsyncKeyState(VK_LMENU) & 0x8000)
+						{
+							for (Player playerIterator = 0; playerIterator < 31; playerIterator++)
+							{
+								selectedPed = PLAYER::GET_PLAYER_PED(playerIterator);
+								DumpPlayerFromVehicle(selectedPed, true);
+							}
+							drawNotification("Everybody out of their car");
+						}
+						else {
+							DumpPlayerFromVehicle(selectedPed, true);
+							drawNotification(GetPlayerName(selectedPlayer) + " dumped from vehicle");
+						}
 					}
 
 					//switch for moneydrop
@@ -450,89 +574,35 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 						DropMoneyonSelectedPlayer(selectedPed);
 					}
 
-					//clone vehicle
-					static bool bNumpad2Pressed = false;
-					if (isKeyPressedOnce(bNumpad2Pressed, VK_NUMPAD2))
+					//Give all weapons to selected player
+					static bool bDividePressed = false;
+					if (isKeyPressedOnce(bDividePressed, VK_DIVIDE))
 					{
-						Vehicle clonedVeh = ClonePedVehicle(selectedPed);
-						BoostBaseVehicleStats(clonedVeh); //Gotta go fast
-						WAIT(0); //We need to wait for the game to assign a random radio station to the car first before changing it.
-						AUDIO::SET_VEH_RADIO_STATION(playerVeh, radioNames[RADIO_SELFRADIO]);
-						drawNotification("Vehicle cloned");
-					}
-
-					//park and clone
-					static bool bNumpad4Pressed = false;
-					if (isKeyPressedOnce(bNumpad4Pressed, VK_NUMPAD4))
-					{
-						if (LSCCarParkClone(selectedPed))
-							drawNotification("Cloned and parked that shit");
-						else
-							drawNotification("Clone and park Failed");
-					}
-
-					//get some plants in LS
-					/*
-					static bool bNumpad5Pressed = false;
-					if (isKeyPressedOnce(bNumpad5Pressed, VK_NUMPAD5))
-					{
-						bFlowerPowerActive = !bFlowerPowerActive;
-					}
-					if (bFlowerPowerActive)
-					{
-						FlowerPower(selectedPed);
-					}
-					*/
-					//Attach junk to player
-					static bool bNumpad6Pressed = false;
-					if (isKeyPressedOnce(bNumpad6Pressed, VK_NUMPAD6))
-					{
-						if (AttachJunktoSelectedPlayer(selectedPed))
-							drawNotification("Attached junk to " + GetPlayerName(selectedPlayer));
-					}
-
-					//Burst all the tires of another players car
-
-					static bool bNumpad7Pressed = false;
-					if (isKeyPressedOnce(bNumpad7Pressed, VK_NUMPAD7))
-					{
-						BurstSelectedPlayerTires(selectedPed);
-						drawNotification("Bursted tires");
-					}
-
-					//Remove player from vehicle
-					static bool bNumpad8Pressed = false;
-					if (isKeyPressedOnce(bNumpad8Pressed, VK_NUMPAD8))
-					{
-						DumpPlayerFromVehicle(selectedPed, true);
-						drawNotification(GetPlayerName(selectedPlayer) + " dumped from vehicle");
-					}
-
-					//kill selected player by explosion
-					if (GetAsyncKeyState(VK_NUMPAD1) & 0x8000)
-					{
-						//if controll is pressed, selected player will kill people around him.
-						if (GetAsyncKeyState(VK_RCONTROL) & 0x8000)
+						//all players or just 1?
+						if (GetAsyncKeyState(VK_LMENU) & 0x8000)
 						{
-							FrameSelectedPlayer(selectedPed);
-							drawNotification(GetPlayerName(selectedPlayer) + " framed!");
+							for (Player playerIterator = 0; playerIterator < 31; playerIterator++)
+							{
+								selectedPed = PLAYER::GET_PLAYER_PED(playerIterator);
+								GiveAllWeaponsToPed(selectedPed, WEAPONTINT_LSPD, selectedPed == playerPed);
+							}
+							drawNotification("Gave all weapons to all players");
 						}
-						else
-						{
-							ExplodeSelectedPlayer(selectedPed);
-							drawNotification(GetPlayerName(selectedPlayer) + " killed");
+						else {
+							GiveAllWeaponsToPed(selectedPed, WEAPONTINT_LSPD, selectedPed == playerPed);
+							//notify user of action
+							drawNotification("Gave all weapons to " + GetPlayerName(selectedPlayer));
 						}
 					}
 
-					//remove all weapons
-					static bool bNumpad3Pressed = false;
-					if (isKeyPressedOnce(bNumpad3Pressed, VK_NUMPAD3))
+					//Teleport to player vehicle
+					static bool bDecimalPressed = false;
+					if (isKeyPressedOnce(bDecimalPressed, VK_DECIMAL) && selectedPed != playerPed)
 					{
-						WEAPON::REMOVE_ALL_PED_WEAPONS(selectedPed, TRUE);
-						drawNotification("Took away all " + GetPlayerName(selectedPlayer) + " guns");
+						TeleporttoSelectedPlayerVehicle(playerPed, selectedPed);
+						drawNotification("Teleported to " + GetPlayerName(selectedPlayer) + "'s vehicle");
 					}
-
-
+					
 			}
 			else //every function without selecting a player
 			{
@@ -544,45 +614,31 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 					draw_menu_line("F10			- Hack Hidden", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, bHackHidden, false, bHackHidden, false);
 					draw_menu_line("Numpad.		- Repair Vehicle", menuWidth, 4.0f, menuTop + 13.0f * 6, menuLeft, 5.0f, false, false, false, false);
 					draw_menu_line("Numpad0	- Teleport to waypoint", menuWidth, 4.0f, menuTop + 13.0f * 7, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad2	- Spawn Kuruma2", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad3	- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad4	- Police disabled", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, bPoliceIgnorePlayer, false, bPoliceIgnorePlayer, false);
-					draw_menu_line("Numpad5	- Kill speaking peasants", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, bKillSpeakers, false, bKillSpeakers, false);
-					draw_menu_line("Numpad6	- Enforce No-Flyzone", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad7	- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad8	- Fountain of gold", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, bMoneyFountainActive, false, bMoneyFountainActive, false);
-					draw_menu_line("Numpad9	- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
-					draw_menu_line("Numpad+	- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 17, menuLeft, 5.0f, false, false, false, false);
-				}
-				
-				//kill all the speaking players
-				static bool bNumpad1Pressed = false;
-				if (isKeyPressedOnce(bNumpad1Pressed, VK_NUMPAD1))
-				{
-					if (bSpectateMode){
-						drawNotification("Stopping Spectate");
-						SpectateMode(false);
-					}
-					else if (!bSpectateMode) {
-						drawNotification("Spectating");
-						SpectateMode(true);
-					}
-					bSpectateMode = !bSpectateMode;
+					draw_menu_line("Numpad1	- NULL", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad2	- Spawn Kuruma2", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad3	- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad4	- Police disabled", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, bPoliceIgnorePlayer, false, bPoliceIgnorePlayer, false);
+					draw_menu_line("Numpad5	- Kill speaking peasants", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, bKillSpeakers, false, bKillSpeakers, false);
+					draw_menu_line("Numpad6	- Enforce No-Flyzone", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad7	- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad8	- Fountain of gold", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, bMoneyFountainActive, false, bMoneyFountainActive, false);
+					draw_menu_line("Numpad9	- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
+					draw_menu_line("Numpad+	- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 17, menuLeft, 5.0f, false, false, false, false);
+					draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 18, menuLeft, 5.0f, false, false, false, false);
 				}
 
 				//Spawn a test car.
 				static bool bNumpad2Pressed, bWaitingForModelCar = false;
 				if ((isKeyPressedOnce(bNumpad2Pressed, VK_NUMPAD2) || bWaitingForModelCar == true) && playerVeh == NULL)
 				{
-					bWaitingForModelCar = SpawnPlayerCar(playerPed, playerVeh, bWaitingForModelCar);
+					bWaitingForModelCar = SpawnPlayerCar(playerPed, bWaitingForModelCar);
 				}
 
 				//Spawn a test aircraft.
 				static bool bNumpad3Pressed, bWaitingForModelAircraft = false;
 				if (isKeyPressedOnce(bNumpad3Pressed, VK_NUMPAD3))
 				{
-					bWaitingForModelAircraft = SpawnPlayerAircraft(playerPed, playerVeh, bWaitingForModelAircraft);
+					bWaitingForModelAircraft = SpawnPlayerAircraft(playerPed, bWaitingForModelAircraft);
 				}
 
 				//Police wont notice me
@@ -671,10 +727,10 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 			}// end of menu
 
 			//Force full reload animation on weapon. If you want a quicker reload, just quickly tap R. The 0x1 state seems to be time sensitive.
-				if (GetAsyncKeyState(0x52) & 0x1)
-				{
-					FastReload(playerPed);
-				}
+			if (GetAsyncKeyState(0x52) & 0x1)
+			{
+				FastReload(playerPed);
+			}
 
 			//Increase wanted level.
 			static bool bAddPressed = false;

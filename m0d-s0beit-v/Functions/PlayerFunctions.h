@@ -25,4 +25,5 @@ void ClearWantedLevel(Player player);
 void ReplenishAmmo(Ped playerPed);
 void EnableRestrictedZones(bool featureRestrictedZones);
 void RequestControl(Entity e);
-void SpectateMode(bool Active);
+void SpectatePlayer(Ped playerped);
+void SpectateMode(bool Active, Ped selectedPed);

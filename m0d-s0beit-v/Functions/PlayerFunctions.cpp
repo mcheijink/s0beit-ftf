@@ -604,19 +604,24 @@ void EnableRestrictedZones(bool featureRestrictedZones)
 
 void SpectatePlayer(Ped playerped)
 {
-	Any RenderCam = CAM::GET_RENDERING_CAM();
+	Any SpectateCam;
 
-	//PED::GET_PED_ENTITY
-
-	
-	//CAM::ATTACH_CAM_TO_ENTITY(RenderCam, )
-	//CAM::POINT_CAM_AT_ENTITY
-
-
+	Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerped, FALSE);
+	SpectateCam = CAM::CREATE_CAM_WITH_PARAMS("DEFAULT_SCRIPTED_FLY_CAMERA", playerPosition.x, playerPosition.y, playerPosition.z, 0.0, 0.0, 0.0, 50.0, 0, 2);
+	CAM::ATTACH_CAM_TO_ENTITY(SpectateCam, playerped, 0, -5, 1, 1);
+	//CAM::ATTACH_CAM_TO_PED_BONE(hi, selectedPed, 0, 0, -5, 1, 1);
+	//CAM::POINT_CAM_AT_PED_BONE(hi, selectedPed, 0, 0, 0.7, 0, 1);
+	//CAM::SET_CAM_FOV(hi, 50.0);
+	CAM::SET_CAM_ACTIVE(playerped, 1);
 }
-void SpectateMode(bool Active)
+void SpectateMode(bool Active, Ped selectedPed)
 {
-	Player player = PLAYER::PLAYER_ID();
-	Ped playerPed = PLAYER::PLAYER_PED_ID();
-	NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(Active, playerPed);
+	NETWORK::NETWORK_SET_IN_SPECTATOR_MODE(Active, selectedPed);
+}
+
+
+void BreatheFire(Ped selectedPed)
+{
+	Vector3 Mouth = PED::GET_PED_BONE_COORDS(selectedPed, SKEL_ROOT, 0.1f , 0.0f, 0.0f);
+	FIRE::_ADD_SPECFX_EXPLOSION(Mouth.x, Mouth.y, Mouth.z, EXPLOSION_DIR_FLAME, EXPLOSION_DIR_FLAME, 1.0f, true, true, 0.0f);
 }

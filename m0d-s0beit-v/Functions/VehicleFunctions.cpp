@@ -27,17 +27,18 @@ void BoostBaseVehicleStats(Vehicle vehicle)
 	VEHICLE::SET_VEHICLE_BODY_HEALTH(vehicle, 1000.0f); //This is what the game does
 }
 
-void AddClanLogoToVehicle(Vehicle vehicle, Ped ped)
+void AddClanLogoToVehicle( Ped playerPed)
 {
+	Vehicle playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
 	vector3_t x, y, z;
 	float scale;
-	Hash modelHash = ENTITY::GET_ENTITY_MODEL(vehicle);
+	Hash modelHash = ENTITY::GET_ENTITY_MODEL(playerVeh);
 	if (GetVehicleInfoForClanLogo(modelHash, x, y, z, scale))
 	{
 		int alpha = 200;
 		if (modelHash == VEHICLE_WINDSOR)
 			alpha = 255;
-		GRAPHICS::_ADD_CLAN_DECAL_TO_VEHICLE(vehicle, ped, ENTITY::_GET_ENTITY_BONE_INDEX(vehicle, "chassis_dummy"), x.x, x.y, x.z, y.x, y.y, y.z, z.x, z.y, z.z, scale, 0, alpha);
+		GRAPHICS::_ADD_CLAN_DECAL_TO_VEHICLE(playerVeh, playerPed, ENTITY::_GET_ENTITY_BONE_INDEX(playerVeh, "chassis_dummy"), x.x, x.y, x.z, y.x, y.y, y.z, z.x, z.y, z.z, scale, 0, alpha);
 	}
 }
 
@@ -105,7 +106,7 @@ Vehicle ClonePedVehicle(Ped ped)
 			VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVeh, VEHICLE::GET_VEHICLE_DIRT_LEVEL(pedVeh));
 			if (GRAPHICS::_HAS_VEHICLE_GOT_DECAL(pedVeh, 0) == TRUE)
 			{
-				AddClanLogoToVehicle(playerVeh, ped);
+				AddClanLogoToVehicle(ped);
 			}
 		}
 		STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(vehicleModelHash);
@@ -325,9 +326,10 @@ void BurstSelectedPlayerTires(Ped selectedPed)
 	}
 }
 
-bool SpawnPlayerAircraft(Ped playerPed, Vehicle playerVeh, bool bWaitingForModelAircraft)
+bool SpawnPlayerAircraft(Ped playerPed, bool bWaitingForModelAircraft)
 {
 	bool bWaiting = true;
+	Vehicle playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
 	if (bWaitingForModelAircraft || playerVeh == NULL)
 	{
 		Hash vehicleModelHash = (GetAsyncKeyState(VK_RCONTROL) & 0x8000) ? VEHICLE_BUZZARD : VEHICLE_VESTRA; //This was Vincentor's idea. See: https://www.youtube.com/watch?v=jAsgKuXaGb4
@@ -366,8 +368,9 @@ bool SpawnPlayerAircraft(Ped playerPed, Vehicle playerVeh, bool bWaitingForModel
 	return bWaiting;
 }
 
-bool SpawnPlayerCar(Ped playerPed, Vehicle playerVeh, bool bWaitingForModelCar)
+bool SpawnPlayerCar(Ped playerPed, bool bWaitingForModelCar)
 {
+	Vehicle playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
 	if (playerVeh == NULL || bWaitingForModelCar == true)
 	{
 		Hash vehicleModelHash = VEHICLE_KURUMA2;
@@ -436,7 +439,7 @@ bool SpawnPlayerCar(Ped playerPed, Vehicle playerVeh, bool bWaitingForModelCar)
 				}
 				VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(playerVeh, NEON_COLOR_ELECTRICBLUE);
 				*/
-				AddClanLogoToVehicle(playerVeh, playerPed);
+				AddClanLogoToVehicle(playerPed);
 				drawNotification("Spawned Zentorno");
 
 			}
@@ -450,6 +453,13 @@ bool SpawnPlayerCar(Ped playerPed, Vehicle playerVeh, bool bWaitingForModelCar)
 				VEHICLE::SET_VEHICLE_EXTRA_COLOURS(playerVeh, 0, COLOR_MATTE_BLACK);
 				VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_GREEN);
 				VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_TRUCK, FALSE);
+
+				//create a driver so we can shoot everything
+				PED::SET_PED_INTO_VEHICLE(playerPed, playerVeh, SEAT_BACKDRIVER);
+				Ped Driver = PED::CREATE_RANDOM_PED_AS_DRIVER(playerVeh, true);
+				PED::SET_PED_DIES_WHEN_INJURED(Driver, false);
+				AI::TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(Driver, true);
+				AIWanderCar(Driver);
 				drawNotification("Spawned Insurgent");
 			}
 			else if (vehicleModelHash == VEHICLE_RUINER)
@@ -476,7 +486,7 @@ bool SpawnPlayerCar(Ped playerPed, Vehicle playerVeh, bool bWaitingForModelCar)
 				VEHICLE::SET_VEHICLE_EXTRA(playerVeh, 7, TRUE);
 				VEHICLE::SET_VEHICLE_EXTRA(playerVeh, 10, TRUE);
 				VEHICLE::SET_VEHICLE_EXTRA(playerVeh, 11, TRUE);
-				AddClanLogoToVehicle(playerVeh, playerPed);
+				AddClanLogoToVehicle(playerPed);
 				drawNotification("Spawned Ruiner");
 			}
 			else
@@ -498,4 +508,35 @@ bool SpawnPlayerCar(Ped playerPed, Vehicle playerVeh, bool bWaitingForModelCar)
 		VEHICLE::SET_VEHICLE_FORWARD_SPEED(playerVeh, VEHICLE::_GET_VEHICLE_MAX_SPEED(ENTITY::GET_ENTITY_MODEL(playerVeh)));
 	}
 	return bWaitingForModelCar;
+}
+
+void AIWanderCar(Ped playerPed)
+{
+	Vehicle playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
+	AI::TASK_VEHICLE_DRIVE_WANDER(playerPed, playerVeh, 100.0f, 0);
+}
+
+void AIParkCar(Ped playerPed)
+{
+	Vehicle playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
+	AI::TASK_VEHICLE_DRIVE_WANDER(playerPed, playerVeh, 30.0f, 1);
+}
+
+void AIJackVehicle(Ped selectedPlayer)
+{
+	if (PED::IS_PED_IN_ANY_VEHICLE(selectedPlayer, FALSE))
+	{
+		Vehicle playerVeh = PED::GET_VEHICLE_PED_IS_USING(selectedPlayer);
+		
+		//Remove PED from vehicle
+		AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPlayer);
+		WAIT(50);
+		//cloning player
+		//Ped Driver = PED::CLONE_PED(selectedPlayer, 0.0f, false, false);
+		Ped Driver = PED::CREATE_RANDOM_PED_AS_DRIVER(playerVeh, true);
+		PED::SET_PED_INTO_VEHICLE(Driver, playerVeh, SEAT_DRIVER);
+		PED::SET_PED_DIES_WHEN_INJURED(Driver, false);
+		AI::TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(Driver, true);
+		AI::TASK_VEHICLE_DRIVE_TO_COORD(Driver, playerVeh, -2000.0f, -1000.0f, 0.0f, 100.0f, 1, ENTITY::GET_ENTITY_MODEL(playerVeh), 0, 0xC00AB, -1);
+	}
 }
