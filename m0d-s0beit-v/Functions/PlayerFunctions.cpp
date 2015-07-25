@@ -257,7 +257,7 @@ void AttackPlayerWithRandomPeds(Ped selectedPed)
 	}
 	//select a random ped arround player
 	Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
-	Vector3 createdPos = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(selectedPed, 0.0, 35, 0.0);
+	Vector3 createdPos = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(selectedPed, 0.0f, 35.0f, 0.0f);
 	//transvest hash: 0x5715E410
 	//stungun hash: 0x1E4A619F
 
@@ -506,6 +506,18 @@ void KillAllTargets(Ped playerPed, BlipList* g_blipList, bool bKillTargetsActive
 	}	
 }
 
+void PlayerGodmode(Player player, Entity playerPed, bool GodModeOn)
+{
+	PLAYER::SET_PLAYER_INVINCIBLE(player, GodModeOn);
+	ENTITY::SET_ENTITY_PROOFS(playerPed, GodModeOn, GodModeOn, GodModeOn, GodModeOn, GodModeOn, GodModeOn, GodModeOn, GodModeOn);
+	PED::SET_PED_CAN_RAGDOLL(playerPed, !GodModeOn);
+	PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, !GodModeOn);
+	if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, FALSE))
+	{
+		VehicleGodmode(playerPed, GodModeOn);
+	}
+}
+
 bool GodMode(Player player, Ped playerPed, bool bGodmodeActive, bool bGodmodeSwitchset)
 {
 	if (bGodmodeActive)
@@ -514,19 +526,14 @@ bool GodMode(Player player, Ped playerPed, bool bGodmodeActive, bool bGodmodeSwi
 		{
 			DEBUGOUT("Setting godmode");
 			drawNotification("Activating godmode");
-			PLAYER::SET_PLAYER_INVINCIBLE(player, true);
-			ENTITY::SET_ENTITY_PROOFS(playerPed, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-			PED::SET_PED_CAN_RAGDOLL(playerPed, FALSE);
-			PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, FALSE);
+			PlayerGodmode(player, playerPed, true);
 			PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
+
 			bGodmodeSwitchset = true;
 		}
 		else if (!PLAYER::GET_PLAYER_INVINCIBLE(player)) 
 		{
-			PLAYER::SET_PLAYER_INVINCIBLE(player, true);
-			ENTITY::SET_ENTITY_PROOFS(playerPed, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-			PED::SET_PED_CAN_RAGDOLL(playerPed, FALSE);
-			PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, FALSE);
+			PlayerGodmode(player, playerPed, true);
 			PED::ADD_ARMOUR_TO_PED(playerPed, PLAYER::GET_PLAYER_MAX_ARMOUR(player) - PED::GET_PED_ARMOUR(playerPed));
 		}
 		
@@ -537,22 +544,17 @@ bool GodMode(Player player, Ped playerPed, bool bGodmodeActive, bool bGodmodeSwi
 		{
 			DEBUGOUT("Deactivating godmode");
 			drawNotification("Deactivating godmode");
-			PLAYER::SET_PLAYER_INVINCIBLE(player, false);
-			ENTITY::SET_ENTITY_PROOFS(playerPed, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
-			PED::SET_PED_CAN_RAGDOLL(playerPed, TRUE);
-			PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, TRUE);
+			PlayerGodmode(player, playerPed, false);
 			bGodmodeSwitchset = false;
 		}
 		else if (PLAYER::GET_PLAYER_INVINCIBLE(player))
 		{	// bugfix for random godmode active
-			PLAYER::SET_PLAYER_INVINCIBLE(player, false);
-			ENTITY::SET_ENTITY_PROOFS(playerPed, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
-			PED::SET_PED_CAN_RAGDOLL(playerPed, TRUE);
-			PED::SET_PED_CAN_RAGDOLL_FROM_PLAYER_IMPACT(playerPed, TRUE);
+			PlayerGodmode(player, playerPed, false);
 		}
 	}
 	return bGodmodeSwitchset;
 }
+
 
 void IncreaseWantedLevel(Player player)
 {
@@ -624,4 +626,50 @@ void BreatheFire(Ped selectedPed)
 {
 	Vector3 Mouth = PED::GET_PED_BONE_COORDS(selectedPed, SKEL_ROOT, 0.1f , 0.0f, 0.0f);
 	FIRE::_ADD_SPECFX_EXPLOSION(Mouth.x, Mouth.y, Mouth.z, EXPLOSION_DIR_FLAME, EXPLOSION_DIR_FLAME, 1.0f, true, true, 0.0f);
+}
+
+
+void CrashPlayer(Ped selectedPed)
+{
+	const int maxPeds = 40;
+	Ped ClonedPed[maxPeds];
+	Ped playerPed = PLAYER::PLAYER_PED_ID();
+
+	Vector3 selectedPedPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
+	Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPed, FALSE);
+
+
+	// check distance so i dont crash myself
+	if (GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(playerPosition.x, playerPosition.y, playerPosition.z, selectedPedPosition.x, selectedPedPosition.y, selectedPedPosition.z, false) > 250.0f)
+	{
+		if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
+		{
+			AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
+		}
+
+		//spawn peds
+		for (int i = 0; i < maxPeds; i++)
+		{
+			ClonedPed[i] = PED::CLONE_PED(selectedPed, 0.0f, false, false);
+		}
+		//I may need a wait function?
+
+		//and delete the evidence
+		for (int i = 0; i < maxPeds; i++)
+		{
+			PED::DELETE_PED(&ClonedPed[i]);
+		}
+	}
+}
+
+void PlayerInvisible(bool Invisible)
+{
+	if (Invisible)
+	{
+		NETWORK::SET_LOCAL_PLAYER_INVISIBLE_LOCALLY(false);
+	}
+	else
+	{
+		NETWORK::SET_LOCAL_PLAYER_VISIBLE_LOCALLY(false);
+	}	
 }

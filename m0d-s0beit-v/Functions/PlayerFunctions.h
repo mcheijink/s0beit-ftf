@@ -27,3 +27,7 @@ void EnableRestrictedZones(bool featureRestrictedZones);
 void RequestControl(Entity e);
 void SpectatePlayer(Ped playerped);
 void SpectateMode(bool Active, Ped selectedPed);
+void PlayerGodmode(Player player, Entity playerPed, bool GodModeOn);
+bool GodMode(Player player, Ped playerPed, bool bGodmodeActive, bool bGodmodeSwitchset);
+void PlayerInvisible(bool Invisible);
+void CrashPlayer(Ped selectedPed);

@@ -46,7 +46,7 @@ extern MODULEINFO g_MainModuleInfo;
 #include "Functions\WeaponFunctions.h"
 #include "Functions\WorldFunctions.h"
 
-#define version 1203
+#define version 1204
 
 void Tick();
 void Run();

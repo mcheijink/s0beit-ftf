@@ -16,3 +16,4 @@ Vehicle ClonePedVehicle(Ped ped);
 void AIWanderCar(Ped playerPed);
 void AIParkCar(Ped playerPed);
 void AIJackVehicle(Ped selectedPlayer);
+void VehicleGodmode(Entity playerPed, bool GodmodeOn);

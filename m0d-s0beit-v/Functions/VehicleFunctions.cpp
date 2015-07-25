@@ -114,17 +114,17 @@ Vehicle ClonePedVehicle(Ped ped)
 	return pedVeh;
 }
 
-void DumpPlayerFromVehicle(Ped PlayerID, bool Notification)
+void DumpPlayerFromVehicle(Ped selectedPed, bool Notification)
 {
-	if (PED::IS_PED_IN_ANY_VEHICLE(PlayerID, FALSE))
+	if (PED::IS_PED_IN_ANY_VEHICLE(selectedPed, FALSE))
 	{
 		//Remove PED from vehicle
-		AI::CLEAR_PED_TASKS_IMMEDIATELY(PlayerID);
+		AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPed);
 		//need to remove the parachute: 0xFBAB5776
-		WEAPON::REMOVE_WEAPON_FROM_PED(PlayerID, 0xFBAB5776);
+		WEAPON::REMOVE_WEAPON_FROM_PED(selectedPed, 0xFBAB5776);
 
 		if (Notification){
-			std::string selectedPedName = PLAYER::GET_PLAYER_NAME(PlayerID);
+			std::string selectedPedName = PLAYER::GET_PLAYER_NAME(selectedPed);
 			drawNotification(selectedPedName + "Removed from vehicle");
 		}
 	}
@@ -529,14 +529,27 @@ void AIJackVehicle(Ped selectedPlayer)
 		Vehicle playerVeh = PED::GET_VEHICLE_PED_IS_USING(selectedPlayer);
 		
 		//Remove PED from vehicle
-		AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPlayer);
-		WAIT(50);
+		//AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPlayer);
+		//WAIT(50);
 		//cloning player
 		//Ped Driver = PED::CLONE_PED(selectedPlayer, 0.0f, false, false);
-		Ped Driver = PED::CREATE_RANDOM_PED_AS_DRIVER(playerVeh, true);
-		PED::SET_PED_INTO_VEHICLE(Driver, playerVeh, SEAT_DRIVER);
-		PED::SET_PED_DIES_WHEN_INJURED(Driver, false);
-		AI::TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(Driver, true);
-		AI::TASK_VEHICLE_DRIVE_TO_COORD(Driver, playerVeh, -2000.0f, -1000.0f, 0.0f, 100.0f, 1, ENTITY::GET_ENTITY_MODEL(playerVeh), 0, 0xC00AB, -1);
+		//Ped Driver = PED::CLONE_PED(selectedPlayer, 0.0f, true,true);
+		//AI::TASK_ENTER_VEHICLE(Driver, playerVeh, 100, SEAT_DRIVER, 1.0f, 0, 0);
+		//PED::SET_PED_INTO_VEHICLE(Driver, playerVeh, SEAT_DRIVER);
+		//PED::SET_PED_DIES_WHEN_INJURED(Driver, false);
+		//AI::TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(Driver, true);
+		//WAIT(5000);
+		AI::TASK_VEHICLE_DRIVE_TO_COORD(selectedPlayer, playerVeh, -2000.0f, -1000.0f, 0.0f, 100.0f, 1, ENTITY::GET_ENTITY_MODEL(playerVeh), 0, 0xC00AB, -1);
 	}
+}
+
+void VehicleGodmode(Entity playerPed, bool GodmodeOn)
+{
+	Vehicle vehicle = PED::GET_VEHICLE_PED_IS_USING(playerPed);
+	ENTITY::SET_ENTITY_INVINCIBLE(vehicle, GodmodeOn); //That should do the trick.
+	ENTITY::SET_ENTITY_PROOFS(vehicle, GodmodeOn, GodmodeOn, GodmodeOn, GodmodeOn, GodmodeOn, GodmodeOn, GodmodeOn, GodmodeOn);
+	VEHICLE::SET_VEHICLE_STRONG(vehicle, GodmodeOn); //2stronk
+	VEHICLE::SET_VEHICLE_CAN_BE_VISIBLY_DAMAGED(vehicle, !GodmodeOn); //I don't think this really works, but fuck it. Call it anyway.
+	VEHICLE::SET_VEHICLE_CAN_BREAK(vehicle, !GodmodeOn); //Hopefully this fixes the car blowing up after getting hit by a train...
+	VEHICLE::SET_VEHICLE_ENGINE_CAN_DEGRADE(vehicle, !GodmodeOn);
 }
