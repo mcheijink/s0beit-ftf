@@ -304,7 +304,8 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 					}
 					Vector3 playerCoordinate = ENTITY::GET_ENTITY_COORDS(debugPed, FALSE); //Dereck B? On your bike!
 					float playerHeading = ENTITY::GET_ENTITY_HEADING(debugPed);
-					draw_menu_line(" x: " + std::to_string(playerCoordinate.x) + " y: " + std::to_string(playerCoordinate.y) + " z: " + std::to_string(playerCoordinate.z) + " heading: " + std::to_string(playerHeading), 15.0f, 4.0f, 13.0f, 550.0f, 5.0f, false, false, false);
+					float playerSpeed = ENTITY::GET_ENTITY_SPEED(debugPed) * 3.6;
+					draw_menu_line(" x: " + std::to_string(round(playerCoordinate.x)) + " y: " + std::to_string(round(playerCoordinate.y)) + " z: " + std::to_string(round(playerCoordinate.z)) + " heading: " + std::to_string(round(playerHeading)) + " speed: " + std::to_string(round(playerSpeed)), 15.0f, 4.0f, 13.0f, 550.0f, 5.0f, false, false, false);
 					static bool bF11Pressed;
 					if (isKeyPressedOnce(bF11Pressed, VK_F11))
 					{

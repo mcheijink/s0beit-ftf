@@ -673,3 +673,8 @@ void PlayerInvisible(bool Invisible)
 		NETWORK::SET_LOCAL_PLAYER_VISIBLE_LOCALLY(false);
 	}	
 }
+
+void PlayerESP()
+{
+	//GRAPHICS::_WORLD3D_TO_SCREEN2D();
+}
