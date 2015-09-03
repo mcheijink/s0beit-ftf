@@ -649,7 +649,7 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 				static bool bNumpad1Pressed;
 				if (isKeyPressedOnce(bNumpad1Pressed, VK_NUMPAD1))
 				{
-					if (driverPed != NULL)
+					if ((driverPed != NULL) && (PED::IS_PED_ON_SPECIFIC_VEHICLE(driverPed,playerVeh)))
 						AIDrivetoWaypoint(driverPed);
 					else
 						AIDrivetoWaypoint(playerPed);

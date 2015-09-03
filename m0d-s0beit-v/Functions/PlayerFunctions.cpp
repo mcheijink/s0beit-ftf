@@ -742,6 +742,7 @@ Ped getRandomPedToDrive()
 		//find random ped
 		//walk to another door and
 		//take a seat
+		WAIT(250);
 		if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, FALSE)){
 			PED::SET_PED_INTO_VEHICLE(playerPed, pedVeh, freeSeat);
 		}
@@ -756,5 +757,5 @@ void SpawnPedMoney(Ped selectedPed)
 	Ped spawnedPed = PED::CLONE_PED(selectedPed,0.0f,true,true);
 	PED::SET_PED_MONEY(spawnedPed, 1999);
 	PED::APPLY_DAMAGE_TO_PED(spawnedPed, 25000, true);
-	PED::DELETE_PED(&spawnedPed);
+	PED::REMOVE_PED_ELEGANTLY(&spawnedPed);
 }
