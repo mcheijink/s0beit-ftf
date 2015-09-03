@@ -555,7 +555,6 @@ bool GodMode(Player player, Ped playerPed, bool bGodmodeActive, bool bGodmodeSwi
 	return bGodmodeSwitchset;
 }
 
-
 void IncreaseWantedLevel(Player player)
 {
 	if (PLAYER::GET_PLAYER_WANTED_LEVEL(player) < 5)
@@ -631,7 +630,7 @@ void BreatheFire(Ped selectedPed)
 
 void CrashPlayer(Ped selectedPed)
 {
-	const int maxPeds = 40;
+	const int maxPeds = 5;
 	Ped ClonedPed[maxPeds];
 	Ped playerPed = PLAYER::PLAYER_PED_ID();
 
@@ -664,17 +663,98 @@ void CrashPlayer(Ped selectedPed)
 
 void PlayerInvisible(bool Invisible)
 {
+	Entity Player = PLAYER::PLAYER_PED_ID();
 	if (Invisible)
 	{
-		NETWORK::SET_LOCAL_PLAYER_INVISIBLE_LOCALLY(false);
+		//NETWORK::SET_LOCAL_PLAYER_INVISIBLE_LOCALLY(false);
+		ENTITY::SET_ENTITY_COLLISION(Player, false, 0);
+		ENTITY::SET_ENTITY_ALPHA(Player, 0, true);
 	}
 	else
-	{
-		NETWORK::SET_LOCAL_PLAYER_VISIBLE_LOCALLY(false);
+	{	
+		ENTITY::SET_ENTITY_COLLISION(Player, true, 0);
+		ENTITY::RESET_ENTITY_ALPHA(Player);
+		//NETWORK::SET_LOCAL_PLAYER_VISIBLE_LOCALLY(false);
 	}	
 }
 
 void PlayerESP()
 {
 	//GRAPHICS::_WORLD3D_TO_SCREEN2D();
+}
+
+Ped getRandomPedToDrive()
+{
+	Ped playerPed = PLAYER::PLAYER_PED_ID();
+	Ped driverPed = NULL;
+	Vehicle pedVeh = NULL;
+	Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(playerPed, FALSE);
+	int currentCarGroup = PED::CREATE_GROUP(0);
+	/*
+	//create a driver so we can shoot everything
+	PED::SET_PED_INTO_VEHICLE(playerPed, playerVeh, SEAT_BACKDRIVER);
+	
+	PED::SET_PED_DIES_WHEN_INJURED(Driver, false);
+	AI::TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(Driver, true);
+	AIWanderCar(Driver);
+	*/
+
+	int freeSeat = -1;
+
+	if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, FALSE))
+		pedVeh = PED::GET_VEHICLE_PED_IS_IN(playerPed, FALSE);
+
+	for (int i = 0; i < VEHICLE::GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(pedVeh); i++)
+	{
+		freeSeat = VEHICLE::IS_VEHICLE_SEAT_FREE(pedVeh, i);
+	}
+	drawNotification(std::to_string(pedVeh));
+	drawNotification(std::to_string(ENTITY::DOES_ENTITY_EXIST(pedVeh)));
+	drawNotification(std::to_string(freeSeat));
+	drawNotification(std::to_string(currentCarGroup));
+
+	if (!ENTITY::DOES_ENTITY_EXIST(pedVeh))				//vehicle exists
+	{ 
+		drawNotification("Car doesn't exist");
+		return NULL;
+	}
+	if (!VEHICLE::_IS_ANY_VEHICLE_SEAT_EMPTY(pedVeh))				//free seat exists
+	{
+		drawNotification("No free seat");
+		return NULL;
+	}
+	if ((currentCarGroup = 0))				//group exists
+	{
+		drawNotification("Group doesn't exist");
+		return NULL;
+	}
+		AI::TASK_LEAVE_VEHICLE(playerPed, pedVeh, 0);
+		while (!VEHICLE::IS_VEHICLE_SEAT_FREE(pedVeh, -1))
+		{
+			WAIT(50);
+		}
+		driverPed = PED::CREATE_RANDOM_PED_AS_DRIVER(pedVeh,true);
+		PED::SET_PED_AS_GROUP_LEADER(playerPed, currentCarGroup);
+		PED::SET_PED_AS_GROUP_MEMBER(driverPed, currentCarGroup);
+		PED::SET_PED_NEVER_LEAVES_GROUP(driverPed, true);
+		//get out of the car and 
+		//AI::TASK_ENTER_VEHICLE(driverPed, pedVeh, 0, -1, 2.0f, 1, 0);
+		//find random ped
+		//walk to another door and
+		//take a seat
+		if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, FALSE)){
+			PED::SET_PED_INTO_VEHICLE(playerPed, pedVeh, freeSeat);
+		}
+		
+
+		return driverPed;
+}
+
+void SpawnPedMoney(Ped selectedPed)
+{
+	//Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(selectedPed, FALSE);
+	Ped spawnedPed = PED::CLONE_PED(selectedPed,0.0f,true,true);
+	PED::SET_PED_MONEY(spawnedPed, 1999);
+	PED::APPLY_DAMAGE_TO_PED(spawnedPed, 25000, true);
+	PED::DELETE_PED(&spawnedPed);
 }

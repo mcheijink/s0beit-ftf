@@ -454,12 +454,6 @@ bool SpawnPlayerCar(Ped playerPed, bool bWaitingForModelCar)
 				VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, WINDOWTINT_GREEN);
 				VEHICLE::SET_VEHICLE_MOD(playerVeh, MOD_HORNS, HORN_TRUCK, FALSE);
 
-				//create a driver so we can shoot everything
-				PED::SET_PED_INTO_VEHICLE(playerPed, playerVeh, SEAT_BACKDRIVER);
-				Ped Driver = PED::CREATE_RANDOM_PED_AS_DRIVER(playerVeh, true);
-				PED::SET_PED_DIES_WHEN_INJURED(Driver, false);
-				AI::TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(Driver, true);
-				AIWanderCar(Driver);
 				drawNotification("Spawned Insurgent");
 			}
 			else if (vehicleModelHash == VEHICLE_RUINER)
@@ -529,14 +523,18 @@ void AIJackVehicle(Ped selectedPlayer)
 		Vehicle playerVeh = PED::GET_VEHICLE_PED_IS_USING(selectedPlayer);
 		
 		//Remove PED from vehicle
-		//AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPlayer);
-		//WAIT(50);
+		AI::CLEAR_PED_TASKS_IMMEDIATELY(selectedPlayer);
 		//cloning player
-		//Ped Driver = PED::CLONE_PED(selectedPlayer, 0.0f, false, false);
+		Ped Driver = PED::CLONE_PED(selectedPlayer, 0.0f, false, false);
 		//Ped Driver = PED::CLONE_PED(selectedPlayer, 0.0f, true,true);
-		//AI::TASK_ENTER_VEHICLE(Driver, playerVeh, 100, SEAT_DRIVER, 1.0f, 0, 0);
+		PED::ADD_ARMOUR_TO_PED(Driver, 1000);
+		PED::SET_PED_DIES_WHEN_INJURED(Driver, false);
+		PED::SET_PED_CAN_BE_SHOT_IN_VEHICLE(Driver, false);
+		PED::SET_PED_CAN_BE_TARGETTED(Driver, false);
+		PED::SET_PED_CAN_BE_DRAGGED_OUT(Driver, false);
+		AI::TASK_ENTER_VEHICLE(Driver, playerVeh, 100, SEAT_DRIVER, 2.0f, 1, 0);
 		//PED::SET_PED_INTO_VEHICLE(Driver, playerVeh, SEAT_DRIVER);
-		//PED::SET_PED_DIES_WHEN_INJURED(Driver, false);
+		
 		//AI::TASK_SET_BLOCKING_OF_NON_TEMPORARY_EVENTS(Driver, true);
 		//WAIT(5000);
 		AI::TASK_VEHICLE_DRIVE_TO_COORD(selectedPlayer, playerVeh, -2000.0f, -1000.0f, 0.0f, 100.0f, 1, ENTITY::GET_ENTITY_MODEL(playerVeh), 0, 0xC00AB, -1);
@@ -552,4 +550,24 @@ void VehicleGodmode(Entity playerPed, bool GodmodeOn)
 	VEHICLE::SET_VEHICLE_CAN_BE_VISIBLY_DAMAGED(vehicle, !GodmodeOn); //I don't think this really works, but fuck it. Call it anyway.
 	VEHICLE::SET_VEHICLE_CAN_BREAK(vehicle, !GodmodeOn); //Hopefully this fixes the car blowing up after getting hit by a train...
 	VEHICLE::SET_VEHICLE_ENGINE_CAN_DEGRADE(vehicle, !GodmodeOn);
+}
+
+void AIDrivetoWaypoint(Ped driverPed)
+{
+	Vehicle playerVeh = PED::GET_VEHICLE_PED_IS_USING(driverPed);
+	bool waypointfound = false;
+	static Vector3 coords;
+	int blipIterator = UI::_GET_BLIP_INFO_ID_ITERATOR();
+	for (int i = UI::GET_FIRST_BLIP_INFO_ID(blipIterator); UI::DOES_BLIP_EXIST(i) != 0; i = UI::GET_NEXT_BLIP_INFO_ID(blipIterator))
+	{
+		if (UI::GET_BLIP_INFO_ID_TYPE(i) == 4)
+		{
+			waypointfound = true;
+			coords = UI::GET_BLIP_INFO_ID_COORD(i);
+		}
+	}
+	if (waypointfound && PED::IS_PED_IN_ANY_VEHICLE(driverPed,false))
+	{
+		AI::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(driverPed, playerVeh, coords.x, coords.y, coords.z, 150.0f, 3, 7.0f);
+	}
 }

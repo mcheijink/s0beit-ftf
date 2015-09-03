@@ -88,3 +88,20 @@ void ATMFountain(Ped playerPed, bool bATMFountainActive)
 		}	
 	}
 }
+
+float Height(Vector3 Coordinate)
+{
+	float waterheight, groundheight;
+
+	WATER::GET_WATER_HEIGHT(Coordinate.x, Coordinate.y, Coordinate.z, &waterheight);
+	GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(Coordinate.x, Coordinate.y, Coordinate.z, &groundheight);
+
+	if (waterheight > groundheight)
+	{
+		return waterheight;
+	}
+	else
+	{
+		return groundheight;
+	}
+}
