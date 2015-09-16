@@ -74,9 +74,6 @@
     <ClInclude Include="Functions\WorldFunctions.h">
       <Filter>Header Files\Functions</Filter>
     </ClInclude>
-    <ClInclude Include="natives_bak.h">
-      <Filter>Header Files\Script</Filter>
-    </ClInclude>
     <ClInclude Include="natives.h">
       <Filter>Header Files\Script</Filter>
     </ClInclude>

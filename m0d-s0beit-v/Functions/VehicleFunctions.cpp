@@ -568,6 +568,21 @@ void AIDrivetoWaypoint(Ped driverPed)
 	}
 	if (waypointfound && PED::IS_PED_IN_ANY_VEHICLE(driverPed,false))
 	{
-		AI::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(driverPed, playerVeh, coords.x, coords.y, coords.z, 150.0f, 3, 7.0f);
+		AI::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(driverPed, playerVeh, coords.x, coords.y, coords.z, 150.0f, 4, 7.0f);
 	}
+	/*
+	Makes a ped in a vehicle follow an entity (ped, vehicle, etc.)
+
+	note: ped can halt vehicle (if losing sight?, continues if entity is near)
+
+	drivingStyle:
+	0 = Rushed
+	1 = Ignore Traffic Lights
+	2 = Fast
+	3 = Normal (Stop in Traffic)
+	4 = Fast avoid traffic
+	5 = Fast, stops in traffic but overtakes sometimes
+	6 = Fast avoids traffic extremely
+
+	*/
 }
