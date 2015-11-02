@@ -12,6 +12,11 @@ void BoostBaseVehicleStats(Vehicle vehicle)
 	VEHICLE::SET_VEHICLE_ENGINE_CAN_DEGRADE(vehicle, !IsRCtrlUp);
 	VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE); //What seems to be the officer, problem? *le9gagmemeface*
 	VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(vehicle, FALSE); //Bulletproof Tires.
+	Player player = PLAYER::PLAYER_ID();
+	DECORATOR::DECOR_REGISTER("Player_Vehicle", 3);
+	DECORATOR::DECOR_REGISTER("Veh_Modded_By_Player", 3);
+	DECORATOR::DECOR_SET_INT(vehicle, "Player_Vehicle", NETWORK::_0xBC1D768F2F5D6C05(player));
+	DECORATOR::DECOR_SET_INT(vehicle, "Veh_Modded_By_Player", GAMEPLAY::GET_HASH_KEY(PLAYER::GET_PLAYER_NAME(player)));
 	Hash vehicleModel = ENTITY::GET_ENTITY_MODEL(vehicle);
 	if (VEHICLE::IS_THIS_MODEL_A_CAR(vehicleModel) || VEHICLE::IS_THIS_MODEL_A_BIKE(vehicleModel))
 	{
@@ -25,21 +30,6 @@ void BoostBaseVehicleStats(Vehicle vehicle)
 		VEHICLE::TOGGLE_VEHICLE_MOD(vehicle, MOD_TURBO, TRUE); //Forced induction huehuehue
 	}
 	VEHICLE::SET_VEHICLE_BODY_HEALTH(vehicle, 1000.0f); //This is what the game does
-}
-
-void AddClanLogoToVehicle( Ped playerPed)
-{
-	Vehicle playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
-	vector3_t x, y, z;
-	float scale;
-	Hash modelHash = ENTITY::GET_ENTITY_MODEL(playerVeh);
-	if (GetVehicleInfoForClanLogo(modelHash, x, y, z, scale))
-	{
-		int alpha = 200;
-		if (modelHash == VEHICLE_WINDSOR)
-			alpha = 255;
-		GRAPHICS::_ADD_CLAN_DECAL_TO_VEHICLE(playerVeh, playerPed, ENTITY::_GET_ENTITY_BONE_INDEX(playerVeh, "chassis_dummy"), x.x, x.y, x.z, y.x, y.y, y.z, z.x, z.y, z.z, scale, 0, alpha);
-	}
 }
 
 Vehicle ClonePedVehicle(Ped ped)
@@ -104,10 +94,6 @@ Vehicle ClonePedVehicle(Ped ped)
 			VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(playerVeh, neonColor[0], neonColor[1], neonColor[2]);
 			VEHICLE::SET_VEHICLE_WINDOW_TINT(playerVeh, VEHICLE::GET_VEHICLE_WINDOW_TINT(pedVeh));
 			VEHICLE::SET_VEHICLE_DIRT_LEVEL(playerVeh, VEHICLE::GET_VEHICLE_DIRT_LEVEL(pedVeh));
-			if (GRAPHICS::_HAS_VEHICLE_GOT_DECAL(pedVeh, 0) == TRUE)
-			{
-				AddClanLogoToVehicle(ped);
-			}
 		}
 		STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(vehicleModelHash);
 	}
@@ -439,7 +425,6 @@ bool SpawnPlayerCar(Ped playerPed, bool bWaitingForModelCar)
 				}
 				VEHICLE::_SET_VEHICLE_NEON_LIGHTS_COLOUR(playerVeh, NEON_COLOR_ELECTRICBLUE);
 				*/
-				AddClanLogoToVehicle(playerPed);
 				drawNotification("Spawned Zentorno");
 
 			}
@@ -480,7 +465,6 @@ bool SpawnPlayerCar(Ped playerPed, bool bWaitingForModelCar)
 				VEHICLE::SET_VEHICLE_EXTRA(playerVeh, 7, TRUE);
 				VEHICLE::SET_VEHICLE_EXTRA(playerVeh, 10, TRUE);
 				VEHICLE::SET_VEHICLE_EXTRA(playerVeh, 11, TRUE);
-				AddClanLogoToVehicle(playerPed);
 				drawNotification("Spawned Ruiner");
 			}
 			else
@@ -563,7 +547,8 @@ void AIDrivetoWaypoint(Ped driverPed)
 		if (UI::GET_BLIP_INFO_ID_TYPE(i) == 4)
 		{
 			waypointfound = true;
-			coords = UI::GET_BLIP_INFO_ID_COORD(i);
+			coords = UI::GET_BLIP_INFO_ID_COORD(i)
+				;
 		}
 	}
 	if (waypointfound && PED::IS_PED_IN_ANY_VEHICLE(driverPed,false))
@@ -585,4 +570,14 @@ void AIDrivetoWaypoint(Ped driverPed)
 	6 = Fast avoids traffic extremely
 
 	*/
+}
+
+void SetRadio()
+{
+	Ped playerPed = PLAYER::PLAYER_PED_ID();
+	if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, FALSE))
+	{
+		Vehicle playerVeh = PED::GET_VEHICLE_PED_IS_USING(playerPed);
+		AUDIO::SET_VEH_RADIO_STATION(playerVeh, AUDIO::GET_RADIO_STATION_NAME(RADIO_SELFRADIO));
+	}
 }

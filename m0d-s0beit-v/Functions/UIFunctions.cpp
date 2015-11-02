@@ -9,7 +9,7 @@ void draw_menu_line(std::string caption, float lineWidth, float lineHeight, floa
 {
 	// default values
 	int text_col[4] = { 255, 255, 255, 255 },
-		rect_col[4] = { 70, 95, 95, 150 };
+		rect_col[4] = { 70, 95, 95, 255 };
 	float text_scale = 0.30f;
 	int font = 0; //Maybe make this a parameter in the future.
 

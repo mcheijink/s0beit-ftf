@@ -14,4 +14,5 @@ public:
 	static void Msg(const char* fmt, ...);
 	static void Error(const char* fmt, ...);
 	static void Fatal(const char* fmt, ...);
+	static void ToScreen(const int index, const char* fmt, ...);
 };

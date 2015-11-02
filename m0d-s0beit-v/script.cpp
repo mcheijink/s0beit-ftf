@@ -1,151 +1,9 @@
 #include "stdafx.h"
 
 //https://s-media-cache-ak0.pinimg.com/236x/a5/32/43/a5324394baa368ef5273ef2e95a2976c.jpg
-rage::scrThread* GetActiveThread()
-{
-	char* moduleTls = *(char**)__readgsqword(88);
+Player moneyPlayer = -1;
 
-	return *reinterpret_cast<rage::scrThread**>(moduleTls + 2096); //citizenMP sigs this offset. It's been the same for 3 versions. Not worth it.
-}
-//I won't even begin to claim that I know what the fuck is going on here. ~gir489
-void SetActiveThread(rage::scrThread* thread)
-{
-	char* moduleTls = *(char**)__readgsqword(88);
-
-	*reinterpret_cast<rage::scrThread**>(moduleTls + 2096) = thread;
-}
-
-bool isKeyPressedOnce(bool& bIsPressed, DWORD vk)
-{
-	if (GetAsyncKeyState(vk) & 0x8000)
-	{
-		if (bIsPressed == false)
-		{
-			bIsPressed = true;
-			return true;
-		}
-	}
-	else if (bIsPressed == true)
-	{
-		bIsPressed = false;
-	}
-	return false;
-}
-
-void ReleaseKeys()
-{
-	keybd_event(VK_NUMPAD1, 0, KEYEVENTF_KEYUP, 0);
-	keybd_event(VK_SUBTRACT, 0, KEYEVENTF_KEYUP, 0);
-}
-
-char* radioNames[] = { "RADIO_01_CLASS_ROCK", "RADIO_02_POP", "RADIO_03_HIPHOP_NEW", "RADIO_04_PUNK", "RADIO_05_TALK_01", "RADIO_06_COUNTRY", "RADIO_07_DANCE_01", "RADIO_08_MEXICAN", "RADIO_09_HIPHOP_OLD", "RADIO_12_REGGAE", "RADIO_13_JAZZ", "RADIO_14_DANCE_02", "RADIO_15_MOTOWN", "RADIO_20_THELAB", "RADIO_16_SILVERLAKE", "RADIO_17_FUNK", "RADIO_18_90S_ROCK", "RADIO_19_USER", "RADIO_11_TALK_02", "HIDDEN_RADIO_AMBIENT_TV_BRIGHT", "OFF" };
-
-
-void CheckPlayer(int& iPlayer, bool direction)
-{
-	int iOriginalPlayer = iPlayer;
-	if (iPlayer > 30) {
-		iPlayer = 0;
-	}
-	else if (iPlayer < 0) {
-		iPlayer = 30;
-	}
-	while (ENTITY::DOES_ENTITY_EXIST(PLAYER::GET_PLAYER_PED(iPlayer)) == FALSE)
-	{
-		if (iPlayer > 30)
-		{
-			iPlayer = 0;
-			break;
-		}
-		else if (iPlayer < 0)
-		{
-			iPlayer = 30;
-			break;
-		}
-		direction ? iPlayer++ : iPlayer--;
-	}
-	if (iPlayer != iOriginalPlayer)
-		ReleaseKeys(); //This is so you don't continue to blow up the server under someone's name if they leave.
-}
-
-DWORD64 g_dwRegistrationTablePtr = 0;
-NativeRegistration** GetRegistrationTable() {
-	if (!g_dwRegistrationTablePtr) {
-		g_dwRegistrationTablePtr = Pattern::Scan(g_MainModuleInfo, "76 61 49 8B 7A 40 48 8D 0D");
-
-		if (!g_dwRegistrationTablePtr) {
-			Log::Fatal("Unable to find Native Registration Table");
-		}
-
-		g_dwRegistrationTablePtr += 6;
-
-		DWORD64 dwAddressOfRegistrationTable = g_dwRegistrationTablePtr + *(DWORD*)(g_dwRegistrationTablePtr + 3) + 7;
-
-		if (!dwAddressOfRegistrationTable ||
-			dwAddressOfRegistrationTable < (DWORD64)g_MainModuleInfo.lpBaseOfDll ||
-			dwAddressOfRegistrationTable > (DWORD64) g_MainModuleInfo.lpBaseOfDll + g_MainModuleInfo.SizeOfImage) {
-			Log::Fatal("Error reading Native Registration Table opcode (0x%I64X)", dwAddressOfRegistrationTable);
-		}
-
-		g_dwRegistrationTablePtr = dwAddressOfRegistrationTable;
-		DEBUGOUT("g_dwRegistrationTablePtr = 0x%I64X", g_dwRegistrationTablePtr);
-	}
-
-	return (NativeRegistration**)g_dwRegistrationTablePtr;
-}
-
-NativeHandler GetNativeHandler(UINT64 hash) {
-	NativeRegistration** registrationTable = GetRegistrationTable();
-
-	if (!registrationTable)
-		return nullptr;
-
-	NativeRegistration* table = registrationTable[hash & 0xFF];
-
-	for (; table; table = table->nextRegistration)
-	{
-		for (UINT32 i = 0; i < table->numEntries; i++)
-		{
-			if (hash == table->hashes[i])
-			{
-				return table->handlers[i];
-			}
-		}
-	}
-	return nullptr;
-}
-
-DWORD64 g_dwThreadCollectionPtr = 0;
-BlipList* g_blipList;
-rage::pgPtrCollection<GtaThread>* GetGtaThreadCollection() {
-	if (!g_dwThreadCollectionPtr) {
-		g_dwThreadCollectionPtr = Pattern::Scan(g_MainModuleInfo, "48 8B ? ? ? ? ? 8B CA 4C 8B 0C C8");
-
-		if (!g_dwThreadCollectionPtr) {
-			Log::Fatal("Unable to find GTA Thread Pool");
-		}
-
-		DWORD64 dwAddressOfThreadCollection = g_dwThreadCollectionPtr + *(DWORD*)(g_dwThreadCollectionPtr + 3) + 7;
-
-		if (!dwAddressOfThreadCollection ||
-			dwAddressOfThreadCollection < (DWORD64)g_MainModuleInfo.lpBaseOfDll ||
-			dwAddressOfThreadCollection >(DWORD64) g_MainModuleInfo.lpBaseOfDll + g_MainModuleInfo.SizeOfImage) {
-			Log::Fatal("Error reading GTA Thread Pool opcode (0x%I64X)", dwAddressOfThreadCollection);
-		}
-
-		g_dwThreadCollectionPtr = dwAddressOfThreadCollection;
-		DEBUGOUT("g_dwThreadCollectionPtr = 0x%I64X", g_dwThreadCollectionPtr);
-
-		DWORD64 blipCollectionSignature = Pattern::Scan(g_MainModuleInfo, "4C 8D 05 ? ? ? ? 0F B7 C1");
-
-		g_blipList = (BlipList*)(blipCollectionSignature + *(DWORD*)(blipCollectionSignature + 3) + 7);
-
-		DEBUGOUT("g_blipList = 0x%I64X", g_blipList);
-	}
-
-	return (rage::pgPtrCollection<GtaThread>*) g_dwThreadCollectionPtr;
-}
-
+BlipList* pBlipList;
 GtaThread_VTable gGtaThreadOriginal;
 GtaThread_VTable gGtaThreadNew;
 
@@ -160,18 +18,11 @@ void WAIT(DWORD ms)
 #endif
 }
 
-int cint(float number)
-{
-	int result = (number + 0.5);
-	return result;
-}
-
-
 eThreadState Trampoline(GtaThread* This)
 {
 	rage::scrThread* runningThread = GetActiveThread();
 	SetActiveThread(This);
-#ifdef  __DEBUG 
+#ifdef  __DEBUG
 	Run(); //We don't want to also call RunUnlireable, since it's expecting WAIT() to work, which it doesn't in debug mode. #depechemode
 #else
 	Tick();
@@ -233,12 +84,18 @@ void Tick()
 		scriptFiber = CreateFiber(NULL, HeavyWaitFunction, nullptr);
 }
 
+int cint(float number)
+{
+	int result = (number + 0.5);
+	return result;
+}
 void RunUnreliable() //Put functions that don't really need to be run every frame that can cause heavy wait times for the function here.
 {
-	
+
 }
 
-void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and call this again regardless of the specified wakeAt time.
+void Run() //Put functions that don't really need to be run every frame that can cause heavy wait times for the function here.
+ //Only call WAIT(0) here. The Tick() function will ignore wakeAt and call this again regardless of the specified wakeAt time.
 {
 #ifdef __DEBUG
 	static bool bQuit, F12 = false;
@@ -428,15 +285,15 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 					}
 
 					//kill selected player by explosion
-					if (GetAsyncKeyState(VK_NUMPAD1) & 0x8000)
+					if (IsKeyPressed(VK_NUMPAD1))
 					{
 						//if controll is pressed, selected player will kill people around him.
-						if (GetAsyncKeyState(VK_RCONTROL) & 0x8000)
+						if (IsKeyPressed(VK_RCONTROL))
 						{
 							FrameSelectedPlayer(selectedPed);
 							drawNotification(GetPlayerName(selectedPlayer) + " framed!");
 						}
-						else if (GetAsyncKeyState(VK_LMENU) & 0x8000)
+						else if (IsKeyPressed(VK_LMENU))
 						{
 							for (Player playerIterator = 0; playerIterator < 31; playerIterator++)
 							{
@@ -459,14 +316,14 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 						Vehicle clonedVeh = ClonePedVehicle(selectedPed);
 						BoostBaseVehicleStats(clonedVeh); //Gotta go fast
 						WAIT(0); //We need to wait for the game to assign a random radio station to the car first before changing it.
-						AUDIO::SET_VEH_RADIO_STATION(playerVeh, radioNames[RADIO_SELFRADIO]);
+						AUDIO::SET_VEH_RADIO_STATION(playerVeh, AUDIO::GET_RADIO_STATION_NAME(RADIO_SELFRADIO));
 						drawNotification("Vehicle cloned");
 					}
 
 					//remove all weapons
 					if (isKeyPressedOnce(bNumpad3Pressed, VK_NUMPAD3))
 					{
-						if (GetAsyncKeyState(VK_LMENU) & 0x8000)
+						if (IsKeyPressed(VK_LMENU))
 						{
 							for (Player playerIterator = 0; playerIterator < 31; playerIterator++)
 							{
@@ -498,7 +355,7 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 						if (bSpectateMode){
 							drawNotification("Stopping Spectate");
 							AI::CLEAR_PED_TASKS(playerPed);
-							SpectateMode(false,selectedPed);
+							SpectateMode(false, selectedPed);
 						}
 						else if (!bSpectateMode) {
 							drawNotification("Spectating");
@@ -512,11 +369,11 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 					/*
 					if (isKeyPressedOnce(bNumpad5Pressed, VK_NUMPAD5))
 					{
-						bFlowerPowerActive = !bFlowerPowerActive;
+					bFlowerPowerActive = !bFlowerPowerActive;
 					}
 					if (bFlowerPowerActive)
 					{
-						FlowerPower(selectedPed);
+					FlowerPower(selectedPed);
 					}
 					*/
 
@@ -525,7 +382,7 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 					if (isKeyPressedOnce(bNumpad6Pressed, VK_NUMPAD6))
 					{
 						//all players or just 1?
-						if (GetAsyncKeyState(VK_LMENU) & 0x8000)
+						if (IsKeyPressed(VK_LMENU))
 						{
 							for (Player playerIterator = 0; playerIterator < 31; playerIterator++)
 							{
@@ -553,7 +410,7 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 					if (isKeyPressedOnce(bNumpad8Pressed, VK_NUMPAD8))
 					{
 						//all players or just 1?
-						if (GetAsyncKeyState(VK_LMENU) & 0x8000)
+						if (IsKeyPressed(VK_LMENU))
 						{
 							for (Player playerIterator = 0; playerIterator < 31; playerIterator++)
 							{
@@ -567,29 +424,29 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 							drawNotification(GetPlayerName(selectedPlayer) + " dumped from vehicle");
 						}
 					}
-					
+
 					static bool bNumpad9Pressed = false;
 					if (isKeyPressedOnce(bNumpad9Pressed, VK_NUMPAD9))
 					{
 						SpawnPedMoney(selectedPed);
 					}
-					
+
 
 					//switch for moneydrop
 					/*
 					if (isKeyPressedOnce(bSubtractPressed, VK_SUBTRACT))
 					{
-						if (bMoneyDropActive){
-							drawNotification("Stopping moneydrop");
-						}
-						else if (bMoneyDropActive) {
-							drawNotification("And the rain of the moneyzbagz started!" + GetPlayerName(selectedPlayer) + " be rich and happy");
-						}
-						bMoneyDropActive = !bMoneyDropActive;
+					if (bMoneyDropActive){
+					drawNotification("Stopping moneydrop");
+					}
+					else if (bMoneyDropActive) {
+					drawNotification("And the rain of the moneyzbagz started!" + GetPlayerName(selectedPlayer) + " be rich and happy");
+					}
+					bMoneyDropActive = !bMoneyDropActive;
 					}
 					if (bMoneyDropActive)
 					{
-						DropMoneyonSelectedPlayer(selectedPed);
+					DropMoneyonSelectedPlayer(selectedPed);
 					}
 					*/
 
@@ -598,7 +455,7 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 					if (isKeyPressedOnce(bDividePressed, VK_DIVIDE))
 					{
 						//all players or just 1?
-						if (GetAsyncKeyState(VK_LMENU) & 0x8000)
+						if (IsKeyPressed(VK_LMENU))
 						{
 							for (Player playerIterator = 0; playerIterator < 31; playerIterator++)
 							{
@@ -621,202 +478,200 @@ void Run() //Only call WAIT(0) here. The Tick() function will ignore wakeAt and 
 						TeleporttoSelectedPlayerVehicle(playerPed, selectedPed);
 						drawNotification("Teleported to " + GetPlayerName(selectedPlayer) + "'s vehicle");
 					}
-					
-			}
-			else //every function without selecting a player
-			{
-				if (!bHackHidden){
-					//Hack modes for outside menu
-					draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 19);
-					draw_menu_line("F8			- Max ammo", menuWidth, 4.0f, menuTop + 13.0f * 3, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("F9			- Remove Junk", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("F10			- Hack Hidden", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, bHackHidden, false, bHackHidden, false);
-					draw_menu_line("Numpad.		- Repair Vehicle", menuWidth, 4.0f, menuTop + 13.0f * 6, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad0	- Teleport to waypoint", menuWidth, 4.0f, menuTop + 13.0f * 7, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad1		- Drive to waypoint", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad2	- Spawn Kuruma2", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad3	- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad4	- Police disabled", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, bPoliceIgnorePlayer, false, bPoliceIgnorePlayer, false);
-					draw_menu_line("Numpad5	- Kill speaking peasants", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, bKillSpeakers, false, bKillSpeakers, false);
-					draw_menu_line("Numpad6	- Enforce No-Flyzone", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad7	- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad8	- Get a driver", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f,false , false, false, false);
-					draw_menu_line("Numpad9	- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
-					draw_menu_line("Numpad+	- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 17, menuLeft, 5.0f, false, false, false, false);
-					draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 18, menuLeft, 5.0f, false, false, false, false);
-				}
 
-				static bool bNumpad1Pressed;
-				if (isKeyPressedOnce(bNumpad1Pressed, VK_NUMPAD1))
-				{
-					if ((driverPed != NULL) && (PED::IS_PED_ON_SPECIFIC_VEHICLE(driverPed,playerVeh)))
-						AIDrivetoWaypoint(driverPed);
-					else
-						AIDrivetoWaypoint(playerPed);
-					drawNotification("Driving to Waypoint");
 				}
-
-				//Spawn a test car.
-				static bool bNumpad2Pressed, bWaitingForModelCar = false;
-				if ((isKeyPressedOnce(bNumpad2Pressed, VK_NUMPAD2) || bWaitingForModelCar == true) && playerVeh == NULL)
+				else //every function without selecting a player
 				{
-					bWaitingForModelCar = SpawnPlayerCar(playerPed, bWaitingForModelCar);
-				}
-
-				//Spawn a test aircraft.
-				static bool bNumpad3Pressed, bWaitingForModelAircraft = false;
-				if (isKeyPressedOnce(bNumpad3Pressed, VK_NUMPAD3))
-				{
-					bWaitingForModelAircraft = SpawnPlayerAircraft(playerPed, bWaitingForModelAircraft);
-				}
-
-				//Police wont notice me
-				static bool bNumpad4Pressed = false;
-				if (isKeyPressedOnce(bNumpad4Pressed, VK_NUMPAD4))
-				{
-					bPoliceIgnorePlayer = !bPoliceIgnorePlayer;
-				}
-				
-				//kill all the speaking players
-				static bool bNumpad5Pressed = false;
-				if (isKeyPressedOnce(bNumpad5Pressed, VK_NUMPAD5))
-				{
-					if (bKillSpeakers){
-						drawNotification("Keep'n the talking peasants alive...");
+					if (!bHackHidden){
+						//Hack modes for outside menu
+						draw_rect_sc(menuTop, menuLeft, menuWidth, 13.0f * 19);
+						draw_menu_line("F8			- Max ammo", menuWidth, 4.0f, menuTop + 13.0f * 3, menuLeft, 5.0f, false, false, false, false);
+						draw_menu_line("F9			- Remove Junk", menuWidth, 4.0f, menuTop + 13.0f * 4, menuLeft, 5.0f, false, false, false, false);
+						draw_menu_line("F10			- Hack Hidden", menuWidth, 4.0f, menuTop + 13.0f * 5, menuLeft, 5.0f, bHackHidden, false, bHackHidden, false);
+						draw_menu_line("Numpad.		- Repair Vehicle", menuWidth, 4.0f, menuTop + 13.0f * 6, menuLeft, 5.0f, false, false, false, false);
+						draw_menu_line("Numpad0	- Teleport to waypoint", menuWidth, 4.0f, menuTop + 13.0f * 7, menuLeft, 5.0f, false, false, false, false);
+						draw_menu_line("Numpad1		- Drive to waypoint", menuWidth, 4.0f, menuTop + 13.0f * 8, menuLeft, 5.0f, false, false, false, false);
+						draw_menu_line("Numpad2	- Spawn Kuruma2", menuWidth, 4.0f, menuTop + 13.0f * 9, menuLeft, 5.0f, false, false, false, false);
+						draw_menu_line("Numpad3	- Spawn Vestra", menuWidth, 4.0f, menuTop + 13.0f * 10, menuLeft, 5.0f, false, false, false, false);
+						draw_menu_line("Numpad4	- Police disabled", menuWidth, 4.0f, menuTop + 13.0f * 11, menuLeft, 5.0f, bPoliceIgnorePlayer, false, bPoliceIgnorePlayer, false);
+						draw_menu_line("Numpad5	- Kill speaking peasants", menuWidth, 4.0f, menuTop + 13.0f * 12, menuLeft, 5.0f, bKillSpeakers, false, bKillSpeakers, false);
+						draw_menu_line("Numpad6	- Enforce No-Flyzone", menuWidth, 4.0f, menuTop + 13.0f * 13, menuLeft, 5.0f, false, false, false, false);
+						draw_menu_line("Numpad7	- Teleport to objective", menuWidth, 4.0f, menuTop + 13.0f * 14, menuLeft, 5.0f, false, false, false, false);
+						draw_menu_line("Numpad8	- Get a driver", menuWidth, 4.0f, menuTop + 13.0f * 15, menuLeft, 5.0f, false, false, false, false);
+						draw_menu_line("Numpad9	- Kill all targets on map", menuWidth, 4.0f, menuTop + 13.0f * 16, menuLeft, 5.0f, bKillTargetsActive, false, bKillTargetsActive, false);
+						draw_menu_line("Numpad+	- Increase wanted level", menuWidth, 4.0f, menuTop + 13.0f * 17, menuLeft, 5.0f, false, false, false, false);
+						draw_menu_line("Numpad*		- Remove wanted level", menuWidth, 4.0f, menuTop + 13.0f * 18, menuLeft, 5.0f, false, false, false, false);
 					}
-					else if (!bKillSpeakers) {
-						drawNotification("Killing those peasants");
+
+					static bool bNumpad1Pressed;
+					if (isKeyPressedOnce(bNumpad1Pressed, VK_NUMPAD1))
+					{
+						if ((driverPed != NULL) && (PED::IS_PED_ON_SPECIFIC_VEHICLE(driverPed, playerVeh)))
+							AIDrivetoWaypoint(driverPed);
+						else
+							AIDrivetoWaypoint(playerPed);
+						drawNotification("Driving to Waypoint");
 					}
-					bKillSpeakers = !bKillSpeakers;
-				}
-				if (bKillSpeakers) {
-					Player speakingPlayer = KillalltheSpeakingPlayers();
-					if (speakingPlayer != -1)
-						drawNotification(GetPlayerName(speakingPlayer) + " killed for speaking out loud");
-				}
 
-				// no fly zone
-				static bool bNumpad6Pressed = false;
-				if (isKeyPressedOnce(bNumpad6Pressed, VK_NUMPAD6))
-				{
-					drawNotification("Cleared Airspace of off " + std::to_string(ClearingTheSkiesofPlayers()) + " pilots");
-				}
-
-				//TP to mission objective.
-				static bool bNumpad7Pressed = false;
-				if (isKeyPressedOnce(bNumpad7Pressed, VK_NUMPAD7))
-				{
-					TeleporttoMissionObjective(playerPed, g_blipList);
-					drawNotification("Teleported to Mission objective");
-				}
-
-				static bool bNumpad8Pressed;
-				if (isKeyPressedOnce(bNumpad8Pressed, VK_NUMPAD8))
-				{
-					driverPed = getRandomPedToDrive();
-					if (driverPed != NULL)
-						drawNotification("Getting a new driver");
-				}
-
-				//Shoot all spaghettios (Fuck Deliver EMP)
-				static bool bNumpad9Pressed = false;
-				if (isKeyPressedOnce(bNumpad9Pressed, VK_NUMPAD9))
-				{
-					if (bKillTargetsActive){
-						drawNotification("Stopping masacre");
+					//Spawn a test car.
+					static bool bNumpad2Pressed, bWaitingForModelCar = false;
+					if ((isKeyPressedOnce(bNumpad2Pressed, VK_NUMPAD2) || bWaitingForModelCar == true) && playerVeh == NULL)
+					{
+						bWaitingForModelCar = SpawnPlayerCar(playerPed, bWaitingForModelCar);
 					}
-					else if (!bKillTargetsActive) {
-						drawNotification("Starting killing spree");
+
+					//Spawn a test aircraft.
+					static bool bNumpad3Pressed, bWaitingForModelAircraft = false;
+					if (isKeyPressedOnce(bNumpad3Pressed, VK_NUMPAD3))
+					{
+						bWaitingForModelAircraft = SpawnPlayerAircraft(playerPed, bWaitingForModelAircraft);
 					}
-					bKillTargetsActive = !bKillTargetsActive;
-				}
 
-				//Teleport to waypoint.
-				static bool bNumpad0Pressed = false;
-				static int teleportIteratrions = -1;
-				if (isKeyPressedOnce(bNumpad0Pressed, VK_NUMPAD0) || teleportIteratrions > -1)
+					//Police wont notice me
+					static bool bNumpad4Pressed = false;
+					if (isKeyPressedOnce(bNumpad4Pressed, VK_NUMPAD4))
+					{
+						bPoliceIgnorePlayer = !bPoliceIgnorePlayer;
+					}
+
+					//kill all the speaking players
+					static bool bNumpad5Pressed = false;
+					if (isKeyPressedOnce(bNumpad5Pressed, VK_NUMPAD5))
+					{
+						if (bKillSpeakers){
+							drawNotification("Keep'n the talking peasants alive...");
+						}
+						else if (!bKillSpeakers) {
+							drawNotification("Killing those peasants");
+						}
+						bKillSpeakers = !bKillSpeakers;
+					}
+					if (bKillSpeakers) {
+						Player speakingPlayer = KillalltheSpeakingPlayers();
+						if (speakingPlayer != -1)
+							drawNotification(GetPlayerName(speakingPlayer) + " killed for speaking out loud");
+					}
+
+					// no fly zone
+					static bool bNumpad6Pressed = false;
+					if (isKeyPressedOnce(bNumpad6Pressed, VK_NUMPAD6))
+					{
+						drawNotification("Cleared Airspace of off " + std::to_string(ClearingTheSkiesofPlayers()) + " pilots");
+					}
+
+					//TP to mission objective.
+					static bool bNumpad7Pressed = false;
+					if (isKeyPressedOnce(bNumpad7Pressed, VK_NUMPAD7))
+					{
+						TeleporttoMissionObjective(playerPed, pBlipList);
+						drawNotification("Teleported to Mission objective");
+					}
+
+					static bool bNumpad8Pressed;
+					if (isKeyPressedOnce(bNumpad8Pressed, VK_NUMPAD8))
+					{
+						driverPed = getRandomPedToDrive();
+						if (driverPed != NULL)
+							drawNotification("Getting a new driver");
+					}
+
+					//Shoot all spaghettios (Fuck Deliver EMP)
+					static bool bNumpad9Pressed = false;
+					if (isKeyPressedOnce(bNumpad9Pressed, VK_NUMPAD9))
+					{
+						if (bKillTargetsActive){
+							drawNotification("Stopping masacre");
+						}
+						else if (!bKillTargetsActive) {
+							drawNotification("Starting killing spree");
+						}
+						bKillTargetsActive = !bKillTargetsActive;
+					}
+
+					//Teleport to waypoint.
+					static bool bNumpad0Pressed = false;
+					static int teleportIteratrions = -1;
+					if (isKeyPressedOnce(bNumpad0Pressed, VK_NUMPAD0))
+					{
+						TeleporttoWaypoint(playerPed);
+						drawNotification("Teleported to waypoint");
+					}
+
+					//Fix player.
+					static bool bDecimalPressed = false;
+					if (isKeyPressedOnce(bDecimalPressed, VK_DECIMAL))
+					{
+						FixPlayer(playerPed);
+						drawNotification("Player fixed");
+					}
+
+				}// end of menu
+
+				//Force full reload animation on weapon. If you want a quicker reload, just quickly tap R. The 0x1 state seems to be time sensitive.
+				if (IsKeyPressed(0x52))
 				{
-					teleportIteratrions = TeleporttoWaypoint(playerPed, teleportIteratrions);
-					drawNotification("Teleported to waypoint");
+					FastReload(playerPed);
 				}
 
-				//Fix player.
-				static bool bDecimalPressed = false;
-				if (isKeyPressedOnce(bDecimalPressed, VK_DECIMAL))
+				//Increase wanted level.
+				static bool bAddPressed = false;
+				if (isKeyPressedOnce(bAddPressed, VK_ADD))
 				{
-					FixPlayer(playerPed);
-					drawNotification("Player fixed");
+					IncreaseWantedLevel(player);
 				}
 
-			}// end of menu
+				//Clear Wanted Level
+				if (IsKeyPressed(VK_MULTIPLY))
+				{
+					ClearWantedLevel(player);
+				}
 
-			//Force full reload animation on weapon. If you want a quicker reload, just quickly tap R. The 0x1 state seems to be time sensitive.
-			if (GetAsyncKeyState(0x52) & 0x1)
-			{
-				FastReload(playerPed);
-			}
+				//switch for godmode
+				static bool bF7Pressed = false;
+				if (isKeyPressedOnce(bF7Pressed, VK_F7))
+				{
+					bGodmodeActive = !bGodmodeActive;
+				}
 
-			//Increase wanted level.
-			static bool bAddPressed = false;
-			if (isKeyPressedOnce(bAddPressed, VK_ADD))
-			{
-				IncreaseWantedLevel(player);
-			}
+				static bool F8Pressed = false;
+				if (isKeyPressedOnce(F8Pressed, VK_F8))
+				{
+					ReplenishAmmo(playerPed);
+					drawNotification("Got maximum ammo");
+				}
 
-			//Clear Wanted Level
-			if (GetAsyncKeyState(VK_MULTIPLY) & 0x8000)
-			{
-				ClearWantedLevel(player);
-			}
-
-			//switch for godmode
-			static bool bF7Pressed = false;
-			if (isKeyPressedOnce(bF7Pressed, VK_F7))
-			{
-				bGodmodeActive = !bGodmodeActive;
-			}
-
-			static bool F8Pressed = false;
-			if (isKeyPressedOnce(F8Pressed, VK_F8))
-			{
-				ReplenishAmmo(playerPed);				
-				drawNotification("Got maximum ammo");
-			}
-
-			static bool F9Pressed = false;
-			if (isKeyPressedOnce(F9Pressed, VK_F9))
-			{
-				RemoveAllPropsFromPlayer(playerPed);
-				drawNotification("Removed attached junk");
-			}
+				static bool F9Pressed = false;
+				if (isKeyPressedOnce(F9Pressed, VK_F9))
+				{
+					RemoveAllPropsFromPlayer(playerPed);
+					drawNotification("Removed attached junk");
+				}
 		}
 	}
 
 	/*
 	a couple of functions that need to run each tick
 	*/
-
-	//moneyfountain action
-	MoneyFountain(bMoneyFountainActive);
-
 	//kill all targets active
-	KillAllTargets(playerPed, g_blipList, bKillTargetsActive);
+	KillAllTargets(playerPed, pBlipList, bKillTargetsActive);
 
 	//police ignore player
-	bPoliceIgnoreSwitchSet = PoliceIgnorePlayer(player, bPoliceIgnorePlayer, bPoliceIgnoreSwitchSet);
+	PoliceIgnorePlayer(player, bPoliceIgnorePlayer);
 	EnableRestrictedZones(!bPoliceIgnoreSwitchSet);
 
 	//Godmode
-	bGodmodeSwitchset = GodMode(player, playerPed, bGodmodeActive, bGodmodeSwitchset);
+	GodMode(player, playerPed, bGodmodeActive);
 
-	if (!(driverPed == NULL) && PED::_IS_PED_DEAD(driverPed, true))
+	SetRadio();
+
+	if (!(driverPed == NULL) && PED::IS_PED_DEAD_OR_DYING(driverPed, true))
 		driverPed = NULL;
 
 	return;
 }
-
-bool AttemptScriptHook() {
-	rage::pgPtrCollection<GtaThread>* threadCollection = GetGtaThreadCollection();
+bool AttemptScriptHook()
+{
+	rage::pgPtrCollection<GtaThread>* threadCollection = GetGtaThreadCollection(pBlipList);
 
 	if (!threadCollection) {
 		return false;
@@ -829,7 +684,7 @@ bool AttemptScriptHook() {
 			continue;
 
 		//s0biet originally had some junk thread that was called for like 2 seconds then died. This thread is better.
-		if (pThread->GetContext()->ScriptHash != 0x5700179C) {
+		if (pThread->GetContext()->ScriptHash != 0x5700179C) { //MAIN_PERSISTANT?
 			continue;
 		}
 
@@ -856,23 +711,9 @@ DWORD WINAPI lpHookScript(LPVOID lpParam) {
 		Sleep(100);
 	}
 
-	return 0; //We no longer need the lpHookScript thread because our new_Run function will now be the hip and or hop hang out spot for the KewlKidzKlub®.
+	return 0; //We no longer need the lpHookScript thread because our Trampoline function will now be the hip and or hop hang out spot for the KewlKidzKlub®.
 }
 
 void SpawnScriptHook() {
 	CreateThread(0, 0, lpHookScript, 0, 0, 0);
-}
-
-void BypassOnlineModelRequestBlock() {
-	DWORD64 dwGetModelTableFunctionAddress = Pattern::Scan(g_MainModuleInfo, "48 8B C8 FF 52 30 84 C0 74 05 48");
-	if (dwGetModelTableFunctionAddress != NULL)
-		*(unsigned short*)(dwGetModelTableFunctionAddress + 0x8) = 0x9090;
-	else
-		{
-		#ifndef __DEBUG
-				Log::Error("Failed to find model table signature");
-		#else
-				Log::Debug("Failed to find model table signature");
-		#endif
-		}
 }

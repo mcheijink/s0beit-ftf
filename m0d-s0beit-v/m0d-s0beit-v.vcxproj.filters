@@ -77,6 +77,18 @@
     <ClInclude Include="natives.h">
       <Filter>Header Files\Script</Filter>
     </ClInclude>
+    <ClInclude Include="RAGEHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\ConcurrencySal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RadioScripts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StatScripts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -107,6 +119,15 @@
       <Filter>Source Files\Functions</Filter>
     </ClCompile>
     <ClCompile Include="Functions\WorldFunctions.cpp">
+      <Filter>Source Files\Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="RadioHelper.cpp">
+      <Filter>Source Files\Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="RAGEHelper.cpp">
+      <Filter>Source Files\Functions</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyHelper.cpp">
       <Filter>Source Files\Functions</Filter>
     </ClCompile>
   </ItemGroup>

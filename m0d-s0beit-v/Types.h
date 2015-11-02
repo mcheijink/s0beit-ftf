@@ -25,8 +25,11 @@ typedef int Camera;
 typedef int TaskSequence;
 typedef int ColourIndex;
 typedef int Sphere;
+typedef int Blip;
 
-class Blip
+#define MAX_PLAYERS 31
+
+struct Blip_t
 {
 public:
 	__int32 iID; //0x0000 
@@ -54,14 +57,14 @@ public:
 	BYTE bAlpha; //0x0059
 };//Size=0x005A
 
-class BlipEntry
+struct BlipEntry
 {
 public:
-	Blip* m_pBlip; //0x0000 
+	Blip_t* m_pBlip; //0x0000 
 
 };//Size=0x0008
 
-class BlipList
+struct BlipList
 {
 public:
 	BlipEntry m_Blips[1500]; //0x0000 
@@ -220,7 +223,8 @@ enum BlipIcons
 	BLIP_JET2 = 424,
 	BLIP_INSURGENT = 426,
 	BLIP_BOAT = 427,
-	BLIP_HEISTSROOM = 428
+	BLIP_HEISTSROOM = 428,
+	BLIP_DOLLARSIGN = 431,
 };
 
 enum BlipColors
@@ -235,7 +239,9 @@ enum BlipColors
 	BLIPCOLOR_MICHAEL = 0x2A,
 	BLIPCOLOR_FRANKLIN = 0x2B,
 	BLIPCOLOR_TREAVOR = 0x2C,
+	BLIPCOLOR_REDMISSION = 0x31,
 	BLIPCOLOR_MISSIONVEHICLE = 0x36,
+	BLIPCOLOR_YELLOWMISSION2 = 0x3C,
 	BLIPCOLOR_MISSION = 0x42,
 	BLIPCOLOR_WAYPOINT = 0x53
 };
@@ -304,7 +310,6 @@ enum RadioStationIndexes
 	RADIO_HIDDENRADIOAMBIENTTV,
 	RADIO_OFF
 };
-
 enum BoneTypes
 {
 	SKEL_ROOT = 0x0,

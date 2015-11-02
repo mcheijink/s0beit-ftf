@@ -20,10 +20,15 @@
 #include <iostream>
 #include <fstream>
 #include <timeapi.h>
+#include <time.h>
 
 #pragma comment(lib, "winmm.lib")
 
 extern MODULEINFO g_MainModuleInfo;
+
+// Mine
+#include "Log.h"
+#include "Pattern.h"
 
 // Mine
 #include "Log.h"
@@ -36,17 +41,22 @@ extern MODULEINFO g_MainModuleInfo;
 #include "Hashes.h"
 #include "VehicleValues.h"
 #include "natives.h"
+#include "RAGEHelper.h"
+#include "StatScripts.h"
+#include "KeyHelper.h"
+#include "RadioScripts.h"
+
 
 // Main
 #include "script.h"
-
 #include "Functions\PlayerFunctions.h"
 #include "Functions\UIFunctions.h"
 #include "Functions\VehicleFunctions.h"
 #include "Functions\WeaponFunctions.h"
 #include "Functions\WorldFunctions.h"
 
-#define version 1301
+
+#define version 1303
 
 void Tick();
 void Run();

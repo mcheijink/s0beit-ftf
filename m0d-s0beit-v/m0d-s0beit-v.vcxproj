@@ -30,7 +30,7 @@
     <ProjectGuid>{8CB71C14-85EF-4E5B-B7A9-4537999AA7BC}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>m0ds0beitv</RootNamespace>
-    <ProjectName>m0d-s0beitftf-build 1301</ProjectName>
+    <ProjectName>m0d-s0beitftf-build 1303</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -199,6 +199,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\ConcurrencySal.h" />
     <ClInclude Include="Functions\PlayerFunctions.h" />
     <ClInclude Include="Functions\UIFunctions.h" />
     <ClInclude Include="Functions\VehicleFunctions.h" />
@@ -209,8 +210,11 @@
     <ClInclude Include="natives.h" />
     <ClInclude Include="Pattern.h" />
     <ClInclude Include="pgCollection.h" />
+    <ClInclude Include="RadioScripts.h" />
+    <ClInclude Include="RAGEHelper.h" />
     <ClInclude Include="script.h" />
     <ClInclude Include="scrThread.h" />
+    <ClInclude Include="StatScripts.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="vehicleValues.h" />
@@ -241,7 +245,10 @@
     <ClCompile Include="Functions\VehicleFunctions.cpp" />
     <ClCompile Include="Functions\WeaponFunctions.cpp" />
     <ClCompile Include="Functions\WorldFunctions.cpp" />
+    <ClCompile Include="KeyHelper.cpp" />
     <ClCompile Include="Log.cpp" />
+    <ClCompile Include="RadioHelper.cpp" />
+    <ClCompile Include="RAGEHelper.cpp" />
     <ClCompile Include="script.cpp" />
     <ClCompile Include="scrThread.cpp" />
     <ClCompile Include="stdafx.cpp">
