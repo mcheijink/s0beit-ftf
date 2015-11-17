@@ -72,37 +72,21 @@ void TeleporttoSelectedPlayer(Ped playerPed, Ped selectedPed)
 void DropMoneyonSelectedPlayer(Ped moneyPlayer)
 {
 	//Emulated am_cr_securityvan money drop script.
-	if (moneyPlayer != -1)
-	{
-		Ped moneyPed = PLAYER::GET_PLAYER_PED(moneyPlayer);
-		if (ENTITY::DOES_ENTITY_EXIST(moneyPed) && !(PED::IS_PED_IN_ANY_VEHICLE(moneyPed, TRUE)))
+		STREAMING::REQUEST_MODEL(PROP_MONEY_BAG_01);
+		while (!STREAMING::HAS_MODEL_LOADED(PROP_MONEY_BAG_01))
+			WAIT(0);
+		if (STREAMING::HAS_MODEL_LOADED(PROP_MONEY_BAG_01))
 		{
-			static DWORD time = 0;
-			if ((timeGetTime() - time) > 2500)
+			int numBags = GAMEPLAY::GET_RANDOM_INT_IN_RANGE(2, 6);
+			int cashMoneyBaby = (GAMEPLAY::GET_RANDOM_INT_IN_RANGE(4000, 12001) / numBags);
+			cashMoneyBaby = (int)round(cashMoneyBaby);
+			for (int i = 0; i < numBags; i++)
 			{
-				STREAMING::REQUEST_MODEL(PROP_MONEY_BAG_01);
-				if (!STREAMING::HAS_MODEL_LOADED(PROP_MONEY_BAG_01))
-					WAIT(0);
-				else
-				{
-					int numBags = GAMEPLAY::GET_RANDOM_INT_IN_RANGE(2, 6);
-					int cashMoneyBaby = (GAMEPLAY::GET_RANDOM_INT_IN_RANGE(4000, 12001) / numBags);
-					cashMoneyBaby = (int)round(cashMoneyBaby);
-					for (int i = 0; i < numBags; i++)
-					{
-						Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(moneyPed, FALSE);
-						OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, playerPosition.x, playerPosition.y, playerPosition.z + 0.5f, 0, cashMoneyBaby, PROP_MONEY_BAG_01, FALSE, TRUE);
-					}
-					STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(PROP_MONEY_BAG_01);
-					time = timeGetTime();
-				}
+				Vector3 playerPosition = ENTITY::GET_ENTITY_COORDS(moneyPlayer, FALSE);
+				OBJECT::CREATE_AMBIENT_PICKUP(PICKUP_MONEY_CASE, playerPosition.x, playerPosition.y, playerPosition.z + 0.5f, 0, cashMoneyBaby, PROP_MONEY_BAG_01, FALSE, TRUE);
 			}
+			STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(PROP_MONEY_BAG_01);
 		}
-	}
-	else
-	{
-		moneyPlayer = -1;
-	}
 }
 
 void TeleportSelectedPlayertoAlamosSea(Ped selectedPed)

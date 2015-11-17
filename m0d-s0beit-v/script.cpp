@@ -433,7 +433,7 @@ void Run() //Put functions that don't really need to be run every frame that can
 
 
 					//switch for moneydrop
-					/*
+					
 					if (isKeyPressedOnce(bSubtractPressed, VK_SUBTRACT))
 					{
 					if (bMoneyDropActive){
@@ -448,7 +448,7 @@ void Run() //Put functions that don't really need to be run every frame that can
 					{
 					DropMoneyonSelectedPlayer(selectedPed);
 					}
-					*/
+					
 
 					//Give all weapons to selected player
 					static bool bDividePressed = false;
@@ -662,7 +662,8 @@ void Run() //Put functions that don't really need to be run every frame that can
 	//Godmode
 	GodMode(player, playerPed, bGodmodeActive);
 
-	SetRadio();
+	//SetRadio();
+	//AntiCrash();
 
 	if (!(driverPed == NULL) && PED::IS_PED_DEAD_OR_DYING(driverPed, true))
 		driverPed = NULL;

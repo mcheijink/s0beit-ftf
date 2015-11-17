@@ -56,7 +56,7 @@ extern MODULEINFO g_MainModuleInfo;
 #include "Functions\WorldFunctions.h"
 
 
-#define version 1303
+#define version 1305
 
 void Tick();
 void Run();

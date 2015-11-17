@@ -12,11 +12,12 @@ void BoostBaseVehicleStats(Vehicle vehicle)
 	VEHICLE::SET_VEHICLE_ENGINE_CAN_DEGRADE(vehicle, !IsRCtrlUp);
 	VEHICLE::SET_VEHICLE_IS_STOLEN(vehicle, FALSE); //What seems to be the officer, problem? *le9gagmemeface*
 	VEHICLE::SET_VEHICLE_TYRES_CAN_BURST(vehicle, FALSE); //Bulletproof Tires.
-	Player player = PLAYER::PLAYER_ID();
+	/*Niemand kan meer in de auto, is wat onhandig*/
+	/*Player player = PLAYER::PLAYER_ID();
 	DECORATOR::DECOR_REGISTER("Player_Vehicle", 3);
 	DECORATOR::DECOR_REGISTER("Veh_Modded_By_Player", 3);
 	DECORATOR::DECOR_SET_INT(vehicle, "Player_Vehicle", NETWORK::_0xBC1D768F2F5D6C05(player));
-	DECORATOR::DECOR_SET_INT(vehicle, "Veh_Modded_By_Player", GAMEPLAY::GET_HASH_KEY(PLAYER::GET_PLAYER_NAME(player)));
+	DECORATOR::DECOR_SET_INT(vehicle, "Veh_Modded_By_Player", GAMEPLAY::GET_HASH_KEY(PLAYER::GET_PLAYER_NAME(player)));*/
 	Hash vehicleModel = ENTITY::GET_ENTITY_MODEL(vehicle);
 	if (VEHICLE::IS_THIS_MODEL_A_CAR(vehicleModel) || VEHICLE::IS_THIS_MODEL_A_BIKE(vehicleModel))
 	{
